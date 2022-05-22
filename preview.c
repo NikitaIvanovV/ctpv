@@ -143,12 +143,17 @@ static Preview *find_by_mimetype(char const *mimetype)
     return NULL;
 }
 
-Preview *find_preview(char const *ext, char const *mimetype)
+static void check_init_previews(void)
 {
     if (!sorted_by_ext || !sorted_by_mimetype) {
         print_error("init_previews() not called");
         abort();
     }
+}
+
+Preview *find_preview(char const *ext, char const *mimetype)
+{
+    check_init_previews();
 
     Preview *ret = NULL;
     if (mimetype)
@@ -182,4 +187,11 @@ int run_preview(Preview *p, PreviewArgs *pa)
         printf("error: preview exited with code: %d\n", exitcode);
 
     return ret;
+}
+
+Preview **get_previews_list(size_t *len)
+{
+    check_init_previews();
+    *len = prevs_length;
+    return sorted_by_mimetype;
 }

@@ -9,11 +9,19 @@
 #include "utils.h"
 #include "previews.h"
 
+#define ANY_TYPE "*"
+
+static const char any_type[] = ANY_TYPE;
+
 static magic_t magic;
 
 static struct {
-    int server;
-} ctpv;
+    enum {
+        MODE_PREVIEW,
+        MODE_SERVER,
+        MODE_LIST,
+    } mode;
+} ctpv = { MODE_PREVIEW };
 
 static void cleanup(void) {
     cleanup_previews();
@@ -29,6 +37,11 @@ static int init_magic() {
                magic_error(magic));
 
     return OK;
+}
+
+static void init_previews_v(void)
+{
+    init_previews(previews, LEN(previews));
 }
 
 static const char *get_mimetype(char const *path) {
@@ -49,15 +62,9 @@ static const char *get_ext(char const *path) {
     return &r[1];
 }
 
-static int server(void)
-{
-    /* TODO */ 
-    return OK;
-}
-
 #define GET_PARG(a, i) (a) = argc > (i) ? argv[i] : NULL
 
-static int client(int argc, char *argv[])
+static int preview(int argc, char *argv[])
 {
     char *f, *w, *h, *x, *y;
     GET_PARG(f, 0);
@@ -72,7 +79,7 @@ static int client(int argc, char *argv[])
 
     ERRCHK_RET_OK(init_magic());
 
-    init_previews(previews, LEN(previews));
+    init_previews_v();
 
     const char *mimetype = get_mimetype(f);
     ERRCHK_RET(!mimetype);
@@ -90,15 +97,53 @@ static int client(int argc, char *argv[])
     return OK;
 }
 
+static int server(void)
+{
+    /* TODO */
+    return OK;
+}
+
+static int list(void)
+{
+    init_previews_v();
+
+    size_t len;
+    Preview p, **list = get_previews_list(&len);
+    const char *t, *s;
+
+    puts("List of available previews:");
+
+    for (size_t i = 0; i < len; i++) {
+        p = *list[i];
+        t = p.type;
+        s = p.subtype;
+
+        if (!t) {
+            t = any_type;
+            s = any_type;
+        } else if (!s) {
+            s = any_type;
+        }
+
+        printf("\t%s/%s\n", t, s);
+    }
+
+    puts("\nNote: '" ANY_TYPE "' means that it matches any mimetype.");
+    return OK;
+}
+
 int main(int argc, char *argv[])
 {
     program = argc > 0 ? argv[0] : "ctpv";
 
     int c;
-    while ((c = getopt(argc, argv, "s")) != -1) {
+    while ((c = getopt(argc, argv, "sl")) != -1) {
         switch (c) {
         case 's':
-            ctpv.server = 1;
+            ctpv.mode = MODE_SERVER;
+            break;
+        case 'l':
+            ctpv.mode = MODE_LIST;
             break;
         default:
             return EXIT_FAILURE;
@@ -106,10 +151,21 @@ int main(int argc, char *argv[])
     }
 
     int ret;
-    if (ctpv.server)
-        ret = server();
-    else
-        ret = client(argc, &argv[optind]);
+    switch (ctpv.mode) {
+        case MODE_PREVIEW:
+            ret = preview(argc, &argv[optind]);
+            break;
+        case MODE_SERVER:
+            ret = server();
+            break;
+        case MODE_LIST:
+            ret = list();
+            break;
+        default:
+            print_errorf("unknowm mode: %d", ctpv.mode);
+            ret = ERR;
+            break;
+    }
 
     cleanup();
 
