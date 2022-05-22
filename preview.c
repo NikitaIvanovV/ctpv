@@ -32,21 +32,24 @@ static int cmp_prev_mimetype(const void *p1, const void *p2)
     Preview *pr1 = *(Preview **)p1;
     Preview *pr2 = *(Preview **)p2;
 
-    if (pr1->type[0] == '\0')
+    if (!pr1->type && pr2->type)
         return 1;
-    else if (pr2->type[0] == '\0')
+    else if (pr1->type && !pr2->type)
+        return -1;
+    else if (!pr1->type && !pr2->type)
+        return 0;
+
+    if (!pr1->subtype && pr2->subtype)
+        return 1;
+    else if (pr1->subtype && !pr2->subtype)
         return -1;
 
-    if (!pr1->subtype && pr2->subtype) {
-        return 1;
-    } else if (pr1->subtype && !pr2->subtype) {
-        return -1;
-    } else {
-        int ret = strcmp(pr1->type, pr2->type);
-        if (ret == 0 && pr1->subtype && pr2->subtype)
-            return strcmp(pr1->subtype, pr2->subtype);
-        return ret;
-    }
+    int ret = strcmp(pr1->type, pr2->type);
+
+    if (ret == 0 && pr1->subtype && pr2->subtype)
+        return strcmp(pr1->subtype, pr2->subtype);
+
+    return ret;
 }
 
 void init_previews(Preview *ps, size_t len)
@@ -66,6 +69,9 @@ void init_previews(Preview *ps, size_t len)
 
     qsort(sorted_by_ext,      len, PREVP_SIZE, cmp_prev_ext);
     qsort(sorted_by_mimetype, len, PREVP_SIZE, cmp_prev_mimetype);
+
+    /* for (size_t i = 0; i < len; i++) */
+    /*     printf("%s %s\n", sorted_by_mimetype[i]->type, sorted_by_mimetype[i]->subtype); */
 }
 
 void cleanup_previews(void)
@@ -121,14 +127,17 @@ static Preview *find_by_mimetype(char const *mimetype)
     for (size_t i = 0; i < prevs_length; i++) {
         p = sorted_by_mimetype[i];
 
-        if (strcmp(t, p->type) == 0) {
-            if (p->subtype) {
-                if (strcmp(s, p->subtype) == 0)
-                    return p;
-            } else {
-                return p;
-            }
-        }
+        if (!p->type)
+            return p;
+
+        if (strcmp(t, p->type) != 0)
+            continue;
+
+        if (!p->subtype)
+            return p;
+
+        if (strcmp(s, p->subtype) == 0)
+            return p;
     }
 
     return NULL;
