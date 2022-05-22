@@ -1,0 +1,5 @@
+*.o
+*.d
+/gen/
+/ctpv
+/embed/embed
