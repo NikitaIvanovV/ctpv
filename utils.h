@@ -23,7 +23,7 @@ typedef struct {
 
 extern char *program;
 
-int spawn(char *args[], pid_t *cpid, int *exitcode);
+int spawn(char *args[], pid_t *cpid, int *exitcode, int *fds[2]);
 
 CharVec char_v_new(size_t cap);
 void char_v_append(CharVec *v, char c);

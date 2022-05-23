@@ -20,6 +20,7 @@ static struct {
         MODE_PREVIEW,
         MODE_SERVER,
         MODE_LIST,
+        MODE_MIME,
     } mode;
 } ctpv = { MODE_PREVIEW };
 
@@ -29,9 +30,10 @@ static void cleanup(void) {
         magic_close(magic);
 }
 
-static int init_magic() {
-    magic = magic_open(MAGIC_MIME_TYPE);
-    ERRCHK_RET(!magic, "magic_open() failed");
+static int init_magic()
+{
+    ERRCHK_RET(!(magic = magic_open(MAGIC_MIME_TYPE)),
+               "magic_open() failed: %s", magic_error(magic));
 
     ERRCHK_RET(magic_load(magic, NULL) != 0, "magic_load() failed: %s",
                magic_error(magic));
@@ -44,7 +46,8 @@ static void init_previews_v(void)
     init_previews(previews, LEN(previews));
 }
 
-static const char *get_mimetype(char const *path) {
+static const char *get_mimetype(char const *path)
+{
     const char *r = magic_file(magic, path);
     if (!r) {
         print_errorf("magic_file() failed: %s", magic_error(magic));
@@ -54,12 +57,26 @@ static const char *get_mimetype(char const *path) {
     return r;
 }
 
-static const char *get_ext(char const *path) {
-    const char *r = strrchr(path, '.');
-    if (!r)
+static const char *get_ext(char const *path)
+{
+    const char *dot = strrchr(path, '.');
+    if (!dot)
         return NULL;
 
-    return &r[1];
+    const char *slash = strrchr(path, '/');
+    if (slash && dot < slash)
+        return NULL;
+
+    return &dot[1];
+}
+
+static int check_file(char const *f)
+{
+    ERRCHK_RET(!f, "file not given");
+    ERRCHK_RET(access(f, R_OK) != 0, "failed to access '%s': %s", f,
+               strerror(errno));
+
+    return OK;
 }
 
 #define GET_PARG(a, i) (a) = argc > (i) ? argv[i] : NULL
@@ -73,9 +90,7 @@ static int preview(int argc, char *argv[])
     GET_PARG(x, 3);
     GET_PARG(y, 4);
 
-    ERRCHK_RET(!f, "file not given");
-    ERRCHK_RET(access(f, R_OK) != 0, "failed to access '%s': %s", f,
-               strerror(errno));
+    ERRCHK_RET_OK(check_file(f));
 
     ERRCHK_RET_OK(init_magic());
 
@@ -84,15 +99,9 @@ static int preview(int argc, char *argv[])
     const char *mimetype = get_mimetype(f);
     ERRCHK_RET(!mimetype);
 
-    Preview *p = find_preview(get_ext(f), mimetype);
-    if (!p) {
-        puts("no preview found");
-        return OK;
-    }
-
     PreviewArgs args = { .f = f, .w = w, .h = h, .x = x, .y = y };
 
-    ERRCHK_RET_OK(run_preview(p, &args));
+    ERRCHK_RET_OK(run_preview(get_ext(f), mimetype, &args));
 
     return OK;
 }
@@ -132,12 +141,34 @@ static int list(void)
     return OK;
 }
 
+static int mime(int argc, char *argv[])
+{
+    char const *f, *mimetype;
+
+    for (int i = 0; i < argc; i++) {
+        f = argv[i];
+        ERRCHK_RET_OK(check_file(f));
+
+        ERRCHK_RET_OK(init_magic());
+
+        mimetype = get_mimetype(f);
+        ERRCHK_RET(!mimetype);
+
+        if (argc > 1)
+            printf("%s: ", f);
+
+        puts(mimetype);
+    }
+
+    return OK;
+}
+
 int main(int argc, char *argv[])
 {
     program = argc > 0 ? argv[0] : "ctpv";
 
     int c;
-    while ((c = getopt(argc, argv, "sl")) != -1) {
+    while ((c = getopt(argc, argv, "slm")) != -1) {
         switch (c) {
         case 's':
             ctpv.mode = MODE_SERVER;
@@ -145,21 +176,30 @@ int main(int argc, char *argv[])
         case 'l':
             ctpv.mode = MODE_LIST;
             break;
+        case 'm':
+            ctpv.mode = MODE_MIME;
+            break;
         default:
             return EXIT_FAILURE;
         }
     }
 
+    argc -= optind;
+    argv = &argv[optind];
+
     int ret;
     switch (ctpv.mode) {
         case MODE_PREVIEW:
-            ret = preview(argc, &argv[optind]);
+            ret = preview(argc, argv);
             break;
         case MODE_SERVER:
             ret = server();
             break;
         case MODE_LIST:
             ret = list();
+            break;
+        case MODE_MIME:
+            ret = mime(argc, argv);
             break;
         default:
             print_errorf("unknowm mode: %d", ctpv.mode);

@@ -13,8 +13,7 @@ typedef struct {
 
 void init_previews(Preview *ps, size_t len);
 void cleanup_previews(void);
-Preview *find_preview(char const *ext, char const *mimetype);
-int run_preview(Preview *p, PreviewArgs *pa);
+int run_preview(const char *ext, const char *mimetype, PreviewArgs *pa);
 Preview **get_previews_list(size_t *len);
 
 #endif

@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "utils.h"
 #include "error.h"
 #include "preview.h"
 
 #define PREVP_SIZE sizeof(Preview *)
+
+typedef Preview *(*FindFunc)(char const *s, size_t *i);
 
 static char shell[] = "sh";
 
@@ -69,9 +72,6 @@ void init_previews(Preview *ps, size_t len)
 
     qsort(sorted_by_ext,      len, PREVP_SIZE, cmp_prev_ext);
     qsort(sorted_by_mimetype, len, PREVP_SIZE, cmp_prev_mimetype);
-
-    /* for (size_t i = 0; i < len; i++) */
-    /*     printf("%s %s\n", sorted_by_mimetype[i]->type, sorted_by_mimetype[i]->subtype); */
 }
 
 void cleanup_previews(void)
@@ -89,14 +89,21 @@ void cleanup_previews(void)
     prevs_length = 0;
 }
 
-static Preview *find_by_ext(char const *ext)
+static Preview *find_by_ext(char const *ext, size_t *i)
 {
-    Preview *key = &(Preview){ .ext = (char *)ext };
+    if (!ext)
+        return NULL;
 
-    void *p =
-        bsearch(&key, sorted_by_ext, prevs_length, PREVP_SIZE, cmp_prev_ext);
+    Preview *p;
 
-    return p ? *(Preview **)p : NULL;
+    for (; *i < prevs_length; (*i)++) {
+        p = sorted_by_ext[*i];
+
+        if (p->ext && strcmp(ext, p->ext) == 0)
+            return p;
+    }
+
+    return NULL;
 }
 
 static void break_mimetype(char *mimetype, char **type, char **subtype)
@@ -116,7 +123,7 @@ static void break_mimetype(char *mimetype, char **type, char **subtype)
 
 #define MIMETYPE_MAX 64
 
-static Preview *find_by_mimetype(char const *mimetype)
+static Preview *find_by_mimetype(char const *mimetype, size_t *i)
 {
     Preview *p;
     char mimetype_c[MIMETYPE_MAX], *t, *s;
@@ -124,8 +131,8 @@ static Preview *find_by_mimetype(char const *mimetype)
     strncpy(mimetype_c, mimetype, MIMETYPE_MAX - 1);
     break_mimetype(mimetype_c, &t, &s);
 
-    for (size_t i = 0; i < prevs_length; i++) {
-        p = sorted_by_mimetype[i];
+    for (; *i < prevs_length; (*i)++) {
+        p = sorted_by_mimetype[*i];
 
         if (!p->type)
             return p;
@@ -151,17 +158,38 @@ static void check_init_previews(void)
     }
 }
 
-Preview *find_preview(char const *ext, char const *mimetype)
+static int run(Preview *p, int *exitcode)
 {
-    check_init_previews();
+    printf("MIME: .%s %s/%s\n", p->ext, p->type, p->subtype);
+    char *args[] = { shell, "-c", p->script, shell, NULL };
 
-    Preview *ret = NULL;
-    if (mimetype)
-        ret = find_by_mimetype(mimetype);
-    if (!ret)
-        ret = find_by_ext(ext);
+    int *fds[] = { (int[]){ STDOUT_FILENO, STDERR_FILENO }, NULL };
 
-    return ret;
+    return spawn(args, NULL, exitcode, fds);
+}
+
+static int find_and_run(int *found, FindFunc func, char const *arg)
+{
+    Preview *p;
+    size_t i = 0;
+    int exitcode;
+
+    *found = 0;
+
+run:
+    p = func(arg, &i);
+    if (!p)
+        return OK;
+
+    ERRCHK_RET_OK(run(p, &exitcode));
+    if (exitcode == 127) {
+        i++;
+        goto run;
+    }
+
+    *found = 1;
+
+    return OK;
 }
 
 #define SET_PENV(n, v)                            \
@@ -170,7 +198,7 @@ Preview *find_preview(char const *ext, char const *mimetype)
             ERRCHK_RET(setenv((n), (v), 1) != 0); \
     } while (0)
 
-int run_preview(Preview *p, PreviewArgs *pa)
+int run_preview(const char *ext, const char *mimetype, PreviewArgs *pa)
 {
     SET_PENV("f", pa->f);
     SET_PENV("w", pa->w);
@@ -178,15 +206,24 @@ int run_preview(Preview *p, PreviewArgs *pa)
     SET_PENV("x", pa->x);
     SET_PENV("y", pa->y);
 
-    char *args[] = { shell, "-c", p->script, shell, NULL };
-    int ret, exitcode;
+    SET_PENV("m", mimetype);
+    SET_PENV("e", ext);
 
-    ret = spawn(args, NULL, &exitcode);
+    check_init_previews();
 
-    if (exitcode > 0)
-        printf("error: preview exited with code: %d\n", exitcode);
+    int found;
 
-    return ret;
+    ERRCHK_RET_OK(find_and_run(&found, find_by_mimetype, mimetype));
+    if (found)
+        return OK;
+
+    ERRCHK_RET_OK(find_and_run(&found, find_by_ext, ext));
+    if (found)
+        return OK;
+
+    puts("ctpv: no previews found");
+
+    return OK;
 }
 
 Preview **get_previews_list(size_t *len)

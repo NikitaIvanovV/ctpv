@@ -14,8 +14,11 @@ char *program;
  *
  * If cpid is NULL, wait for the command to finish executing;
  * otherwise store pid in cpid
+ *
+ * fd is a NULL-terminated array of pairs of file descriptors
+ * to pass to dup2()
  */
-int spawn(char *args[], pid_t *cpid, int *exitcode)
+int spawn(char *args[], pid_t *cpid, int *exitcode, int *fds[2])
 {
     if (exitcode)
         *exitcode = -1;
@@ -25,6 +28,14 @@ int spawn(char *args[], pid_t *cpid, int *exitcode)
 
     /* Child process */
     if (pid == 0) {
+        while (*fds) {
+            if (dup2((*fds)[0], (*fds)[1]) == -1) {
+                print_errorf("dup2() failed: %s", strerror(errno));
+                exit(EXIT_FAILURE);
+            }
+            fds = &fds[1];
+        }
+
         execvp(args[0], args);
         print_errorf("exec() failed: %s", strerror(errno));
         exit(EXIT_FAILURE);
