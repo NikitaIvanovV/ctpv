@@ -8,32 +8,22 @@
 
 #define PREVP_SIZE sizeof(Preview *)
 
-typedef Preview *(*FindFunc)(char const *s, size_t *i);
-
 static char shell[] = "sh";
 
-static Preview **sorted_by_ext,
-               **sorted_by_mimetype;
-static size_t prevs_length;
+static Preview **prevs;
+static size_t prevs_len;
 
-static int cmp_prev_ext(const void *p1, const void *p2)
+static int cmp_previews(const void *p1, const void *p2)
 {
     Preview *pr1 = *(Preview **)p1;
     Preview *pr2 = *(Preview **)p2;
 
-    if (!pr1->ext)
+    if (pr1->ext && pr2->ext)
+        return strcmp(pr1->ext, pr2->ext);
+    else if (!pr1->ext && pr2->ext)
         return 1;
-
-    if (!pr2->ext)
+    else if (pr1->ext && !pr2->ext)
         return -1;
-
-    return strcmp(pr1->ext, pr2->ext);
-}
-
-static int cmp_prev_mimetype(const void *p1, const void *p2)
-{
-    Preview *pr1 = *(Preview **)p1;
-    Preview *pr2 = *(Preview **)p2;
 
     if (!pr1->type && pr2->type)
         return 1;
@@ -57,53 +47,28 @@ static int cmp_prev_mimetype(const void *p1, const void *p2)
 
 void init_previews(Preview *ps, size_t len)
 {
-    prevs_length = len;
-    size_t size = len * PREVP_SIZE;
+    prevs_len = len;
 
-    sorted_by_ext = malloc(size);
-    sorted_by_mimetype = malloc(size);
-    if (!sorted_by_ext || !sorted_by_mimetype) {
+    prevs = malloc(len * PREVP_SIZE);
+    if (!prevs) {
         print_error("malloc() failed");
         abort();
     }
 
     for (size_t i = 0; i < len; i++)
-        sorted_by_ext[i] = sorted_by_mimetype[i] = &ps[i];
+        prevs[i] = &ps[i];
 
-    qsort(sorted_by_ext,      len, PREVP_SIZE, cmp_prev_ext);
-    qsort(sorted_by_mimetype, len, PREVP_SIZE, cmp_prev_mimetype);
+    qsort(prevs, len, PREVP_SIZE, cmp_previews);
 }
 
 void cleanup_previews(void)
 {
-    if (sorted_by_ext) {
-        free(sorted_by_ext);
-        sorted_by_ext = NULL;
+    if (prevs) {
+        free(prevs);
+        prevs = NULL;
     }
 
-    if (sorted_by_mimetype) {
-        free(sorted_by_mimetype);
-        sorted_by_mimetype = NULL;
-    }
-
-    prevs_length = 0;
-}
-
-static Preview *find_by_ext(char const *ext, size_t *i)
-{
-    if (!ext)
-        return NULL;
-
-    Preview *p;
-
-    for (; *i < prevs_length; (*i)++) {
-        p = sorted_by_ext[*i];
-
-        if (p->ext && strcmp(ext, p->ext) == 0)
-            return p;
-    }
-
-    return NULL;
+    prevs_len = 0;
 }
 
 static void break_mimetype(char *mimetype, char **type, char **subtype)
@@ -123,7 +88,7 @@ static void break_mimetype(char *mimetype, char **type, char **subtype)
 
 #define MIMETYPE_MAX 64
 
-static Preview *find_by_mimetype(char const *mimetype, size_t *i)
+static Preview *find_preview(char const *mimetype, char const *ext, size_t *i)
 {
     Preview *p;
     char mimetype_c[MIMETYPE_MAX], *t, *s;
@@ -131,19 +96,25 @@ static Preview *find_by_mimetype(char const *mimetype, size_t *i)
     strncpy(mimetype_c, mimetype, MIMETYPE_MAX - 1);
     break_mimetype(mimetype_c, &t, &s);
 
-    for (; *i < prevs_length; (*i)++) {
-        p = sorted_by_mimetype[*i];
+    for (; *i < prevs_len; (*i)++) {
+        p = prevs[*i];
 
-        if (!p->type)
+        if (!p->ext && !p->type)
             return p;
 
-        if (strcmp(t, p->type) != 0)
+        if (p->ext && !ext)
             continue;
 
-        if (!p->subtype)
+        if (p->ext && strcmp(ext, p->ext) == 0)
             return p;
 
-        if (strcmp(s, p->subtype) == 0)
+        if (p->type && strcmp(t, p->type) != 0)
+            continue;
+
+        if (p->type && !p->subtype)
+            return p;
+
+        if (p->subtype && strcmp(s, p->subtype) == 0)
             return p;
     }
 
@@ -152,7 +123,7 @@ static Preview *find_by_mimetype(char const *mimetype, size_t *i)
 
 static void check_init_previews(void)
 {
-    if (!sorted_by_ext || !sorted_by_mimetype) {
+    if (!prevs) {
         print_error("init_previews() not called");
         abort();
     }
@@ -160,36 +131,11 @@ static void check_init_previews(void)
 
 static int run(Preview *p, int *exitcode)
 {
-    printf("MIME: .%s %s/%s\n", p->ext, p->type, p->subtype);
     char *args[] = { shell, "-c", p->script, shell, NULL };
 
     int *fds[] = { (int[]){ STDOUT_FILENO, STDERR_FILENO }, NULL };
 
     return spawn(args, NULL, exitcode, fds);
-}
-
-static int find_and_run(int *found, FindFunc func, char const *arg)
-{
-    Preview *p;
-    size_t i = 0;
-    int exitcode;
-
-    *found = 0;
-
-run:
-    p = func(arg, &i);
-    if (!p)
-        return OK;
-
-    ERRCHK_RET_OK(run(p, &exitcode));
-    if (exitcode == 127) {
-        i++;
-        goto run;
-    }
-
-    *found = 1;
-
-    return OK;
 }
 
 #define SET_PENV(n, v)                            \
@@ -211,17 +157,22 @@ int run_preview(const char *ext, const char *mimetype, PreviewArgs *pa)
 
     check_init_previews();
 
-    int found;
+    Preview *p;
+    size_t i = 0;
+    int exitcode;
 
-    ERRCHK_RET_OK(find_and_run(&found, find_by_mimetype, mimetype));
-    if (found)
+run:
+    p = find_preview(mimetype, ext, &i);
+    if (!p) {
+        puts("ctpv: no previews found");
         return OK;
+    }
 
-    ERRCHK_RET_OK(find_and_run(&found, find_by_ext, ext));
-    if (found)
-        return OK;
-
-    puts("ctpv: no previews found");
+    ERRCHK_RET_OK(run(p, &exitcode));
+    if (exitcode == 127) {
+        i++;
+        goto run;
+    }
 
     return OK;
 }
@@ -229,6 +180,6 @@ int run_preview(const char *ext, const char *mimetype, PreviewArgs *pa)
 Preview **get_previews_list(size_t *len)
 {
     check_init_previews();
-    *len = prevs_length;
-    return sorted_by_mimetype;
+    *len = prevs_len;
+    return prevs;
 }
