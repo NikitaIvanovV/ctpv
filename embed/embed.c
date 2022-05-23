@@ -54,8 +54,8 @@ void print_file(char *f)
 
 void embed_file(char *prefix, char *filename, char *helpers)
 {
-
     static char varname[FILENAME_MAX];
+
     getvarname(varname, prefix, filename);
 
     printf("char %s[] = { ", varname);

@@ -1,1 +1,1 @@
-exiftool "$f" || true
+exiftool "$f"
