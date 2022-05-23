@@ -5,7 +5,7 @@ SRC := $(wildcard *.c)
 OBJ := $(SRC:.c=.o)
 DEP := $(OBJ:.o=.d)
 PRE := $(wildcard prev/*.sh)
-GEN := gen/prev/scripts.h gen/prev/helpers.h
+GEN := gen/prev/scripts.h
 
 CFLAGS  += -Os -MD -Wall -Wextra -Wno-unused-parameter
 LDFLAGS += -lmagic
@@ -37,11 +37,7 @@ ctpv.c: $(GEN)
 
 gen/prev/scripts.h: embed/embed $(PRE)
 	@mkdir -p $(@D)
-	embed/embed -p prev_scr_ $(PRE) > $@
-
-gen/prev/helpers.h: embed/embed helpers.sh
-	@mkdir -p $(@D)
-	embed/embed -p prev_ helpers.sh > $@
+	embed/embed -p prev_scr_ -h helpers.sh $(PRE) > $@
 
 embed/embed: make_embed
 	@:

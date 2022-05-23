@@ -19,46 +19,69 @@ void getvarname(char *res, char *prefix, char *filename)
         res += prefix_len;
     }
 
-    for (int c, i = 0; s[i] != 0; i++) {
+    int c, i = 0;
+    for (; s[i] != 0; i++) {
         c = s[i];
         if (!isalnum(c))
             c = '_';
 
         res[i] = c;
     }
+
+    res[i] = '\0';
 }
 
-void embed_file(char *prefix, char *filename)
+void print_byte(char c)
 {
-    FILE *f = fopen(filename, "r");
-    if (!f) {
-        fprintf(stderr, "failed to open %s: %s\n", filename, strerror(errno));
+    printf("0x%x, ", c);
+}
+
+void print_file(char *f)
+{
+    int c;
+    FILE *file = fopen(f, "r");
+
+    if (!file) {
+        fprintf(stderr, "failed to open %s: %s\n", f, strerror(errno));
         exit(EXIT_FAILURE);
     }
+
+    while ((c = fgetc(file)) != EOF)
+        print_byte(c);
+
+    fclose(file);
+}
+
+void embed_file(char *prefix, char *filename, char *helpers)
+{
 
     static char varname[FILENAME_MAX];
     getvarname(varname, prefix, filename);
 
     printf("char %s[] = { ", varname);
 
-    int c;
-    while ((c = fgetc(f)) != EOF)
-        printf("0x%x, ", c);
+    if (helpers) {
+        print_file(helpers);
+        print_byte('\n');
+    }
+
+    print_file(filename);
 
     puts("0 };");
-
-    fclose(f);
 }
 
 int main(int argc, char *argv[])
 {
-    char *prefix = NULL;
+    char *prefix = NULL, *helpers = NULL;
 
     int c;
-    while ((c = getopt(argc, argv, "p:")) != -1) {
+    while ((c = getopt(argc, argv, "p:h:")) != -1) {
         switch (c) {
         case 'p':
             prefix = optarg;
+            break;
+        case 'h':
+            helpers = optarg;
             break;
         default:
             return EXIT_FAILURE;
@@ -66,7 +89,7 @@ int main(int argc, char *argv[])
     }
 
     for (int i = optind; i < argc; i++)
-        embed_file(prefix, argv[i]);
+        embed_file(prefix, argv[i], helpers);
 
     return EXIT_SUCCESS;
 }
