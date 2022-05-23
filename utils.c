@@ -28,12 +28,14 @@ int spawn(char *args[], pid_t *cpid, int *exitcode, int *fds[2])
 
     /* Child process */
     if (pid == 0) {
-        while (*fds) {
-            if (dup2((*fds)[0], (*fds)[1]) == -1) {
-                print_errorf("dup2() failed: %s", strerror(errno));
-                exit(EXIT_FAILURE);
+        if (fds) {
+            while (*fds) {
+                if (dup2((*fds)[0], (*fds)[1]) == -1) {
+                    print_errorf("dup2() failed: %s", strerror(errno));
+                    exit(EXIT_FAILURE);
+                }
+                fds = &fds[1];
             }
-            fds = &fds[1];
         }
 
         execvp(args[0], args);
