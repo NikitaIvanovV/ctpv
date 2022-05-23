@@ -66,7 +66,7 @@ static const char *get_ext(char const *path)
     else
         base = path;
 
-    const char *dot = strrchr(path, '.');
+    const char *dot = strchr(base, '.');
     if (!dot || dot == base)
         return NULL;
 
