@@ -55,6 +55,18 @@ int spawn(char *args[], pid_t *cpid, int *exitcode, int *fds[2])
     return OK;
 }
 
+int strcmpnull(char const *s1, char const *s2)
+{
+    if (!s1 && !s2)
+        return 0;
+    else if (s1 && !s2)
+        return 1;
+    else if (!s1 && s2)
+        return -1;
+
+    return strcmp(s1, s2);
+}
+
 CharVec char_v_new(size_t cap)
 {
     CharVec v;

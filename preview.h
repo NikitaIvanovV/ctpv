@@ -4,7 +4,8 @@
 #include <stdlib.h>
 
 typedef struct {
-    char *ext, *type, *subtype, *script;
+    char *name, *ext, *type, *subtype, *script;
+    int priority;
 } Preview;
 
 typedef struct {

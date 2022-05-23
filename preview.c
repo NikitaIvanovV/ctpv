@@ -18,31 +18,21 @@ static int cmp_previews(const void *p1, const void *p2)
     Preview *pr1 = *(Preview **)p1;
     Preview *pr2 = *(Preview **)p2;
 
-    if (pr1->ext && pr2->ext)
-        return strcmp(pr1->ext, pr2->ext);
-    else if (!pr1->ext && pr2->ext)
-        return 1;
-    else if (pr1->ext && !pr2->ext)
-        return -1;
+    int i;
 
-    if (!pr1->type && pr2->type)
-        return 1;
-    else if (pr1->type && !pr2->type)
-        return -1;
-    else if (!pr1->type && !pr2->type)
-        return 0;
+    if ((i = pr2->priority - pr1->priority) != 0)
+        return i;
 
-    if (!pr1->subtype && pr2->subtype)
-        return 1;
-    else if (pr1->subtype && !pr2->subtype)
-        return -1;
+    if ((i = strcmpnull(pr1->ext, pr2->ext)) != 0)
+        return -i;
 
-    int ret = strcmp(pr1->type, pr2->type);
+    if ((i = strcmpnull(pr1->type, pr2->type)) != 0)
+        return -i;
 
-    if (ret == 0 && pr1->subtype && pr2->subtype)
-        return strcmp(pr1->subtype, pr2->subtype);
+    if ((i = strcmpnull(pr1->subtype, pr2->subtype)) != 0)
+        return i;
 
-    return ret;
+    return i;
 }
 
 void init_previews(Preview *ps, size_t len)
@@ -99,23 +89,16 @@ static Preview *find_preview(char const *mimetype, char const *ext, size_t *i)
     for (; *i < prevs_len; (*i)++) {
         p = prevs[*i];
 
-        if (!p->ext && !p->type)
-            return p;
-
-        if (p->ext && !ext)
+        if (p->ext && strcmpnull(p->ext, ext) != 0)
             continue;
 
-        if (p->ext && strcmp(ext, p->ext) == 0)
-            return p;
-
-        if (p->type && strcmp(t, p->type) != 0)
+        if (p->type && strcmpnull(p->type, t) != 0)
             continue;
 
-        if (p->type && !p->subtype)
-            return p;
+        if (p->subtype && strcmpnull(p->subtype, s) != 0)
+            continue;
 
-        if (p->subtype && strcmp(s, p->subtype) == 0)
-            return p;
+        return p;
     }
 
     return NULL;

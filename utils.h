@@ -25,6 +25,8 @@ extern char *program;
 
 int spawn(char *args[], pid_t *cpid, int *exitcode, int *fds[2]);
 
+int strcmpnull(char const *s1, char const *s2);
+
 CharVec char_v_new(size_t cap);
 void char_v_append(CharVec *v, char c);
 void char_v_free(CharVec *v);

@@ -118,14 +118,18 @@ static int list(void)
 
     size_t len;
     Preview p, **list = get_previews_list(&len);
-    const char *t, *s;
+    const char *e, *t, *s;
 
     puts("List of available previews:");
 
     for (size_t i = 0; i < len; i++) {
         p = *list[i];
+        e = p.ext;
         t = p.type;
         s = p.subtype;
+
+        if (!e)
+            e = any_type;
 
         if (!t) {
             t = any_type;
@@ -134,10 +138,10 @@ static int list(void)
             s = any_type;
         }
 
-        printf("\t%s/%s\n", t, s);
+        printf("\t%-15s .%-6s %s/%s\n", p.name, e, t, s);
     }
 
-    puts("\nNote: '" ANY_TYPE "' means that it matches any mimetype.");
+    puts("\nNote: '" ANY_TYPE "' means that it matches any.");
     return OK;
 }
 
