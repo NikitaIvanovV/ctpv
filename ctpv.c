@@ -59,12 +59,15 @@ static const char *get_mimetype(char const *path)
 
 static const char *get_ext(char const *path)
 {
-    const char *dot = strrchr(path, '.');
-    if (!dot)
-        return NULL;
+    const char *base;
 
-    const char *slash = strrchr(path, '/');
-    if (slash && dot < slash)
+    if ((base = strrchr(path, '/')))
+        base += sizeof(*base);
+    else
+        base = path;
+
+    const char *dot = strrchr(path, '.');
+    if (!dot || dot == base)
         return NULL;
 
     return &dot[1];
