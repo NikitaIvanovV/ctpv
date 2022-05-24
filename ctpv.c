@@ -5,7 +5,6 @@
 #include <magic.h>
 
 #include "error.h"
-#include "utils.h"
 #include "previews.h"
 
 #define ANY_TYPE "*"
@@ -104,8 +103,8 @@ static int preview(int argc, char *argv[])
 
     init_previews_v();
 
-    const char *mimetype = get_mimetype(f);
-    ERRCHK_RET(!mimetype);
+    const char *mimetype;
+    ERRCHK_RET(!(mimetype = get_mimetype(f)));
 
     PreviewArgs args = { .f = f, .w = w, .h = h, .x = x, .y = y };
 

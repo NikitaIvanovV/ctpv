@@ -11,8 +11,10 @@
 
 static char shell[] = "sh";
 
-static Preview **prevs;
-static size_t prevs_len;
+static struct {
+    size_t len;
+    Preview **list;
+} previews;
 
 static int cmp_previews(const void *p1, const void *p2)
 {
@@ -38,28 +40,28 @@ static int cmp_previews(const void *p1, const void *p2)
 
 void init_previews(Preview *ps, size_t len)
 {
-    prevs_len = len;
+    previews.len = len;
 
-    prevs = malloc(len * PREVP_SIZE);
-    if (!prevs) {
+    previews.list = malloc(len * PREVP_SIZE);
+    if (!previews.list) {
         PRINTINTERR(FUNCFAILED("malloc"), ERRNOS);
         abort();
     }
 
     for (size_t i = 0; i < len; i++)
-        prevs[i] = &ps[i];
+        previews.list[i] = &ps[i];
 
-    qsort(prevs, len, PREVP_SIZE, cmp_previews);
+    qsort(previews.list, previews.len, PREVP_SIZE, cmp_previews);
 }
 
 void cleanup_previews(void)
 {
-    if (prevs) {
-        free(prevs);
-        prevs = NULL;
-    }
+    if (!previews.list)
+        return;
 
-    prevs_len = 0;
+    free(previews.list);
+    previews.list = NULL;
+    previews.len = 0;
 }
 
 static void break_mimetype(char *mimetype, char **type, char **subtype)
@@ -87,8 +89,8 @@ static Preview *find_preview(char const *mimetype, char const *ext, size_t *i)
     strncpy(mimetype_c, mimetype, MIMETYPE_MAX - 1);
     break_mimetype(mimetype_c, &t, &s);
 
-    for (; *i < prevs_len; (*i)++) {
-        p = prevs[*i];
+    for (; *i < previews.len; (*i)++) {
+        p = previews.list[*i];
 
         if (p->ext && strcmpnull(p->ext, ext) != 0)
             continue;
@@ -107,7 +109,7 @@ static Preview *find_preview(char const *mimetype, char const *ext, size_t *i)
 
 static void check_init_previews(void)
 {
-    if (!prevs) {
+    if (!previews.list) {
         PRINTINTERR("init_previews() not called");
         abort();
     }
@@ -189,6 +191,6 @@ run:
 Preview **get_previews_list(size_t *len)
 {
     check_init_previews();
-    *len = prevs_len;
-    return prevs;
+    *len = previews.len;
+    return previews.list;
 }
