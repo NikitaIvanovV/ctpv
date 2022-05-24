@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <errno.h>
 #include <unistd.h>
 #include <magic.h>
 
@@ -32,10 +31,10 @@ static void cleanup(void) {
 
 static int init_magic()
 {
-    ERRCHK_RET(!(magic = magic_open(MAGIC_MIME_TYPE)),
-               "magic_open() failed: %s", magic_error(magic));
+    ERRCHK_RET(!(magic = magic_open(MAGIC_MIME_TYPE)), FUNCFAILED("magic_open"),
+               magic_error(magic));
 
-    ERRCHK_RET(magic_load(magic, NULL) != 0, "magic_load() failed: %s",
+    ERRCHK_RET(magic_load(magic, NULL) != 0, FUNCFAILED("magic_load"),
                magic_error(magic));
 
     return OK;
@@ -50,7 +49,7 @@ static const char *get_mimetype(char const *path)
 {
     const char *r = magic_file(magic, path);
     if (!r) {
-        print_errorf("magic_file() failed: %s", magic_error(magic));
+        PRINTINTERR(FUNCFAILED("magic_file"), magic_error(magic));
         return NULL;
     }
 
@@ -75,9 +74,15 @@ static const char *get_ext(char const *path)
 
 static int check_file(char const *f)
 {
-    ERRCHK_RET(!f, "file not given");
-    ERRCHK_RET(access(f, R_OK) != 0, "failed to access '%s': %s", f,
-               strerror(errno));
+    if (!f) {
+        print_error("file not given");
+        return ERR;
+    }
+
+    if (access(f, R_OK) != 0) {
+        print_errorf("failed to access '%s': %s", f, ERRNOS);
+        return ERR;
+    }
 
     return OK;
 }
@@ -209,7 +214,7 @@ int main(int argc, char *argv[])
             ret = mime(argc, argv);
             break;
         default:
-            print_errorf("unknowm mode: %d", ctpv.mode);
+            PRINTINTERR("unknowm mode: %d", ctpv.mode);
             ret = ERR;
             break;
     }

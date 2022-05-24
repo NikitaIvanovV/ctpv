@@ -1,7 +1,6 @@
-#include <errno.h>
+#include <sys/wait.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/wait.h>
 #include <unistd.h>
 
 #include "error.h"
@@ -24,7 +23,7 @@ int spawn(char *args[], pid_t *cpid, int *exitcode, int *fds[2])
         *exitcode = -1;
 
     pid_t pid = fork();
-    ERRCHK_RET(pid == -1, "fork() failed");
+    ERRCHK_RET(pid == -1, FUNCFAILED("fork"), ERRNOS);
 
     /* Child process */
     if (pid == 0) {
@@ -39,7 +38,7 @@ int spawn(char *args[], pid_t *cpid, int *exitcode, int *fds[2])
         }
 
         execvp(args[0], args);
-        print_errorf("exec() failed: %s", strerror(errno));
+        PRINTINTERR(FUNCFAILED("exec"), ERRNOS);
         exit(EXIT_FAILURE);
     }
 
@@ -47,8 +46,8 @@ int spawn(char *args[], pid_t *cpid, int *exitcode, int *fds[2])
         *cpid = pid;
     } else {
         int stat;
-        ERRCHK_RET(waitpid(pid, &stat, 0) == -1, "waitpid() failed: %s",
-                   strerror(errno));
+        ERRCHK_RET(waitpid(pid, &stat, 0) == -1, FUNCFAILED("waitpid"),
+                   ERRNOS);
 
         if (exitcode && WIFEXITED(stat))
             *exitcode = WEXITSTATUS(stat);
@@ -93,7 +92,7 @@ void char_v_append(CharVec *v, char c)
     if (!v->buf) {
         v->buf = malloc(v->cap * sizeof(v->buf[0]));
         if (!v->buf) {
-            print_error("calloc() failed");
+            PRINTINTERR(FUNCFAILED("malloc"), ERRNOS);
             abort();
         }
         v->buf[0] = '\0';
@@ -104,7 +103,7 @@ void char_v_append(CharVec *v, char c)
         v->cap *= 2;
         v->buf = realloc(v->buf, v->cap * sizeof(v->buf[0]));
         if (!v->buf) {
-            print_error("realloc() failed");
+            PRINTINTERR(FUNCFAILED("realloc"), ERRNOS);
             abort();
         }
     }

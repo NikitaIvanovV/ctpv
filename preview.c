@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 #include <unistd.h>
 
 #include "utils.h"
@@ -41,7 +40,7 @@ void init_previews(Preview *ps, size_t len)
 
     prevs = malloc(len * PREVP_SIZE);
     if (!prevs) {
-        print_error("malloc() failed");
+        PRINTINTERR(FUNCFAILED("malloc"), ERRNOS);
         abort();
     }
 
@@ -68,7 +67,7 @@ static void break_mimetype(char *mimetype, char **type, char **subtype)
 
     char *s = strchr(mimetype, '/');
     if (!s) {
-        print_errorf("invalid mimetype: '%s'", mimetype);
+        PRINTINTERR("invalid mimetype: '%s'", mimetype);
         abort();
     }
 
@@ -107,7 +106,7 @@ static Preview *find_preview(char const *mimetype, char const *ext, size_t *i)
 static void check_init_previews(void)
 {
     if (!prevs) {
-        print_error("init_previews() not called");
+        PRINTINTERR("init_previews() not called");
         abort();
     }
 }
@@ -121,10 +120,11 @@ static int run(Preview *p, int *exitcode)
     return spawn(args, NULL, exitcode, fds);
 }
 
-#define SET_PENV(n, v)                            \
-    do {                                          \
-        if (v)                                    \
-            ERRCHK_RET(setenv((n), (v), 1) != 0); \
+#define SET_PENV(n, v)                                                 \
+    do {                                                               \
+        if (v)                                                         \
+            ERRCHK_RET(setenv((n), (v), 1) != 0, FUNCFAILED("setenv"), \
+                       ERRNOS);                                        \
     } while (0)
 
 int run_preview(const char *ext, const char *mimetype, PreviewArgs *pa)
