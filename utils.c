@@ -8,16 +8,28 @@
 
 char *program;
 
+int spawn_redirect(const void *arg)
+{
+    int **fds = (int **)arg;
+    int *pipe = fds[0];
+    int *fd = fds[1];
+
+    ERRCHK_RET(close(pipe[0]) == -1, FUNCFAILED("close"), ERRNOS);
+    ERRCHK_RET(dup2(pipe[1], *fd) == -1, FUNCFAILED("dup2"), ERRNOS);
+
+    return OK;
+}
+
 /*
  * Call command
  *
  * If cpid is NULL, wait for the command to finish executing;
  * otherwise store pid in cpid
  *
- * fd is a NULL-terminated array of pairs of file descriptors
- * to pass to dup2()
+ * cfunc is a function to call when child process is created
  */
-int spawn(char *args[], pid_t *cpid, int *exitcode, int *fds[2])
+int spawn(char *args[], pid_t *cpid, int *exitcode, int (*cfunc)(const void *),
+          const void *carg)
 {
     if (exitcode)
         *exitcode = -1;
@@ -27,15 +39,8 @@ int spawn(char *args[], pid_t *cpid, int *exitcode, int *fds[2])
 
     /* Child process */
     if (pid == 0) {
-        if (fds) {
-            while (*fds) {
-                if (dup2((*fds)[0], (*fds)[1]) == -1) {
-                    print_errorf("dup2() failed: %s", strerror(errno));
-                    exit(EXIT_FAILURE);
-                }
-                fds = &fds[1];
-            }
-        }
+        if (cfunc && (cfunc(carg) != OK))
+            exit(EXIT_FAILURE);
 
         execvp(args[0], args);
         PRINTINTERR(FUNCFAILED("exec"), ERRNOS);

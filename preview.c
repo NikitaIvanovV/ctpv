@@ -5,6 +5,8 @@
 #include "error.h"
 #include "preview.h"
 
+#define FAILED_PREVIEW_EC 127
+
 #define PREVP_SIZE sizeof(Preview *)
 
 static char shell[] = "sh";
@@ -111,13 +113,37 @@ static void check_init_previews(void)
     }
 }
 
+#define CMD_ERR_BUF 256
+
 static int run(Preview *p, int *exitcode)
 {
+    int pipe_fd[2];
+    ERRCHK_RET(pipe(pipe_fd) == -1, FUNCFAILED("pipe"), ERRNOS);
+
+    int fd = STDERR_FILENO;
+    int *sp_arg[] = { pipe_fd, &fd };
+
     char *args[] = { shell, "-c", p->script, shell, NULL };
+    int ret = spawn(args, NULL, exitcode, spawn_redirect, sp_arg);
 
-    int *fds[] = { (int[]){ STDOUT_FILENO, STDERR_FILENO }, NULL };
+    close(pipe_fd[1]);
 
-    return spawn(args, NULL, exitcode, fds);
+    if (*exitcode != FAILED_PREVIEW_EC) {
+        char buf[CMD_ERR_BUF];
+        int len;
+        while ((len = read(pipe_fd[0], buf, CMD_ERR_BUF)) > 0) {
+            write(STDOUT_FILENO, buf, len);
+        }
+
+        if (len == -1) {
+            PRINTINTERR(FUNCFAILED("read"), ERRNOS);
+            ret = ERR;
+        }
+    }
+
+    close(pipe_fd[0]);
+
+    return ret;
 }
 
 #define SET_PENV(n, v)                                                 \
@@ -152,7 +178,7 @@ run:
     }
 
     ERRCHK_RET_OK(run(p, &exitcode));
-    if (exitcode == 127) {
+    if (exitcode == FAILED_PREVIEW_EC) {
         i++;
         goto run;
     }

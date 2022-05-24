@@ -26,7 +26,9 @@ typedef struct {
 
 extern char *program;
 
-int spawn(char *args[], pid_t *cpid, int *exitcode, int *fds[2]);
+int spawn_redirect(const void *arg);
+int spawn(char *args[], pid_t *cpid, int *exitcode, int (*cfunc)(const void *),
+          const void *carg);
 
 int strcmpnull(char const *s1, char const *s2);
 
