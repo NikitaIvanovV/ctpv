@@ -3,13 +3,12 @@
 
 #include "utils.h"
 #include "error.h"
+#include "shell.h"
 #include "preview.h"
 
-#define FAILED_PREVIEW_EC 127
+#define FAILED_PREVIEW_EC NOTEXIST_EC
 
 #define PREVP_SIZE sizeof(Preview *)
-
-static char shell[] = "sh";
 
 static struct {
     size_t len;
@@ -119,21 +118,20 @@ static void check_init_previews(void)
 
 static int run(Preview *p, int *exitcode)
 {
-    int pipe_fd[2];
-    ERRCHK_RET(pipe(pipe_fd) == -1, FUNCFAILED("pipe"), ERRNOS);
+    int pipe_fds[2];
+    ERRCHK_RET(pipe(pipe_fds) == -1, FUNCFAILED("pipe"), ERRNOS);
 
-    int fd = STDERR_FILENO;
-    int *sp_arg[] = { pipe_fd, &fd };
+    int sp_arg[] = { pipe_fds[0], pipe_fds[1], STDERR_FILENO };
 
-    char *args[] = { shell, "-c", p->script, shell, NULL };
+    char *args[] = SHELL_ARGS(p->script);
     int ret = spawn(args, NULL, exitcode, spawn_redirect, sp_arg);
 
-    close(pipe_fd[1]);
+    close(pipe_fds[1]);
 
     if (*exitcode != FAILED_PREVIEW_EC) {
         char buf[CMD_ERR_BUF];
         int len;
-        while ((len = read(pipe_fd[0], buf, CMD_ERR_BUF)) > 0) {
+        while ((len = read(pipe_fds[0], buf, CMD_ERR_BUF)) > 0) {
             write(STDOUT_FILENO, buf, len);
         }
 
@@ -143,7 +141,7 @@ static int run(Preview *p, int *exitcode)
         }
     }
 
-    close(pipe_fd[0]);
+    close(pipe_fds[0]);
 
     return ret;
 }
@@ -176,7 +174,7 @@ run:
     p = find_preview(mimetype, ext, &i);
     if (!p) {
         puts("ctpv: no previews found");
-        return OK;
+        return ERR;
     }
 
     ERRCHK_RET_OK(run(p, &exitcode));
@@ -185,7 +183,7 @@ run:
         goto run;
     }
 
-    return OK;
+    return exitcode == 0 ? OK : ERR;
 }
 
 Preview **get_previews_list(size_t *len)

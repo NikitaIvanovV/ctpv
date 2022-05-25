@@ -33,11 +33,23 @@
         }                                         \
     } while (0)
 
+#define ERRCHK_GOTO(cond, ret, label, ...)        \
+    do {                                          \
+        if (cond) {                               \
+            __VA_OPT__(PRINTINTERR(__VA_ARGS__);) \
+            ret = ERR;                            \
+            goto label;                           \
+        }                                         \
+    } while (0)
+
 /*
  * Shortcut for ERRCHK_RET(expr != OK)
  */
 #define ERRCHK_RET_OK(expr, ...) \
     ERRCHK_RET((expr) != OK __VA_OPT__(, ) __VA_ARGS__)
+
+#define ERRCHK_GOTO_OK(expr, ...) \
+    ERRCHK_GOTO((expr) != OK __VA_OPT__(, ) __VA_ARGS__)
 
 enum {
     OK,

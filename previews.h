@@ -17,4 +17,5 @@ Preview previews[] = {
     PR(NULL,      NULL,             NULL,             any),
     PR("md",      NULL,             NULL,             markdown),
     PR(NULL,      "application",    "json",           json),
+    PR(NULL,      "image",          NULL,             image),
 };

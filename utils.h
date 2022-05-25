@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+#define NOTEXIST_EC 127
+
 #define LEN(a)    (sizeof(a) / sizeof((a)[0]))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -27,6 +29,7 @@ typedef struct {
 extern char *program;
 
 int spawn_redirect(const void *arg);
+int spawn_wait(pid_t pid, int *exitcode);
 int spawn(char *args[], pid_t *cpid, int *exitcode, int (*cfunc)(const void *),
           const void *carg);
 

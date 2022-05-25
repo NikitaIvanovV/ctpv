@@ -10,12 +10,21 @@ char *program;
 
 int spawn_redirect(const void *arg)
 {
-    int **fds = (int **)arg;
-    int *pipe = fds[0];
-    int *fd = fds[1];
+    int *fds = (int *)arg;
 
-    ERRCHK_RET(close(pipe[0]) == -1, FUNCFAILED("close"), ERRNOS);
-    ERRCHK_RET(dup2(pipe[1], *fd) == -1, FUNCFAILED("dup2"), ERRNOS);
+    ERRCHK_RET(close(fds[0]) == -1, FUNCFAILED("close"), ERRNOS);
+    ERRCHK_RET(dup2(fds[1], fds[2]) == -1, FUNCFAILED("dup2"), ERRNOS);
+
+    return OK;
+}
+
+int spawn_wait(pid_t pid, int *exitcode)
+{
+    int stat;
+    ERRCHK_RET(waitpid(pid, &stat, 0) == -1, FUNCFAILED("waitpid"), ERRNOS);
+
+    if (exitcode && WIFEXITED(stat))
+        *exitcode = WEXITSTATUS(stat);
 
     return OK;
 }
@@ -43,20 +52,18 @@ int spawn(char *args[], pid_t *cpid, int *exitcode, int (*cfunc)(const void *),
             exit(EXIT_FAILURE);
 
         execvp(args[0], args);
+        if (errno == ENOENT)
+            exit(NOTEXIST_EC);
+
         PRINTINTERR(FUNCFAILED("exec"), ERRNOS);
         exit(EXIT_FAILURE);
     }
 
-    if (cpid) {
+    if (cpid)
         *cpid = pid;
-    } else {
-        int stat;
-        ERRCHK_RET(waitpid(pid, &stat, 0) == -1, FUNCFAILED("waitpid"),
-                   ERRNOS);
 
-        if (exitcode && WIFEXITED(stat))
-            *exitcode = WEXITSTATUS(stat);
-    }
+    if (exitcode)
+        ERRCHK_RET_OK(spawn_wait(pid, exitcode));
 
     return OK;
 }

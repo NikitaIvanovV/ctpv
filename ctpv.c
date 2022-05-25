@@ -1,10 +1,13 @@
+#include <stdio.h>
+#include <magic.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
+#include <signal.h>
 #include <unistd.h>
-#include <magic.h>
 
 #include "error.h"
+#include "server.h"
+#include "preview.h"
 #include "previews.h"
 
 #define ANY_TYPE "*"
@@ -17,10 +20,13 @@ static struct {
     enum {
         MODE_PREVIEW,
         MODE_SERVER,
+        MODE_CLEAR,
+        MODE_END,
         MODE_LIST,
         MODE_MIME,
     } mode;
-} ctpv = { MODE_PREVIEW };
+    char *server_id_s;
+} ctpv = { .mode = MODE_PREVIEW };
 
 static void cleanup(void) {
     cleanup_previews();
@@ -108,15 +114,22 @@ static int preview(int argc, char *argv[])
 
     PreviewArgs args = { .f = f, .w = w, .h = h, .x = x, .y = y };
 
-    ERRCHK_RET_OK(run_preview(get_ext(f), mimetype, &args));
-
-    return OK;
+    return run_preview(get_ext(f), mimetype, &args);
 }
 
-static int server(void)
+static int server(char const *id_s)
 {
-    /* TODO */
-    return OK;
+    return server_listen(id_s);
+}
+
+static int clear(void)
+{
+    return server_clear();
+}
+
+static int end(char const *id_s)
+{
+    return server_end(id_s);
 }
 
 static int list(void)
@@ -179,10 +192,18 @@ int main(int argc, char *argv[])
     program = argc > 0 ? argv[0] : "ctpv";
 
     int c;
-    while ((c = getopt(argc, argv, "slm")) != -1) {
+    while ((c = getopt(argc, argv, "s:ce:lm")) != -1) {
         switch (c) {
         case 's':
             ctpv.mode = MODE_SERVER;
+            ctpv.server_id_s = optarg;
+            break;
+        case 'c':
+            ctpv.mode = MODE_CLEAR;
+            break;
+        case 'e':
+            ctpv.mode = MODE_END;
+            ctpv.server_id_s = optarg;
             break;
         case 'l':
             ctpv.mode = MODE_LIST;
@@ -204,7 +225,13 @@ int main(int argc, char *argv[])
             ret = preview(argc, argv);
             break;
         case MODE_SERVER:
-            ret = server();
+            ret = server(ctpv.server_id_s);
+            break;
+        case MODE_CLEAR:
+            ret = clear();
+            break;
+        case MODE_END:
+            ret = end(ctpv.server_id_s);
             break;
         case MODE_LIST:
             ret = list();
