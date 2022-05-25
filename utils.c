@@ -113,11 +113,13 @@ void char_v_append(CharVec *v, char c)
 
     if (v->len + 1 >= v->cap) {
         v->cap *= 2;
-        v->buf = realloc(v->buf, v->cap * sizeof(v->buf[0]));
-        if (!v->buf) {
+        void *new = realloc(v->buf, v->cap * sizeof(v->buf[0]));
+        if (!new) {
+            free(v->buf);
             PRINTINTERR(FUNCFAILED("realloc"), ERRNOS);
             abort();
         }
+        v->buf = new;
     }
 
     v->buf[v->len - 1] = c;
