@@ -4,6 +4,7 @@
 #include <string.h>
 #include <signal.h>
 #include <unistd.h>
+#include <sys/stat.h>
 
 #include "error.h"
 #include "server.h"
@@ -24,6 +25,7 @@ static struct {
         MODE_END,
         MODE_LIST,
         MODE_MIME,
+        MODE_NEWER,
     } mode;
     char *server_id_s;
 } ctpv = { .mode = MODE_PREVIEW };
@@ -181,8 +183,33 @@ static int mime(int argc, char *argv[])
         if (argc > 1)
             printf("%s: ", f);
 
+        printf(".%s ", get_ext(f));
         puts(mimetype);
     }
+
+    return OK;
+}
+
+static int newer(int argc, char *argv[])
+{
+    char *f1, *f2;
+    GET_PARG(f1, 0);
+    GET_PARG(f2, 1);
+
+    if (!f1 || !f2) {
+        print_error("2 file should be given");
+        return ERR;
+    }
+
+    struct stat stat1, stat2;
+    ERRCHK_RET(stat(f1, &stat1) == -1, FUNCFAILED("stat"), ERRNOS);
+    ERRCHK_RET(stat(f2, &stat2) == -1, FUNCFAILED("stat"), ERRNOS);
+
+    int sec_d = stat1.st_mtim.tv_sec - stat2.st_mtim.tv_sec;
+    if (sec_d < 0)
+        return ERR;
+    else if (sec_d == 0 && stat1.st_mtim.tv_nsec <= stat2.st_mtim.tv_nsec)
+        return ERR;
 
     return OK;
 }
@@ -192,7 +219,7 @@ int main(int argc, char *argv[])
     program = argc > 0 ? argv[0] : "ctpv";
 
     int c;
-    while ((c = getopt(argc, argv, "s:ce:lm")) != -1) {
+    while ((c = getopt(argc, argv, "s:ce:lmn")) != -1) {
         switch (c) {
         case 's':
             ctpv.mode = MODE_SERVER;
@@ -210,6 +237,9 @@ int main(int argc, char *argv[])
             break;
         case 'm':
             ctpv.mode = MODE_MIME;
+            break;
+        case 'n':
+            ctpv.mode = MODE_NEWER;
             break;
         default:
             return EXIT_FAILURE;
@@ -238,6 +268,9 @@ int main(int argc, char *argv[])
             break;
         case MODE_MIME:
             ret = mime(argc, argv);
+            break;
+        case MODE_NEWER:
+            ret = newer(argc, argv);
             break;
         default:
             PRINTINTERR("unknowm mode: %d", ctpv.mode);

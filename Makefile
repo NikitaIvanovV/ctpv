@@ -22,7 +22,7 @@ install: ctpv ctpvclear
 	install $^ $(BINPREFIX)
 
 uninstall:
-	$(RM) $(BINPREFIX)/ctpv
+	$(RM) $(BINPREFIX)/ctpv $(BINPREFIX)/ctpvclear
 
 clean:
 	$(RM) ctpv $(OBJ) $(DEP) $(GEN)
