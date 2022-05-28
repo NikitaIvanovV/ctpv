@@ -25,17 +25,28 @@ static void kill_ueberzug(void)
     spawn_wait(ueberzug_pid, NULL);
 }
 
-static void sig_int_handler(int s)
+static void do_nothing(int s)
 {
     /* Do nothing */
+}
+
+static int register_signal(int sig, __sighandler_t handler)
+{
+    ERRCHK_RET(signal(sig, handler), FUNCFAILED("signal"), ERRNOS);
+    return OK;
 }
 
 static int listen(int fifo_fd)
 {
     int ret = OK;
 
-    ERRCHK_GOTO(signal(SIGINT, sig_int_handler) == SIG_ERR, ret, exit,
-                FUNCFAILED("signal"), ERRNOS);
+    /*
+     * We don't register actual handlers because when one occures,
+     * poll() returns 0, which will break the loop and a normal
+     * exit will happen.
+     */
+    ERRCHK_GOTO_OK(register_signal(SIGINT, do_nothing), ret, exit);
+    ERRCHK_GOTO_OK(register_signal(SIGTERM, do_nothing), ret, exit);
 
     int pipe_fds[2];
     ERRCHK_GOTO(pipe(pipe_fds) == -1, ret, signal, FUNCFAILED("pipe"), ERRNOS);
@@ -53,11 +64,15 @@ static int listen(int fifo_fd)
 
     struct pollfd pollfd = { .fd = fifo_fd, .events = POLLIN };
 
+    /*
+     * "Listen" to fifo and redirect all the input to ueberzug
+     * instance.
+     */
     int poll_ret, len;
     while ((poll_ret = poll(&pollfd, 1, -1) > 0)) {
         static char buf[1024];
         while ((len = read(fifo_fd, buf, LEN(buf))) > 0) {
-            /* First zero byte means that ctpv -e $id was run */
+            /* But first byte equal to 0 means "exit" */
             if (buf[0] == 0)
                 goto close;
             write(pipe_fds[1], buf, len);
@@ -72,6 +87,7 @@ close:
 
 signal:
     signal(SIGINT, SIG_DFL);
+    signal(SIGTERM, SIG_DFL);
 
 exit:
     return ret;
@@ -111,7 +127,7 @@ fifo_fd:
     close(fifo_fd);
 
 fifo:
-    if (remove(fifo) == -1)
+    if (remove(fifo) == -1 && errno != ENOENT)
         PRINTINTERR(FUNCFAILED("remove"), ERRNOS);
 
 exit:
