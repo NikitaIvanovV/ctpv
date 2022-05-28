@@ -118,20 +118,26 @@ exit:
     return ret;
 }
 
+static int run_script(char *script, size_t script_len, char *arg)
+{
+    int ret = OK;
+
+    char *s = prepend_helpers(script, script_len);
+    char *args[] = SHELL_ARGS(s, arg);
+    int exitcode;
+    ERRCHK_GOTO_OK(spawn(args, NULL, &exitcode, NULL, NULL), ret, cleanup);
+
+cleanup:
+    free(s);
+    return ret;
+}
+
 int server_clear(void)
 {
-    char *args[] = SHELL_ARGS(scr_clear_sh);
-    int exitcode;
-    ERRCHK_RET_OK(spawn(args, NULL, &exitcode, NULL, NULL));
-
-    return OK;
+    return run_script(scr_clear_sh, LEN(scr_clear_sh)-1, "");
 }
 
 int server_end(const char *id_s)
 {
-    char *args[] = SHELL_ARGS(scr_end_sh, (char *)id_s);
-    int exitcode;
-    ERRCHK_RET_OK(spawn(args, NULL, &exitcode, NULL, NULL));
-
-    return OK;
+    return run_script(scr_end_sh, LEN(scr_end_sh)-1, (char *)id_s);
 }

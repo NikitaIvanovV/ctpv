@@ -6,6 +6,7 @@
 typedef struct {
     char *name, *ext, *type, *subtype, *script;
     int priority;
+    size_t script_len;
 } Preview;
 
 typedef struct {

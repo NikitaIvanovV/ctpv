@@ -1,14 +1,16 @@
 #include <stdlib.h>
 #include <limits.h>
 
-#include "gen/prev/scripts.h"
+#include "utils.h"
 #include "preview.h"
+#include "gen/prev/scripts.h"
 
 /*
  * This file is supposed to be included in ctpv.c
  */
 
-#define PP(e, t, s, n, p) { #n, e, t, s, prev_scr_##n##_sh, p }
+#define PNAME(n) prev_scr_##n##_sh
+#define PP(e, t, s, n, p) { #n, e, t, s, PNAME(n), p, LEN(PNAME(n)) }
 #define PR(e, t, s, n) PP(e, t, s, n, 0)
 
 Preview previews[] = {
@@ -21,3 +23,5 @@ Preview previews[] = {
     PR(NULL,      "video",          NULL,             video),
     PR(NULL,      "application",    "pdf",            pdf),
 };
+
+/* vim: set nowrap: */
