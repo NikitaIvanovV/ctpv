@@ -155,6 +155,7 @@ static int run(Preview *p, int *exitcode)
 
 int run_preview(const char *ext, const char *mimetype, PreviewArgs *pa)
 {
+    SET_PENV("ctpv", pa->ctpv);
     SET_PENV("f", pa->f);
     SET_PENV("w", pa->w);
     SET_PENV("h", pa->h);

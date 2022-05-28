@@ -8,7 +8,7 @@ PRE := $(wildcard prev/*.sh)
 GEN := gen/prev/scripts.h gen/server.h
 
 CFLAGS  += -Os -MD -Wall -Wextra -Wno-unused-parameter
-LDFLAGS += -lmagic
+LDFLAGS += -lmagic -lcrypto
 
 all: ctpv
 

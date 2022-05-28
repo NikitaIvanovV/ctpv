@@ -1,12 +1,14 @@
-#include <sys/wait.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
 
 #include "error.h"
 #include "utils.h"
 
-char *program;
+char *program = NULL;
 
 int spawn_redirect(const void *arg)
 {
@@ -78,6 +80,40 @@ int strcmpnull(char const *s1, char const *s2)
         return -1;
 
     return strcmp(s1, s2);
+}
+
+int get_cache_dir(char *buf, size_t len, char *name)
+{
+    char *home, *cache_d, cache_d_buf[FILENAME_MAX];
+
+    if (!(cache_d = getenv("XDG_CACHE_HOME"))) {
+        home = getenv("HOME");
+        ERRCHK_RET(!home, "HOME env var does not exist");
+
+        snprintf(cache_d_buf, LEN(cache_d_buf)-1, "%s/.cache", home);
+        cache_d = cache_d_buf;
+    }
+
+    snprintf(buf, len, "%s/%s", cache_d, name);
+    return OK;
+}
+
+int mkpath(char* file_path, mode_t mode)
+{
+    for (char* p = strchr(file_path + 1, '/'); p; p = strchr(p + 1, '/')) {
+        *p = '\0';
+
+        if (mkdir(file_path, mode) == -1) {
+            if (errno != EEXIST) {
+                *p = '/';
+                return -1;
+            }
+        }
+
+        *p = '/';
+    }
+
+    return 0;
 }
 
 CharVec char_v_new(size_t cap)

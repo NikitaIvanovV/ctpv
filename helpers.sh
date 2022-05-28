@@ -20,11 +20,7 @@ check_exist() {
 }
 
 cache() {
-	cache_d="${XDG_CACHE_HOME:-$HOME/.cache}/ctpv"
-	mkdir -p "$cache_d"
-	cache_f="$cache_d/$(printf '%s' "$f" | md5sum - | cut -d' ' -f1)"
-	test -e "$cache_f" || return
-	ctpv -n "$cache_f" "$f"
+	cache_f="$("$ctpv" -C "$f")"
 }
 
 show_image() {
