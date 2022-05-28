@@ -106,12 +106,13 @@ static int preview(int argc, char *argv[])
         return ERR;
     }
 
-    char *f, *w, *h, *x, *y;
+    char *f, *w, *h, *x, *y, *id;
     GET_PARG(f, 0);
     GET_PARG(w, 1);
     GET_PARG(h, 2);
     GET_PARG(x, 3);
     GET_PARG(y, 4);
+    GET_PARG(id, 5);
 
     ERRCHK_RET_OK(check_file(f));
 
@@ -124,7 +125,7 @@ static int preview(int argc, char *argv[])
 
     PreviewArgs args = {
         .ctpv = ctpv.ctpv_path,
-        .f = f, .w = w, .h = h, .x = x, .y = y
+        .f = f, .w = w, .h = h, .x = x, .y = y, .id = id
     };
 
     return run_preview(get_ext(f), mimetype, &args);

@@ -163,6 +163,7 @@ int run_preview(const char *ext, const char *mimetype, PreviewArgs *pa)
     SET_PENV("h", pa->h);
     SET_PENV("x", pa->x);
     SET_PENV("y", pa->y);
+    SET_PENV("id", pa->id);
 
     SET_PENV("m", mimetype);
     SET_PENV("e", ext);

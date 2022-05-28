@@ -10,7 +10,7 @@ typedef struct {
 } Preview;
 
 typedef struct {
-    char *ctpv, *f, *w, *h, *x, *y;
+    char *ctpv, *f, *w, *h, *x, *y, *id;
 } PreviewArgs;
 
 void init_previews(Preview *ps, size_t len);
