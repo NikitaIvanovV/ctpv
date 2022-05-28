@@ -135,30 +135,57 @@ void char_v_free(CharVec *v)
     }
 }
 
-void char_v_append(CharVec *v, char c)
+static void char_v_create(CharVec *v)
 {
-    if (!v->buf) {
-        v->buf = malloc(v->cap * sizeof(v->buf[0]));
-        if (!v->buf) {
-            PRINTINTERR(FUNCFAILED("malloc"), ERRNOS);
-            abort();
-        }
-        v->buf[0] = '\0';
-        v->len++;
+    if (v->buf)
+        return;
+
+    if (!(v->buf = malloc(v->cap * sizeof(*v->buf)))) {
+        PRINTINTERR(FUNCFAILED("malloc"), ERRNOS);
+        abort();
     }
 
-    if (v->len + 1 >= v->cap) {
+    v->buf[0] = '\0';
+    v->len++;
+}
+
+static void char_v_check_cap(CharVec *v, size_t len_inc)
+{
+    void *new_buf;
+    size_t new_len = v->len + len_inc;
+
+    if (new_len < v->cap)
+        return;
+
+    while (new_len >= v->cap)
         v->cap *= 2;
-        void *new = realloc(v->buf, v->cap * sizeof(v->buf[0]));
-        if (!new) {
-            free(v->buf);
-            PRINTINTERR(FUNCFAILED("realloc"), ERRNOS);
-            abort();
-        }
-        v->buf = new;
+
+    if (!(new_buf = realloc(v->buf, v->cap * sizeof(*v->buf)))) {
+        free(v->buf);
+        PRINTINTERR(FUNCFAILED("realloc"), ERRNOS);
+        abort();
     }
+
+    v->buf = new_buf;
+}
+
+void char_v_append(CharVec *v, char c)
+{
+    char_v_create(v);
+    char_v_check_cap(v, 1);
 
     v->buf[v->len - 1] = c;
     v->buf[v->len] = '\0';
     v->len++;
+}
+
+void char_v_append_str(CharVec *v, char *s)
+{
+    size_t len = strlen(s);
+
+    char_v_create(v);
+    char_v_check_cap(v, len);
+
+    memcpy(v->buf + v->len * sizeof(*v->buf), s, len + 1);
+    v->len += len;
 }

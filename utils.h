@@ -21,11 +21,6 @@
         va_end(args);                                   \
     } while (0)
 
-typedef struct {
-    char *buf;
-    size_t len, cap;
-} CharVec;
-
 extern char *program;
 
 int spawn_redirect(const void *arg);
@@ -37,8 +32,17 @@ int strcmpnull(char const *s1, char const *s2);
 int get_cache_dir(char *buf, size_t len, char *name);
 int mkpath(char* file_path, mode_t mode);
 
+#define CHAR_V_LEN(vec) ((vec).len - 1)
+#define CHAR_V_STR(vec) ((vec).buf)
+
+typedef struct {
+    size_t len, cap;
+    char *buf;
+} CharVec;
+
 CharVec char_v_new(size_t cap);
-void char_v_append(CharVec *v, char c);
 void char_v_free(CharVec *v);
+void char_v_append(CharVec *v, char c);
+void char_v_append_str(CharVec *v, char *s);
 
 #endif
