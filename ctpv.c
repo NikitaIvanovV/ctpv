@@ -136,9 +136,9 @@ static int server(char const *id_s)
     return server_listen(id_s);
 }
 
-static int clear(void)
+static int clear(char const *id_s)
 {
-    return server_clear();
+    return server_clear(id_s);
 }
 
 static int end(char const *id_s)
@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
     program = ctpv.ctpv_path ? ctpv.ctpv_path : "ctpv";
 
     int c;
-    while ((c = getopt(argc, argv, "s:ce:lmC:")) != -1) {
+    while ((c = getopt(argc, argv, "s:c:e:lmC:")) != -1) {
         switch (c) {
         case 's':
             ctpv.mode = MODE_SERVER;
@@ -272,6 +272,7 @@ int main(int argc, char *argv[])
             break;
         case 'c':
             ctpv.mode = MODE_CLEAR;
+            ctpv.server_id_s = optarg;
             break;
         case 'e':
             ctpv.mode = MODE_END;
@@ -304,7 +305,7 @@ int main(int argc, char *argv[])
             ret = server(ctpv.server_id_s);
             break;
         case MODE_CLEAR:
-            ret = clear();
+            ret = clear(ctpv.server_id_s);
             break;
         case MODE_END:
             ret = end(ctpv.server_id_s);

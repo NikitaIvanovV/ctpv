@@ -148,9 +148,9 @@ cleanup:
     return ret;
 }
 
-int server_clear(void)
+int server_clear(const char *id_s)
 {
-    return run_script(scr_clear_sh, LEN(scr_clear_sh)-1, "");
+    return run_script(scr_clear_sh, LEN(scr_clear_sh)-1, (char *)id_s);
 }
 
 int server_end(const char *id_s)

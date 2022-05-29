@@ -5,8 +5,8 @@ fifo_open() {
 }
 
 setup_fifo() {
-	exit_code="${2:-127}"
 	fifo="$(printf '/tmp/ctpvfifo.%s' "${1:-$id}")"
+	exit_code="${2:-127}"
 	[ -e "$fifo" ] || exit "$exit_code"
 	fifo_open "$fifo" || exit "$exit_code"
 }
