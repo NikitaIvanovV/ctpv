@@ -123,7 +123,7 @@ static int run(Preview *p, int *exitcode)
 
     int sp_arg[] = { pipe_fds[0], pipe_fds[1], STDERR_FILENO };
 
-    char *script = prepend_helpers(p->script, p->script_len - 1);
+    char *script = prepend_helpers(p->script, p->script_len);
     char *args[] = SHELL_ARGS(script);
     int ret = spawn(args, NULL, exitcode, spawn_redirect, sp_arg);
 

@@ -12,23 +12,20 @@
 char *prepend_helpers(char *str, size_t len)
 {
     char *buf, *b;
-    size_t mlen;
+    size_t l, helpers_len = LEN(scr_helpers_sh) - 1;
 
-    if (!(buf = malloc(sizeof(*buf) * (LEN(scr_helpers_sh) + len)))) {
+    if (!(buf = malloc(sizeof(*buf) * (helpers_len + len)))) {
         PRINTINTERR(FUNCFAILED("malloc"), ERRNOS);
         abort();
     }
 
     b = buf;
-    mlen = LEN(scr_helpers_sh);
-    memcpy(b, scr_helpers_sh, mlen);
+    l = helpers_len;
+    memcpy(b, scr_helpers_sh, l * sizeof(*b));
 
-    b += (mlen - 1) * sizeof(*str);
-    mlen = len;
-    memcpy(b, str, mlen);
-
-    b += mlen * sizeof(*str);
-    b[0] = '\0';
+    b += l * sizeof(*str);
+    l = len;
+    memcpy(b, str, l * sizeof(*b));
 
     return buf;
 }
