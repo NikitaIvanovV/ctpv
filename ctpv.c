@@ -131,19 +131,19 @@ static int preview(int argc, char *argv[])
     return run_preview(get_ext(f), mimetype, &args);
 }
 
-static int server(char const *id_s)
+static int server(void)
 {
-    return server_listen(id_s);
+    return server_listen(ctpv.server_id_s);
 }
 
-static int clear(char const *id_s)
+static int clear(void)
 {
-    return server_clear(id_s);
+    return server_clear(ctpv.server_id_s);
 }
 
-static int end(char const *id_s)
+static int end(void)
 {
-    return server_end(id_s);
+    return server_end(ctpv.server_id_s);
 }
 
 static int list(void)
@@ -302,13 +302,13 @@ int main(int argc, char *argv[])
             ret = preview(argc, argv);
             break;
         case MODE_SERVER:
-            ret = server(ctpv.server_id_s);
+            ret = server();
             break;
         case MODE_CLEAR:
-            ret = clear(ctpv.server_id_s);
+            ret = clear();
             break;
         case MODE_END:
-            ret = end(ctpv.server_id_s);
+            ret = end();
             break;
         case MODE_LIST:
             ret = list();
