@@ -9,12 +9,8 @@ fifo_open() {
 }
 
 setup_fifo() {
-	if [ -z "$fifo" ]; then
-		echo_err '$fifo is empty!'
-		exit 1
-	fi
-
 	exit_code="${1:-127}"
+	[ -n "$fifo" ] || exit "$exit_code"
 	[ -e "$fifo" ] || exit "$exit_code"
 	fifo_open "$fifo" || exit "$exit_code"
 }
