@@ -1,3 +1,7 @@
+echo_err() {
+	echo "$@" >&2
+}
+
 fifo_open() {
 	# https://unix.stackexchange.com/a/522940/183147
 	dd oflag=nonblock conv=notrunc,nocreat count=0 of="$1" \
@@ -5,8 +9,12 @@ fifo_open() {
 }
 
 setup_fifo() {
-	fifo="$(printf '/tmp/ctpvfifo.%s' "${1:-$id}")"
-	exit_code="${2:-127}"
+	if [ -z "$fifo" ]; then
+		echo_err '$fifo is empty!'
+		exit 1
+	fi
+
+	exit_code="${1:-127}"
 	[ -e "$fifo" ] || exit "$exit_code"
 	fifo_open "$fifo" || exit "$exit_code"
 }

@@ -11,6 +11,8 @@
 #include "shell.h"
 #include "gen/server.h"
 
+#define FIFO_FILENAME_SIZE 256
+
 static pid_t ueberzug_pid;
 
 static void kill_ueberzug(void)
@@ -99,6 +101,11 @@ static int check_ueberzug(int *exitcode)
     return spawn(args, NULL, exitcode, NULL, NULL);
 }
 
+static void get_fifo_name(char *buf, size_t len, const char *id_s)
+{
+    snprintf(buf, len-1, "/tmp/ctpvfifo.%s", id_s);
+}
+
 int server_listen(char const *id_s)
 {
     int ret = OK;
@@ -111,8 +118,8 @@ int server_listen(char const *id_s)
         goto exit;
     }
 
-    char fifo[256];
-    snprintf(fifo, LEN(fifo)-1, "/tmp/ctpvfifo.%s", id_s);
+    char fifo[FIFO_FILENAME_SIZE];
+    get_fifo_name(fifo, LEN(fifo), id_s);
 
     ERRCHK_GOTO(mkfifo(fifo, 0600) == -1 && errno != EEXIST, ret, exit,
                 FUNCFAILED("mkfifo"), ERRNOS);
@@ -148,12 +155,25 @@ cleanup:
     return ret;
 }
 
+int server_set_fifo_var(const char *id_s)
+{
+    char fifo[FIFO_FILENAME_SIZE];
+    get_fifo_name(fifo, LEN(fifo), id_s);
+    ERRCHK_RET(setenv("fifo", fifo, 1) != 0, FUNCFAILED("setenv"), ERRNOS);
+
+    return OK;
+}
+
 int server_clear(const char *id_s)
 {
+    ERRCHK_RET_OK(server_set_fifo_var(id_s));
+
     return run_script(scr_clear_sh, LEN(scr_clear_sh)-1, (char *)id_s);
 }
 
 int server_end(const char *id_s)
 {
+    ERRCHK_RET_OK(server_set_fifo_var(id_s));
+
     return run_script(scr_end_sh, LEN(scr_end_sh)-1, (char *)id_s);
 }

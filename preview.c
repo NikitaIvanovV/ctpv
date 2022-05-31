@@ -4,6 +4,7 @@
 #include "utils.h"
 #include "error.h"
 #include "shell.h"
+#include "server.h"
 #include "preview.h"
 
 #define FAILED_PREVIEW_EC NOTEXIST_EC
@@ -157,6 +158,9 @@ static int run(Preview *p, int *exitcode)
 
 int run_preview(const char *ext, const char *mimetype, PreviewArgs *pa)
 {
+    if (pa->id || (pa->id = getenv("id")))
+        ERRCHK_RET_OK(server_set_fifo_var(pa->id));
+
     SET_PENV("ctpv", pa->ctpv);
     SET_PENV("f", pa->f);
     SET_PENV("w", pa->w);
