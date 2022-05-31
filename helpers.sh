@@ -19,14 +19,6 @@ exists() {
 	command -v "$1" > /dev/null
 }
 
-check_exists() {
-	[ $? = 127 ] && exit 127
-}
-
-cache() {
-	[ -n "$cache_valid" ]
-}
-
 send_image() {
 	path="$(printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g')"
 	printf '{ "action": "add", "identifier": "preview", "x": %d, "y": %d, "width": %d, "height": %d, "scaler": "contain", "scaling_position_x": 0.5, "scaling_position_y": 0.5, "path": "%s"}\n' "$x" "$y" "$w" "$h" "$path" > "$fifo"
@@ -34,7 +26,7 @@ send_image() {
 
 convert_and_show_image() {
 	setup_fifo
-	cache || "$@" || check_exists
+	[ -n "$cache_valid" ] || "$@" || exit "$?"
 	send_image "$cache_f"
 	exit 1
 }
