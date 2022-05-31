@@ -23,7 +23,7 @@ exists() {
 	command -v "$1" > /dev/null
 }
 
-check_exist() {
+check_exists() {
 	[ $? = 127 ] && exit 127
 }
 
@@ -38,7 +38,7 @@ send_image() {
 
 convert_and_show_image() {
 	setup_fifo
-	cache || "$@" || check_exist
+	cache || "$@" || check_exists
 	send_image "$cache_f"
 	exit 1
 }
