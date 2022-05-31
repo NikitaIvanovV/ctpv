@@ -196,12 +196,12 @@ int server_clear(const char *id_s)
 {
     ERRCHK_RET_OK(server_set_fifo_var(id_s));
 
-    return run_script(scr_clear_sh, LEN(scr_clear_sh)-1, (char *)id_s);
+    return run_script(scr_clear_sh, LEN(scr_clear_sh), (char *)id_s);
 }
 
 int server_end(const char *id_s)
 {
     ERRCHK_RET_OK(server_set_fifo_var(id_s));
 
-    return run_script(scr_end_sh, LEN(scr_end_sh)-1, (char *)id_s);
+    return run_script(scr_end_sh, LEN(scr_end_sh), (char *)id_s);
 }
