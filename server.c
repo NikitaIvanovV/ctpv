@@ -100,7 +100,7 @@ static int listen(char *fifo)
 
         if (pollfd.revents & POLLHUP) {
             close(pollfd.fd);
-            ERRCHK_GOTO_OK(open_fifo(&pollfd.fd, fifo), ret, exit);
+            ERRCHK_GOTO_OK(open_fifo(&pollfd.fd, fifo), ret, close);
         }
     }
 
