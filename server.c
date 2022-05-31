@@ -40,17 +40,27 @@ static int register_signal(int sig, __sighandler_t handler)
     return OK;
 }
 
-static int listen(int fifo_fd)
+static int open_fifo(int *fd, char *f)
+{
+    ERRCHK_RET((*fd = open(f, O_RDONLY | O_NONBLOCK)) == -1, FUNCFAILED("open"), ERRNOS);
+
+    return OK;
+}
+
+static int listen(char *fifo)
 {
     int ret = OK;
+
+    struct pollfd pollfd = { .fd = -1, .events = POLLIN };
+    ERRCHK_GOTO_OK(open_fifo(&pollfd.fd, fifo), ret, exit);
 
     /*
      * We don't register actual handlers because when one occures,
      * poll() returns 0, which will break the loop and a normal
      * exit will happen.
      */
-    ERRCHK_GOTO_OK(register_signal(SIGINT, sig_handler_exit), ret, exit);
-    ERRCHK_GOTO_OK(register_signal(SIGTERM, sig_handler_exit), ret, exit);
+    ERRCHK_GOTO_OK(register_signal(SIGINT, sig_handler_exit), ret, fifo);
+    ERRCHK_GOTO_OK(register_signal(SIGTERM, sig_handler_exit), ret, fifo);
 
     int pipe_fds[2];
     ERRCHK_GOTO(pipe(pipe_fds) == -1, ret, signal, FUNCFAILED("pipe"), ERRNOS);
@@ -66,8 +76,6 @@ static int listen(int fifo_fd)
     if (ret != OK)
         goto close;
 
-    struct pollfd pollfd = { .fd = fifo_fd, .events = POLLIN };
-
     /*
      * "Listen" to fifo and redirect all the input to ueberzug
      * instance.
@@ -80,14 +88,22 @@ static int listen(int fifo_fd)
         if (poll_ret == 0)
             continue;
 
-        static char buf[1024];
-        while ((len = read(fifo_fd, buf, LEN(buf))) > 0) {
-            /* But first byte equal to 0 means "exit" */
-            if (buf[0] == 0)
-                goto close;
-            write(pipe_fds[1], buf, len);
+        if (pollfd.revents & POLLIN) {
+            static char buf[1024];
+            while ((len = read(pollfd.fd, buf, LEN(buf))) > 0) {
+                /* But first byte equal to 0 means "exit" */
+                if (buf[0] == 0)
+                    goto close;
+                write(pipe_fds[1], buf, len);
+            }
+        }
+
+        if (pollfd.revents & POLLHUP) {
+            close(pollfd.fd);
+            ERRCHK_GOTO_OK(open_fifo(&pollfd.fd, fifo), ret, exit);
         }
     }
+
 
     ERRCHK_GOTO(poll_ret < 0, ret, close, FUNCFAILED("poll"), ERRNOS);
 
@@ -98,6 +114,10 @@ close:
 signal:
     signal(SIGINT, SIG_DFL);
     signal(SIGTERM, SIG_DFL);
+
+fifo:
+    if (pollfd.fd >= 0)
+        close(pollfd.fd);
 
 exit:
     return ret;
@@ -122,6 +142,7 @@ int server_listen(char const *id_s)
     ERRCHK_GOTO_OK(check_ueberzug(&exitcode), ret, exit);
 
     if (exitcode == 127) {
+        ret = ERR;
         print_error("ueberzug is not installed");
         goto exit;
     }
@@ -129,17 +150,16 @@ int server_listen(char const *id_s)
     char fifo[FIFO_FILENAME_SIZE];
     get_fifo_name(fifo, LEN(fifo), id_s);
 
-    ERRCHK_GOTO(mkfifo(fifo, 0600) == -1 && errno != EEXIST, ret, exit,
-                FUNCFAILED("mkfifo"), ERRNOS);
+    if (mkfifo(fifo, 0600) == -1) {
+        if (errno == EEXIST)
+            print_errorf("server with id %s is already running or fifo %s still exists", id_s, fifo);
+        else
+            PRINTINTERR(FUNCFAILED("mkfifo"), ERRNOS);
+        ret = ERR;
+        goto exit;
+    }
 
-    int fifo_fd;
-    ERRCHK_GOTO((fifo_fd = open(fifo, O_RDONLY | O_NONBLOCK)) == -1, ret, fifo,
-                FUNCFAILED("open"), ERRNOS);
-
-    ERRCHK_GOTO_OK(listen(fifo_fd), ret, fifo_fd);
-
-fifo_fd:
-    close(fifo_fd);
+    ERRCHK_GOTO_OK(listen(fifo), ret, fifo);
 
 fifo:
     if (remove(fifo) == -1 && errno != ENOENT)
