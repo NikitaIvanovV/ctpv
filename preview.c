@@ -161,13 +161,18 @@ int run_preview(const char *ext, const char *mimetype, PreviewArgs *pa)
     if (pa->id || (pa->id = getenv("id")))
         ERRCHK_RET_OK(server_set_fifo_var(pa->id));
 
-    SET_PENV("ctpv", pa->ctpv);
     SET_PENV("f", pa->f);
     SET_PENV("w", pa->w);
     SET_PENV("h", pa->h);
     SET_PENV("x", pa->x);
     SET_PENV("y", pa->y);
     SET_PENV("id", pa->id);
+    SET_PENV("cache_f", pa->cache_file);
+
+    {
+        char *s = pa->cache_valid ? "1" : "";
+        SET_PENV("cache_valid", s);
+    }
 
     SET_PENV("m", mimetype);
     SET_PENV("e", ext);

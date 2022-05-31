@@ -94,7 +94,7 @@ int get_cache_dir(char *buf, size_t len, char *name)
         cache_d = cache_d_buf;
     }
 
-    snprintf(buf, len, "%s/%s", cache_d, name);
+    snprintf(buf, len - 1, "%s/%s", cache_d, name);
     return OK;
 }
 

@@ -10,7 +10,9 @@ typedef struct {
 } Preview;
 
 typedef struct {
-    char *ctpv, *f, *w, *h, *x, *y, *id;
+    char *f, *w, *h, *x, *y, *id;
+    char *cache_file;
+    int cache_valid;
 } PreviewArgs;
 
 void init_previews(Preview *ps, size_t len);

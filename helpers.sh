@@ -28,7 +28,7 @@ check_exists() {
 }
 
 cache() {
-	cache_f="$("$ctpv" -C "$f")"
+	[ -n "$cache_valid" ]
 }
 
 send_image() {

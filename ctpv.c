@@ -26,11 +26,8 @@ static struct {
         MODE_END,
         MODE_LIST,
         MODE_MIME,
-        MODE_CHECK_CACHE,
     } mode;
     char *server_id_s;
-    char *check_file;
-    char *ctpv_path;
 } ctpv = { .mode = MODE_PREVIEW };
 
 static void cleanup(void) {
@@ -97,15 +94,71 @@ static int check_file(char const *f)
     return OK;
 }
 
+static int is_newer(int *resp, char *f1, char *f2)
+{
+    struct stat stat1, stat2;
+    ERRCHK_RET(stat(f1, &stat1) == -1, FUNCFAILED("stat"), ERRNOS);
+    ERRCHK_RET(stat(f2, &stat2) == -1, FUNCFAILED("stat"), ERRNOS);
+
+    int sec_d = stat1.st_mtim.tv_sec - stat2.st_mtim.tv_sec;
+    if (sec_d < 0)
+        goto older;
+    else if (sec_d == 0 && stat1.st_mtim.tv_nsec <= stat2.st_mtim.tv_nsec)
+        goto older;
+
+    *resp = 1;
+    return OK;
+
+older:
+    *resp = 0;
+    return OK;
+}
+
+static void md5_string(char *buf, size_t len, char *s)
+{
+    unsigned char out[MD5_DIGEST_LENGTH];
+    char b[16];
+
+    MD5((const unsigned char *)s, strlen(s), out);
+
+    buf[0] = '\0';
+    for(unsigned int i = 0; i < LEN(out); i++) {
+        snprintf(b, LEN(b)-1, "%02x", out[i]);
+        strncat(buf, b, len);
+    }
+}
+
+static int get_cache_file(char *buf, size_t len, char *file)
+{
+    ERRCHK_RET_OK(get_cache_dir(buf, len, "ctpv/"));
+
+    {
+        char dir[len];
+        strncpy(dir, buf, LEN(dir) - 1);
+        ERRCHK_RET(mkpath(dir, 0700) == -1, FUNCFAILED("mkpath"), ERRNOS);
+    }
+
+    char name[64];
+    md5_string(name, LEN(name) - 1, file);
+    strncat(buf, name, len - 1);
+
+    return OK;
+}
+
+static int check_cache(int *resp, char *file, char *cache_file)
+{
+    if (access(cache_file, F_OK) != 0) {
+        *resp = 0;
+        return OK;
+    }
+
+    return is_newer(resp, cache_file, file);
+}
+
 #define GET_PARG(a, i) (a) = argc > (i) ? argv[i] : NULL
 
 static int preview(int argc, char *argv[])
 {
-    if (!ctpv.ctpv_path) {
-        print_error("argument 0 is null");
-        return ERR;
-    }
-
     char *f, *w, *h, *x, *y, *id;
     GET_PARG(f, 0);
     GET_PARG(w, 1);
@@ -123,9 +176,15 @@ static int preview(int argc, char *argv[])
     const char *mimetype;
     ERRCHK_RET(!(mimetype = get_mimetype(f)));
 
+    char cache_file[FILENAME_MAX];
+    ERRCHK_RET_OK(get_cache_file(cache_file, LEN(cache_file), f));
+
+    int cache_valid;
+    ERRCHK_RET_OK(check_cache(&cache_valid, f, cache_file));
+
     PreviewArgs args = {
-        .ctpv = ctpv.ctpv_path,
-        .f = f, .w = w, .h = h, .x = x, .y = y, .id = id
+        .f = f, .w = w, .h = h, .x = x, .y = y, .id = id,
+        .cache_file = cache_file, .cache_valid = cache_valid,
     };
 
     return run_preview(get_ext(f), mimetype, &args);
@@ -202,69 +261,12 @@ static int mime(int argc, char *argv[])
     return OK;
 }
 
-static int is_newer(char *f1, char *f2)
-{
-    struct stat stat1, stat2;
-    ERRCHK_RET(stat(f1, &stat1) == -1, FUNCFAILED("stat"), ERRNOS);
-    ERRCHK_RET(stat(f2, &stat2) == -1, FUNCFAILED("stat"), ERRNOS);
-
-    int sec_d = stat1.st_mtim.tv_sec - stat2.st_mtim.tv_sec;
-    if (sec_d < 0)
-        return ERR;
-    else if (sec_d == 0 && stat1.st_mtim.tv_nsec <= stat2.st_mtim.tv_nsec)
-        return ERR;
-
-    return OK;
-}
-
-static void md5_string(char *buf, size_t len, char *s)
-{
-    unsigned char out[MD5_DIGEST_LENGTH];
-    char b[16];
-
-    MD5((const unsigned char *)s, strlen(s), out);
-
-    buf[0] = '\0';
-    for(unsigned int i = 0; i < LEN(out); i++) {
-        snprintf(b, LEN(b)-1, "%02x", out[i]);
-        strncat(buf, b, len);
-    }
-}
-
-static int check_cache(void)
-{
-    ERRCHK_RET_OK(check_file(ctpv.check_file));
-
-    char cache_file[FILENAME_MAX];
-    ERRCHK_RET_OK(
-        get_cache_dir(cache_file, LEN(cache_file) - 1, "ctpv//"));
-
-    {
-        char cache_file_cpy[FILENAME_MAX];
-        strncpy(cache_file_cpy, cache_file, LEN(cache_file_cpy) - 1);
-        ERRCHK_RET(mkpath(cache_file_cpy, 0700) == -1, FUNCFAILED("mkpath"),
-                   ERRNOS);
-    }
-
-    char name[64];
-    md5_string(name, LEN(name)-1, ctpv.check_file);
-
-    strncat(cache_file, name, LEN(cache_file)-1);
-    puts(cache_file);
-
-    if (access(cache_file, F_OK) != 0)
-        return ERR;
-
-    return is_newer(cache_file, ctpv.check_file);
-}
-
 int main(int argc, char *argv[])
 {
-    ctpv.ctpv_path = argc > 0 ? argv[0] : NULL;
-    program = ctpv.ctpv_path ? ctpv.ctpv_path : "ctpv";
+    program = argc > 0 ? argv[0] : "ctpv";
 
     int c;
-    while ((c = getopt(argc, argv, "s:c:e:lmC:")) != -1) {
+    while ((c = getopt(argc, argv, "s:c:e:lm")) != -1) {
         switch (c) {
         case 's':
             ctpv.mode = MODE_SERVER;
@@ -283,10 +285,6 @@ int main(int argc, char *argv[])
             break;
         case 'm':
             ctpv.mode = MODE_MIME;
-            break;
-        case 'C':
-            ctpv.mode = MODE_CHECK_CACHE;
-            ctpv.check_file = optarg;
             break;
         default:
             return EXIT_FAILURE;
@@ -315,9 +313,6 @@ int main(int argc, char *argv[])
             break;
         case MODE_MIME:
             ret = mime(argc, argv);
-            break;
-        case MODE_CHECK_CACHE:
-            ret = check_cache();
             break;
         default:
             PRINTINTERR("unknowm mode: %d", ctpv.mode);
