@@ -32,7 +32,7 @@ int spawn_wait(pid_t pid, int *exitcode)
 }
 
 /*
- * Call command
+ * Run command
  *
  * If cpid is NULL, wait for the command to finish executing;
  * otherwise store pid in cpid
