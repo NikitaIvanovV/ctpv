@@ -15,6 +15,8 @@
 
 static pid_t ueberzug_pid;
 
+static volatile int do_exit = 0;
+
 static void kill_ueberzug(void)
 {
     if (kill(ueberzug_pid, SIGTERM) == -1) {
@@ -27,9 +29,9 @@ static void kill_ueberzug(void)
     spawn_wait(ueberzug_pid, NULL);
 }
 
-static void do_nothing(int s)
+static void sig_handler_exit(int s)
 {
-    /* Do nothing */
+    do_exit = 1;
 }
 
 static int register_signal(int sig, __sighandler_t handler)
@@ -47,8 +49,8 @@ static int listen(int fifo_fd)
      * poll() returns 0, which will break the loop and a normal
      * exit will happen.
      */
-    ERRCHK_GOTO_OK(register_signal(SIGINT, do_nothing), ret, exit);
-    ERRCHK_GOTO_OK(register_signal(SIGTERM, do_nothing), ret, exit);
+    ERRCHK_GOTO_OK(register_signal(SIGINT, sig_handler_exit), ret, exit);
+    ERRCHK_GOTO_OK(register_signal(SIGTERM, sig_handler_exit), ret, exit);
 
     int pipe_fds[2];
     ERRCHK_GOTO(pipe(pipe_fds) == -1, ret, signal, FUNCFAILED("pipe"), ERRNOS);
@@ -71,7 +73,13 @@ static int listen(int fifo_fd)
      * instance.
      */
     int poll_ret, len;
-    while ((poll_ret = poll(&pollfd, 1, -1) > 0)) {
+    while ((poll_ret = poll(&pollfd, 1, 100) >= 0)) {
+        if (do_exit)
+            goto close;
+
+        if (poll_ret == 0)
+            continue;
+
         static char buf[1024];
         while ((len = read(fifo_fd, buf, LEN(buf))) > 0) {
             /* But first byte equal to 0 means "exit" */
