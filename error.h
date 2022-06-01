@@ -56,7 +56,7 @@ enum {
     ERR,
 };
 
-void print_error(char const *error_msg);
-void print_errorf(char const *format, ...);
+void print_error(const char *error_msg);
+void print_errorf(const char *format, ...);
 
 #endif

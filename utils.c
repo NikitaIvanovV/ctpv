@@ -70,7 +70,7 @@ int spawn(char *args[], pid_t *cpid, int *exitcode, int (*cfunc)(const void *),
     return OK;
 }
 
-int strcmpnull(char const *s1, char const *s2)
+int strcmpnull(const char *s1, const char *s2)
 {
     if (!s1 && !s2)
         return 0;
@@ -82,7 +82,7 @@ int strcmpnull(char const *s1, char const *s2)
     return strcmp(s1, s2);
 }
 
-int strlennull(char const *s)
+int strlennull(const char *s)
 {
     return s ? strlen(s) : 0;
 }

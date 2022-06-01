@@ -134,7 +134,7 @@ static void get_fifo_name(char *buf, size_t len, const char *id_s)
     snprintf(buf, len-1, "/tmp/ctpvfifo.%s", id_s);
 }
 
-int server_listen(char const *id_s)
+int server_listen(const char *id_s)
 {
     int ret = OK;
 

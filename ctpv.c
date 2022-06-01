@@ -53,7 +53,7 @@ static void init_previews_v(void)
     init_previews(previews, LEN(previews));
 }
 
-static const char *get_mimetype(char const *path)
+static const char *get_mimetype(const char *path)
 {
     const char *r = magic_file(magic, path);
     if (!r) {
@@ -64,7 +64,7 @@ static const char *get_mimetype(char const *path)
     return r;
 }
 
-static const char *get_ext(char const *path)
+static const char *get_ext(const char *path)
 {
     const char *base;
 
@@ -80,7 +80,7 @@ static const char *get_ext(char const *path)
     return &dot[1];
 }
 
-static int check_file(char const *f)
+static int check_file(const char *f)
 {
     if (!f) {
         print_error("file not given");
@@ -268,7 +268,7 @@ static int list(void)
 
 static int mime(int argc, char *argv[])
 {
-    char const *f, *mimetype;
+    const char *f, *mimetype;
 
     for (int i = 0; i < argc; i++) {
         f = argv[i];

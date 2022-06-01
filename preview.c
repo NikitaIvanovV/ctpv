@@ -81,7 +81,7 @@ static void break_mimetype(char *mimetype, char **type, char **subtype)
 
 #define MIMETYPE_MAX 64
 
-static Preview *find_preview(char const *mimetype, char const *ext, size_t *i)
+static Preview *find_preview(const char *mimetype, const char *ext, size_t *i)
 {
     Preview *p;
     char mimetype_c[MIMETYPE_MAX], *t, *s;
