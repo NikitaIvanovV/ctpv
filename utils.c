@@ -82,6 +82,11 @@ int strcmpnull(char const *s1, char const *s2)
     return strcmp(s1, s2);
 }
 
+int strlennull(char const *s)
+{
+    return s ? strlen(s) : 0;
+}
+
 int get_cache_dir(char *buf, size_t len, char *name)
 {
     char *home, *cache_d, cache_d_buf[FILENAME_MAX];

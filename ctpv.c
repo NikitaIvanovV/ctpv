@@ -8,6 +8,7 @@
 #include <openssl/md5.h>
 
 #include "error.h"
+#include "utils.h"
 #include "server.h"
 #include "preview.h"
 #include "previews.h"
@@ -211,9 +212,34 @@ static int list(void)
 
     size_t len;
     Preview p, **list = get_previews_list(&len);
-    const char *e, *t, *s;
+    const char *n, *e, *t, *s;
+
+    const char header_name[] = "Name", header_ext[] = "Extension",
+               header_mime[] = "MIME type";
+
+    int width_name = 0, width_ext = 0;
+
+    for (size_t i = 0; i < len + 1; i++) {
+        if (i < len) {
+            p = *list[i];
+            n = p.name;
+            e = p.ext;
+        } else {
+            n = header_name;
+            e = header_ext;
+        }
+
+        int name_len = strlennull(n);
+        int ext_len = strlennull(e);
+        width_name = MAX(width_name, name_len);
+        width_ext = MAX(width_ext, ext_len);
+    }
+
+    width_name += 2, width_ext += 2;
 
     puts("List of available previews:");
+    printf("\t%-*s %-*s %s\n", width_name, header_name, width_ext, header_ext,
+           header_mime);
 
     for (size_t i = 0; i < len; i++) {
         p = *list[i];
@@ -231,10 +257,12 @@ static int list(void)
             s = any_type;
         }
 
-        printf("\t%-15s .%-6s %s/%s\n", p.name, e, t, s);
+        printf("\t%-*s .%-*s %s/%s\n", width_name, p.name, width_ext - 1, e, t,
+               s);
     }
 
     puts("\nNote: '" ANY_TYPE "' means that it matches any.");
+
     return OK;
 }
 

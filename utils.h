@@ -29,6 +29,8 @@ int spawn(char *args[], pid_t *cpid, int *exitcode, int (*cfunc)(const void *),
           const void *carg);
 
 int strcmpnull(char const *s1, char const *s2);
+int strlennull(char const *s);
+
 int get_cache_dir(char *buf, size_t len, char *name);
 int mkpath(char* file_path, mode_t mode);
 
