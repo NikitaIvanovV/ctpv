@@ -15,7 +15,10 @@
 
 Preview previews[] = {
     PP(NULL,      NULL,             NULL,             wrapper, INT_MAX),
-    PR(NULL,      "text",           NULL,             text),
+    PR(NULL,      "text",           NULL,             bat),
+    PR(NULL,      "text",           NULL,             highlight),
+    PR(NULL,      "text",           NULL,             source_highlight),
+    PR(NULL,      "text",           NULL,             cat),
     PR(NULL,      NULL,             NULL,             any),
     PR("md",      NULL,             NULL,             markdown),
     PR(NULL,      "application",    "json",           json),
