@@ -31,13 +31,14 @@ static struct {
     char *server_id_s;
 } ctpv = { .mode = MODE_PREVIEW };
 
-static void cleanup(void) {
+static void cleanup(void)
+{
     cleanup_previews();
     if (magic != NULL)
         magic_close(magic);
 }
 
-static int init_magic()
+static int init_magic(void)
 {
     ERRCHK_RET(!(magic = magic_open(MAGIC_MIME_TYPE)), FUNCFAILED("magic_open"),
                magic_error(magic));
