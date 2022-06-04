@@ -90,7 +90,7 @@ static int listen(char *fifo)
 
         if (pollfd.revents & POLLIN) {
             static char buf[1024];
-            while ((len = read(pollfd.fd, buf, LEN(buf))) > 0) {
+            while ((len = read(pollfd.fd, buf, sizeof(buf))) > 0) {
                 /* But first byte equal to 0 means "exit" */
                 if (buf[0] == 0)
                     goto close;

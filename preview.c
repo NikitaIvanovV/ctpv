@@ -132,7 +132,7 @@ static int run(Preview *p, int *exitcode)
     if (*exitcode != FAILED_PREVIEW_EC) {
         char buf[256];
         int len;
-        while ((len = read(pipe_fds[0], buf, LEN(buf))) > 0) {
+        while ((len = read(pipe_fds[0], buf, sizeof(buf))) > 0) {
             write(STDOUT_FILENO, buf, len);
         }
 
