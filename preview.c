@@ -115,8 +115,6 @@ static void check_init_previews(void)
     }
 }
 
-#define CMD_ERR_BUF 256
-
 static int run(Preview *p, int *exitcode)
 {
     int pipe_fds[2];
@@ -132,9 +130,9 @@ static int run(Preview *p, int *exitcode)
     close(pipe_fds[1]);
 
     if (*exitcode != FAILED_PREVIEW_EC) {
-        char buf[CMD_ERR_BUF];
+        char buf[256];
         int len;
-        while ((len = read(pipe_fds[0], buf, CMD_ERR_BUF)) > 0) {
+        while ((len = read(pipe_fds[0], buf, LEN(buf))) > 0) {
             write(STDOUT_FILENO, buf, len);
         }
 
