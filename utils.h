@@ -32,19 +32,7 @@ int strcmpnull(const char *s1, const char *s2);
 int strlennull(const char *s);
 
 int get_cache_dir(char *buf, size_t len, char *name);
+
 int mkpath(char* file_path, mode_t mode);
-
-#define CHAR_V_LEN(vec) ((vec).len - 1)
-#define CHAR_V_STR(vec) ((vec).buf)
-
-typedef struct {
-    size_t len, cap;
-    char *buf;
-} CharVec;
-
-CharVec char_v_new(size_t cap);
-void char_v_free(CharVec *v);
-void char_v_append(CharVec *v, char c);
-void char_v_append_str(CharVec *v, char *s);
 
 #endif

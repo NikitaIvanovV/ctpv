@@ -10,37 +10,38 @@
     } Vector##name
 
 #define VECTOR_SIGN(name, type, func, ret, ...) \
-    ret vector_##func##_##type(__VA_ARGS__)
+    ret vector##name##_##func(__VA_ARGS__)
 
 #define VECTOR_SIGN_V(name, type, func, ret, ...) \
-    ret vector_##func##_##type(Vector##name *v __VA_OPT__(,) __VA_ARGS__)
+    VECTOR_SIGN(name, type, func, ret,            \
+                Vector##name *v __VA_OPT__(, ) __VA_ARGS__)
 
 #define VECTOR_SIGN_NEW(name, type)        VECTOR_SIGN(name,   type, new, Vector##name *, size_t cap)
 #define VECTOR_SIGN_FREE(name, type)       VECTOR_SIGN_V(name, type, free, void)
 #define VECTOR_SIGN_APPEND_ARR(name, type) VECTOR_SIGN_V(name, type, append_arr, void, type *arr, size_t len)
 #define VECTOR_SIGN_APPEND(name, type)     VECTOR_SIGN_V(name, type, append, void, type val)
-#define VECTOR_SIGN_GET(name, type)        VECTOR_SIGN_V(name, type, get, type, size_t i)
+#define VECTOR_SIGN_GET(name, type)        VECTOR_SIGN_V(name, type, get, type *, size_t i)
 
 #define VECTOR_GEN_SOURCE_(name, type, spec)                  \
-    spec VECTOR_SIGN_NEW(name, type)                          \
+    inline spec VECTOR_SIGN_NEW(name, type)                   \
     {                                                         \
         return (Vector##name *)vector_new(sizeof(type), cap); \
     }                                                         \
-    spec VECTOR_SIGN_FREE(name, type)                         \
+    inline spec VECTOR_SIGN_FREE(name, type)                  \
     {                                                         \
         vector_free((Vector *)v);                             \
     }                                                         \
-    spec VECTOR_SIGN_APPEND_ARR(name, type)                   \
+    inline spec VECTOR_SIGN_APPEND_ARR(name, type)            \
     {                                                         \
         vector_append_arr((Vector *)v, arr, len);             \
     }                                                         \
-    spec VECTOR_SIGN_APPEND(name, type)                       \
+    inline spec VECTOR_SIGN_APPEND(name, type)                \
     {                                                         \
         vector_append((Vector *)v, &val);                     \
     }                                                         \
-    spec VECTOR_SIGN_GET(name, type)                          \
+    inline spec VECTOR_SIGN_GET(name, type)                   \
     {                                                         \
-        return *(type *)vector_get((Vector *)v, i);           \
+        return (type *)vector_get((Vector *)v, i);            \
     }
 
 #define VECTOR_GEN_SOURCE(name, type) VECTOR_GEN_SOURCE_(name, type, )
@@ -51,9 +52,9 @@
 #define VECTOR_GEN_HEADER(name, type)   \
     VECTOR_TYPE(name, type);            \
     VECTOR_SIGN_NEW(name, type);        \
+    VECTOR_SIGN_FREE(name, type);       \
     VECTOR_SIGN_APPEND_ARR(name, type); \
     VECTOR_SIGN_APPEND(name, type);     \
-    VECTOR_SIGN_FREE(name, type);       \
     VECTOR_SIGN_GET(name, type);
 
 VECTOR_TYPE(, void);
