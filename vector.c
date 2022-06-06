@@ -37,24 +37,30 @@ void vector_free(Vector *vec)
     free(vec);
 }
 
-void vector_append_arr(Vector *vec, void *arr, size_t len)
+static void resize_if_needed(Vector *vec, size_t new_len)
 {
     void *p;
     size_t cap = vec->cap;
 
-    while (cap < vec->len + len)
+    while (new_len > cap)
         cap *= 2;
 
-    if (cap != vec->cap) {
-        if (!(p = realloc(vec->buf, vec->size * cap))) {
-            vector_free(vec);
-            PRINTINTERR(FUNCFAILED("realloc"), ERRNOS);
-            abort();
-        }
+    if (cap == vec->cap)
+        return;
 
-        vec->buf = p;
-        vec->cap = cap;
+    if (!(p = realloc(vec->buf, vec->size * cap))) {
+        vector_free(vec);
+        PRINTINTERR(FUNCFAILED("realloc"), ERRNOS);
+        abort();
     }
+
+    vec->buf = p;
+    vec->cap = cap;
+}
+
+void vector_append_arr(Vector *vec, void *arr, size_t len)
+{
+    resize_if_needed(vec, vec->len + len);
 
     memcpy(vec->buf + vec->len * vec->size, arr, len * vec->size);
     vec->len += len;
@@ -68,4 +74,11 @@ void vector_append(Vector *vec, void *val)
 void *vector_get(Vector *vec, size_t i)
 {
     return vec->buf + i * vec->size;
+}
+
+void vector_resize(Vector *vec, size_t len)
+{
+    resize_if_needed(vec, len);
+
+    vec->len = len;
 }
