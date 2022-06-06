@@ -58,17 +58,21 @@ static void resize_if_needed(Vector *vec, size_t new_len)
     vec->cap = cap;
 }
 
-void vector_append_arr(Vector *vec, void *arr, size_t len)
+size_t vector_append_arr(Vector *vec, void *arr, size_t len)
 {
+    size_t old_len = vec->len;
+
     resize_if_needed(vec, vec->len + len);
 
     memcpy(vec->buf + vec->len * vec->size, arr, len * vec->size);
     vec->len += len;
+
+    return old_len;
 }
 
-void vector_append(Vector *vec, void *val)
+size_t vector_append(Vector *vec, void *val)
 {
-    vector_append_arr(vec, val, 1);
+    return vector_append_arr(vec, val, 1);
 }
 
 void *vector_get(Vector *vec, size_t i)

@@ -18,9 +18,9 @@
 
 #define VECTOR_SIGN_NEW(name, type)        VECTOR_SIGN(name,   type, new, Vector##name *, size_t cap)
 #define VECTOR_SIGN_FREE(name, type)       VECTOR_SIGN_V(name, type, free, void)
-#define VECTOR_SIGN_APPEND_ARR(name, type) VECTOR_SIGN_V(name, type, append_arr, void, type *arr, size_t len)
-#define VECTOR_SIGN_APPEND(name, type)     VECTOR_SIGN_V(name, type, append, void, type val)
-#define VECTOR_SIGN_GET(name, type)        VECTOR_SIGN_V(name, type, get, type *, size_t i)
+#define VECTOR_SIGN_APPEND_ARR(name, type) VECTOR_SIGN_V(name, type, append_arr, size_t, type *arr, size_t len)
+#define VECTOR_SIGN_APPEND(name, type)     VECTOR_SIGN_V(name, type, append, size_t, type val)
+#define VECTOR_SIGN_GET(name, type)        VECTOR_SIGN_V(name, type, get, type, size_t i)
 #define VECTOR_SIGN_RESIZE(name, type)     VECTOR_SIGN_V(name, type, resize, void, size_t len)
 
 #define VECTOR_GEN_SOURCE_(name, type, spec)                  \
@@ -34,15 +34,15 @@
     }                                                         \
     inline spec VECTOR_SIGN_APPEND_ARR(name, type)            \
     {                                                         \
-        vector_append_arr((Vector *)vec, arr, len);           \
+        return vector_append_arr((Vector *)vec, arr, len);    \
     }                                                         \
     inline spec VECTOR_SIGN_APPEND(name, type)                \
     {                                                         \
-        vector_append((Vector *)vec, &val);                   \
+        return vector_append((Vector *)vec, &val);            \
     }                                                         \
     inline spec VECTOR_SIGN_GET(name, type)                   \
     {                                                         \
-        return (type *)vector_get((Vector *)vec, i);          \
+        return *(type *)vector_get((Vector *)vec, i);         \
     }                                                         \
     inline spec VECTOR_SIGN_RESIZE(name, type)                \
     {                                                         \
@@ -67,8 +67,8 @@ VECTOR_TYPE(, void);
 
 Vector *vector_new(size_t size, size_t cap);
 void vector_free(Vector *vec);
-void vector_append_arr(Vector *vec, void *arr, size_t len);
-void vector_append(Vector *vec, void *arr);
+size_t vector_append_arr(Vector *vec, void *arr, size_t len);
+size_t vector_append(Vector *vec, void *arr);
 void *vector_get(Vector *vec, size_t i);
 void vector_resize(Vector *vec, size_t len);
 
