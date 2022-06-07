@@ -13,7 +13,7 @@
 #define PP(e, t, s, n, p) { #n, e, t, s, PNAME(n), p, LEN(PNAME(n)) }
 #define PR(e, t, s, n) PP(e, t, s, n, 0)
 
-Preview previews[] = {
+Preview b_previews[] = {
     PP(NULL,      NULL,             NULL,             wrapper, INT_MAX),
     PR(NULL,      "text",           NULL,             bat),
     PR(NULL,      "text",           NULL,             highlight),

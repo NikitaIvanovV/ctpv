@@ -9,14 +9,16 @@
     print_errorf("config parse error:%u:%u " format, (c).line, (c).col \
                  __VA_OPT__(, ) __VA_ARGS__)
 
-#define TOK_TYPE_ALIAS(t) ((Token){ .type = t })
+#define TOK_TYPE(t) ((Token){ .type = t })
 
-#define NULL_TOK TOK_TYPE_ALIAS(TOK_NULL)
-#define EOF_TOK  TOK_TYPE_ALIAS(TOK_EOF)
-#define END_TOK  TOK_TYPE_ALIAS(TOK_END)
-#define ERR_TOK  TOK_TYPE_ALIAS(TOK_ERR)
+#define NULL_TOK TOK_TYPE(TOK_NULL)
+#define EOF_TOK  TOK_TYPE(TOK_EOF)
+#define END_TOK  TOK_TYPE(TOK_END)
+#define ERR_TOK  TOK_TYPE(TOK_ERR)
 
 #define READ_PUNCT(c, t, s) read_punct((c), (t), (s), LEN(s) - 1)
+
+#define EOF_CHAR (-1)
 
 typedef int (*Predicate)(int);
 
@@ -38,7 +40,11 @@ struct Lexer {
     VectorChar *text_buf;
 };
 
-static char block_open[] = "{{{", block_close[] = "}}}";
+static char block_open[] = "{{{",
+            block_close[] = "}}}",
+            slash[] = "/",
+            star[] = "*",
+            dot[] = ".";
 
 static void add_token_queue(Lexer *ctx, Token tok)
 {
@@ -74,7 +80,7 @@ static int peekn_char(Lexer *ctx, unsigned int i)
         goto exit;
 
     if (b->eof || (i > 0 && i >= b->len))
-        return -1;
+        return EOF_CHAR;
 
     if (i > 0) {
         assert(i < LEN(b->buf));
@@ -93,7 +99,7 @@ static int peekn_char(Lexer *ctx, unsigned int i)
             PRINTINTERR("fread() failed");
 
         if (b->len == 0)
-            return -1;
+            return EOF_CHAR;
     }
 
 exit:
@@ -217,28 +223,20 @@ static void read_while(Lexer *ctx, Predicate p, int add)
         add_text_buf(ctx, '\0');
 }
 
-static inline Token read_eof(Lexer *ctx)
+static inline Token read_end(Lexer *ctx)
 {
-    char c = peek_char(ctx);
+    Token tok = NULL_TOK;
 
-    if (c >= 0)
-        return NULL_TOK;
+    while (peek_char(ctx) == '\n') {
+        char c = peek_char(ctx);
+        if (c != '\n')
+            break;
 
-    next_char(ctx);
+        next_char(ctx);
+        tok = END_TOK;
+    }
 
-    return EOF_TOK;
-}
-
-static inline Token read_newline(Lexer *ctx)
-{
-    char c = peek_char(ctx);
-
-    if (c != '\n')
-        return NULL_TOK;
-
-    next_char(ctx);
-
-    return END_TOK;
+    return tok;
 }
 
 static inline Token read_symbol(Lexer *ctx)
@@ -274,7 +272,7 @@ static Token read_punct(Lexer *ctx, int type, char *s, int n)
 {
     Token tok;
 
-    if (peek_char(ctx) < 0)
+    if (peek_char(ctx) == EOF_CHAR)
         return EOF_TOK;
 
     int ret = cmp_nextn(ctx, n, s);
@@ -337,6 +335,15 @@ static Token read_block(Lexer *ctx)
             return t;           \
     } while (0)
 
+#define ATTEMPT_READ_CHAR(ctx, ch, type) \
+    do {                                 \
+        char c = peek_char(ctx);         \
+        if (c == (ch)) {                 \
+            next_char(ctx);              \
+            return (type);               \
+        }                                \
+    } while (0)
+
 Token lexer_get_token(Lexer *ctx)
 {
     if (!is_empty_token_queue(ctx))
@@ -344,8 +351,12 @@ Token lexer_get_token(Lexer *ctx)
 
     read_while(ctx, isblank, 0);
 
-    ATTEMPT_READ(ctx, read_eof);
-    ATTEMPT_READ(ctx, read_newline);
+    ATTEMPT_READ_CHAR(ctx, EOF_CHAR, EOF_TOK);
+    ATTEMPT_READ_CHAR(ctx, '/', TOK_TYPE(TOK_SLASH));
+    ATTEMPT_READ_CHAR(ctx, '*', TOK_TYPE(TOK_STAR));
+    ATTEMPT_READ_CHAR(ctx, '.', TOK_TYPE(TOK_DOT));
+
+    ATTEMPT_READ(ctx, read_end);
     ATTEMPT_READ(ctx, read_symbol);
     ATTEMPT_READ(ctx, read_digit);
     ATTEMPT_READ(ctx, read_block);
@@ -360,4 +371,35 @@ char *lexer_get_string(Lexer *ctx, Token tok)
         return NULL;
 
     return get_text_buf_at(ctx, tok.val.sp);
+}
+
+char *lexer_token_type_str(enum TokenType type)
+{
+    switch (type) {
+    case TOK_NULL:
+        return "<null>";
+    case TOK_EOF:
+        return "<end of file>";
+    case TOK_ERR:
+        return "<TOKEN ERROR>";
+    case TOK_END:
+        return "<end>";
+    case TOK_BLK_OPEN:
+        return block_open;
+    case TOK_BLK_CLS:
+        return block_close;
+    case TOK_SLASH:
+        return slash;
+    case TOK_STAR:
+        return star;
+    case TOK_DOT:
+        return dot;
+    case TOK_INT:
+        return "<integer>";
+    case TOK_STR:
+        return "<string>";
+    }
+
+    PRINTINTERR("unknown type: %d", type);
+    abort();
 }

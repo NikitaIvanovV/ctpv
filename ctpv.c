@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <magic.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
@@ -9,13 +10,14 @@
 
 #include "error.h"
 #include "utils.h"
+#include "config.h"
 #include "server.h"
 #include "preview.h"
 #include "previews.h"
 
 #define ANY_TYPE "*"
 
-static const char any_type[] = ANY_TYPE;
+static char any_type[] = ANY_TYPE;
 
 static magic_t magic;
 
@@ -31,11 +33,16 @@ static struct {
     char *server_id_s;
 } ctpv = { .mode = MODE_PREVIEW };
 
+static VectorPreview *previews;
+
 static void cleanup(void)
 {
     cleanup_previews();
+    config_cleanup();
     if (magic != NULL)
         magic_close(magic);
+    if (previews)
+        vectorPreview_free(previews);
 }
 
 static int init_magic(void)
@@ -49,9 +56,41 @@ static int init_magic(void)
     return OK;
 }
 
-static void init_previews_v(void)
+static int create_dir(char *buf, size_t len)
 {
-    init_previews(previews, LEN(previews));
+    char dir[len];
+    strncpy(dir, buf, LEN(dir) - 1);
+    ERRCHK_RET(mkpath(dir, 0700) == -1, FUNCFAILED("mkpath"), ERRNOS);
+
+    return OK;
+}
+
+static int get_config_file(char *buf, size_t len)
+{
+    ERRCHK_RET_OK(get_config_dir(buf, len, "ctpv/"));
+    ERRCHK_RET_OK(create_dir(buf, len));
+
+    strncat(buf, "config", len - 1);
+
+    if (access(buf, F_OK) != 0)
+        close(creat(buf, 0600));
+
+    return OK;
+}
+
+static int init_previews_v(void)
+{
+    previews = vectorPreview_new(LEN(b_previews));
+    vectorPreview_append_arr(previews, b_previews, LEN(b_previews));
+
+    char config_file[FILENAME_MAX];
+    get_config_file(config_file, LEN(config_file));
+
+    ERRCHK_RET_OK(config_load(previews, config_file, any_type));
+
+    init_previews(previews->buf, previews->len);
+
+    return OK;
 }
 
 static const char *get_mimetype(const char *path)
@@ -133,12 +172,7 @@ static void md5_string(char *buf, size_t len, char *s)
 static int get_cache_file(char *buf, size_t len, char *file)
 {
     ERRCHK_RET_OK(get_cache_dir(buf, len, "ctpv/"));
-
-    {
-        char dir[len];
-        strncpy(dir, buf, LEN(dir) - 1);
-        ERRCHK_RET(mkpath(dir, 0700) == -1, FUNCFAILED("mkpath"), ERRNOS);
-    }
+    ERRCHK_RET_OK(create_dir(buf, len));
 
     char name[64];
     md5_string(name, LEN(name) - 1, file);
@@ -173,7 +207,7 @@ static int preview(int argc, char *argv[])
 
     ERRCHK_RET_OK(init_magic());
 
-    init_previews_v();
+    ERRCHK_RET_OK(init_previews_v());
 
     const char *mimetype;
     ERRCHK_RET(!(mimetype = get_mimetype(f)));
@@ -209,7 +243,7 @@ static int end(void)
 
 static int list(void)
 {
-    init_previews_v();
+    ERRCHK_RET_OK(init_previews_v());
 
     size_t len;
     Preview p, **list = get_previews_list(&len);

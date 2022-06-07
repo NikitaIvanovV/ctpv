@@ -3,11 +3,15 @@
 
 #include <stdlib.h>
 
+#include "vector.h"
+
 typedef struct {
     char *name, *ext, *type, *subtype, *script;
     int priority;
     size_t script_len;
 } Preview;
+
+VECTOR_GEN_HEADER(Preview, Preview)
 
 typedef struct {
     char *f, *w, *h, *x, *y, *id;

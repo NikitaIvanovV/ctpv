@@ -32,6 +32,7 @@ int strcmpnull(const char *s1, const char *s2);
 int strlennull(const char *s);
 
 int get_cache_dir(char *buf, size_t len, char *name);
+int get_config_dir(char *buf, size_t len, char *name);
 
 int mkpath(char* file_path, mode_t mode);
 

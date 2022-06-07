@@ -87,20 +87,30 @@ int strlennull(const char *s)
     return s ? strlen(s) : 0;
 }
 
-int get_cache_dir(char *buf, size_t len, char *name)
+static int get_xdg_dir(char *buf, size_t len, char *var, char *var_sub, char *name)
 {
-    char *home, *cache_d, cache_d_buf[FILENAME_MAX];
+    char *home, *dir, dir_buf[FILENAME_MAX];
 
-    if (!(cache_d = getenv("XDG_CACHE_HOME"))) {
+    if (!(dir = getenv(var))) {
         home = getenv("HOME");
         ERRCHK_RET(!home, "HOME env var does not exist");
 
-        snprintf(cache_d_buf, LEN(cache_d_buf)-1, "%s/.cache", home);
-        cache_d = cache_d_buf;
+        snprintf(dir_buf, LEN(dir_buf)-1, "%s/%s", home, var_sub);
+        dir = dir_buf;
     }
 
-    snprintf(buf, len - 1, "%s/%s", cache_d, name);
+    snprintf(buf, len - 1, "%s/%s", dir, name);
     return OK;
+}
+
+int get_cache_dir(char *buf, size_t len, char *name)
+{
+    return get_xdg_dir(buf, len, "XDG_CACHE_HOME", ".cache", name);
+}
+
+int get_config_dir(char *buf, size_t len, char *name)
+{
+    return get_xdg_dir(buf, len, "XDG_CONFIG_HOME", ".config", name);
 }
 
 int mkpath(char* file_path, mode_t mode)

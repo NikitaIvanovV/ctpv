@@ -11,6 +11,8 @@
 
 #define PREVP_SIZE sizeof(Preview *)
 
+VECTOR_GEN_SOURCE(Preview, Preview)
+
 static struct {
     size_t len;
     Preview **list;
