@@ -14,6 +14,10 @@
 #define CHECK_NULL(f)    CHECK(f, x != STAT_NULL)
 #define CHECK_OK_NULL(f) CHECK(f, x != STAT_OK || x != STAT_NULL)
 
+#define EXPECT(x)     CHECK_OK(expect(x))
+#define ACCEPT(x)     CHECK_OK(accept(x))
+#define NOT_ACCEPT(x) CHECK_NULL(accept(x))
+
 enum {
     STAT_OK,
     STAT_ERR,
@@ -88,10 +92,10 @@ static inline char *get_str(Token tok)
 
 static int preview_type_ext(char **ext)
 {
-    CHECK_OK(accept(TOK_DOT));
+    ACCEPT(TOK_DOT);
 
     Token tok = token;
-    CHECK_OK(expect(TOK_STR));
+    EXPECT(TOK_STR);
     *ext = get_str(tok);
 
     return STAT_OK;
@@ -100,10 +104,10 @@ static int preview_type_ext(char **ext)
 static int preview_type_mime_part(char **s)
 {
     *s = NULL;
-    CHECK_NULL(accept(TOK_STAR));
+    NOT_ACCEPT(TOK_STAR);
 
     Token t = token;
-    CHECK_OK(expect(TOK_STR));
+    EXPECT(TOK_STR);
     *s = get_str(t);
 
     return STAT_OK;
@@ -112,7 +116,7 @@ static int preview_type_mime_part(char **s)
 static int preview_type_mime(char **type, char **subtype)
 {
     CHECK_OK(preview_type_mime_part(type));
-    CHECK_OK(expect(TOK_SLASH));
+    EXPECT(TOK_SLASH);
     CHECK_OK(preview_type_mime_part(subtype));
 
     return STAT_OK;
@@ -127,19 +131,19 @@ static int preview_type(char **type, char **subtype, char **ext)
 static int new_preview(void)
 {
     Token name = token;
-    CHECK_OK(expect(TOK_STR));
+    EXPECT(TOK_STR);
 
     char *type = NULL;
     char *subtype = NULL;
     char *ext = NULL;
     CHECK_OK(preview_type(&type, &subtype, &ext));
 
-    CHECK_OK(expect(TOK_BLK_OPEN));
+    EXPECT(TOK_BLK_OPEN);
 
     Token script = token;
-    CHECK_OK(expect(TOK_STR));
+    EXPECT(TOK_STR);
 
-    CHECK_OK(expect(TOK_BLK_CLS));
+    EXPECT(TOK_BLK_CLS);
 
     add_preview(get_str(name), get_str(script), type, subtype, ext);
     return STAT_OK;
@@ -154,7 +158,7 @@ static int priority(Token tok)
 static int command(void)
 {
     Token cmd = token;
-    CHECK_OK(expect(TOK_STR));
+    EXPECT(TOK_STR);
 
     char *cmd_str = get_str(cmd);
     if (strcmp(cmd_str, "preview") == 0)
@@ -168,6 +172,9 @@ static int command(void)
 
 static int end(void)
 {
+    NOT_ACCEPT(TOK_EOF);
+    EXPECT(TOK_NEW_LN);
+
     while (1) {
         if (accept(TOK_NEW_LN) != STAT_OK)
             break;
@@ -181,7 +188,7 @@ static int commands(void)
     accept(TOK_NEW_LN);
 
     while (1) {
-        CHECK_NULL(accept(TOK_EOF));
+        NOT_ACCEPT(TOK_EOF);
         CHECK_OK(command());
         CHECK_OK(end());
     }
