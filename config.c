@@ -167,7 +167,7 @@ static int commands(void)
     while (1) {
         CHECK_NULL(accept(TOK_EOF));
         CHECK_OK(command());
-        CHECK_OK_NULL(accept(TOK_NEW_LN));
+        CHECK_OK(accept(TOK_NEW_LN));
     }
 }
 
