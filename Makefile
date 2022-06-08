@@ -1,13 +1,13 @@
 PREFIX    := /usr/local
 BINPREFIX := $(PREFIX)/bin
 
-SRC := $(wildcard *.c)
+SRC := $(wildcard src/*.c)
 OBJ := $(SRC:.c=.o)
 DEP := $(OBJ:.o=.d)
 PRE := $(wildcard prev/*.sh)
 GEN := gen/prev/scripts.h gen/server.h gen/helpers.h
 
-CFLAGS  += -Os -MD -Wall -Wextra -Wno-unused-parameter
+CFLAGS  += -I. -Os -MD -Wall -Wextra -Wno-unused-parameter
 LDFLAGS += -lmagic -lcrypto
 
 all: ctpv
@@ -32,8 +32,9 @@ make_embed:
 	$(MAKE) -C embed
 
 ctpv: $(OBJ)
+	$(CC) $(LDFLAGS) $+ -o $@
 
-ctpv.c: $(GEN)
+src/ctpv.c: $(GEN)
 
 gen/prev/scripts.h: $(PRE) embed/embed
 	@mkdir -p $(@D)
