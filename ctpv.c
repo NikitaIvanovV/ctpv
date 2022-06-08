@@ -257,8 +257,8 @@ static int list(void)
 
     width_name += 2, width_ext += 2;
 
-    puts("List of available previews:");
-    printf("\t%-*s %-*s %s\n", width_name, header_name, width_ext, header_ext,
+    puts("List of available previews:\n");
+    printf("\t%-*s %-*s %s\n\n", width_name, header_name, width_ext, header_ext,
            header_mime);
 
     for (size_t i = 0; i < len; i++) {
@@ -281,7 +281,7 @@ static int list(void)
                s);
     }
 
-    puts("\nNote: '" ANY_TYPE "' means that it matches any.");
+    puts("\nNote: '" ANY_TYPE "' means that it matches any.\n");
 
     return OK;
 }
@@ -289,6 +289,11 @@ static int list(void)
 static int mime(int argc, char *argv[])
 {
     const char *f, *mimetype;
+
+    if (argc <= 0) {
+        print_error("files are not specified");
+        return ERR;
+    }
 
     for (int i = 0; i < argc; i++) {
         f = argv[i];
@@ -300,7 +305,7 @@ static int mime(int argc, char *argv[])
         ERRCHK_RET(!mimetype);
 
         if (argc > 1)
-            printf("%s: ", f);
+            printf("%s:\t", f);
 
         printf(".%s ", get_ext(f));
         puts(mimetype);
