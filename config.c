@@ -25,7 +25,7 @@ static VectorPreview *previews;
 static char *any_type;
 
 static void add_preview(char *name, char *script, char *type, char *subtype,
-                       char *ext)
+                        char *ext)
 {
     if (type && strcmp(type, any_type) == 0)
         type = NULL;
@@ -69,7 +69,7 @@ static int expect(enum TokenType type)
     if (token.type == TOK_ERR)
         return STAT_ERR;
 
-    print_errorf("unexpected token: %s, expected: %s",
+    PARSEERROR(token, "unexpected token: %s, expected: %s",
                  lexer_token_type_str(token.type),
                  lexer_token_type_str(type));
     return STAT_ERR;
@@ -139,9 +139,9 @@ static int new_preview(void)
     return STAT_OK;
 }
 
-static int priority(void)
+static int priority(Token tok)
 {
-    print_error("priority is not supported yet");
+    PARSEERROR(tok, "priority is not supported yet");
     return STAT_ERR;
 }
 
@@ -154,9 +154,9 @@ static int command(void)
     if (strcmp(cmd_str, "preview") == 0)
         return new_preview();
     else if (strcmp(cmd_str, "priority") == 0)
-        return priority();
+        return priority(cmd);
 
-    print_errorf("unknown command: %s", cmd_str);
+    PARSEERROR(cmd, "unknown command: %s", cmd_str);
     return STAT_ERR;
 }
 

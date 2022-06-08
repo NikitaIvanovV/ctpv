@@ -5,17 +5,6 @@
 #include "lexer.h"
 #include "vector.h"
 
-#define PARSEERROR(c, format, ...)                                     \
-    print_errorf("config parse error:%u:%u " format, (c).line, (c).col \
-                 __VA_OPT__(, ) __VA_ARGS__)
-
-#define TOK_TYPE(t) ((Token){ .type = t })
-
-#define NULL_TOK TOK_TYPE(TOK_NULL)
-#define EOF_TOK  TOK_TYPE(TOK_EOF)
-#define END_TOK  TOK_TYPE(TOK_END)
-#define ERR_TOK  TOK_TYPE(TOK_ERR)
-
 #define READ_PUNCT(c, t, s) read_punct((c), (t), (s), LEN(s) - 1)
 
 #define EOF_CHAR (-1)
@@ -35,6 +24,9 @@ typedef struct {
 
 struct Lexer {
     unsigned int line, col;
+    struct {
+        unsigned int line, col;
+    } tok_pos;
     InputBuffer input_buf;
     TokenQueue tok_queue;
     VectorChar *text_buf;
@@ -223,9 +215,16 @@ static void read_while(Lexer *ctx, Predicate p, int add)
         add_text_buf(ctx, '\0');
 }
 
+static inline Token get_tok(Lexer *ctx, enum TokenType type)
+{
+    return (Token){ .type = type,
+                    .line = ctx->tok_pos.line,
+                    .col = ctx->tok_pos.col };
+}
+
 static inline Token read_end(Lexer *ctx)
 {
-    Token tok = NULL_TOK;
+    Token tok = get_tok(ctx, TOK_NULL);
 
     while (peek_char(ctx) == '\n') {
         char c = peek_char(ctx);
@@ -233,7 +232,7 @@ static inline Token read_end(Lexer *ctx)
             break;
 
         next_char(ctx);
-        tok = END_TOK;
+        tok = get_tok(ctx, TOK_END);
     }
 
     return tok;
@@ -244,12 +243,15 @@ static inline Token read_symbol(Lexer *ctx)
     char c = peek_char(ctx);
 
     if (!isalpha(c))
-        return NULL_TOK;
+        return get_tok(ctx, TOK_NULL);
 
     size_t p = get_text_buf_len(ctx);
     read_while(ctx, isalnum, 1);
 
-    return (Token){ TOK_STR, { .sp = p } };
+    Token tok = get_tok(ctx, TOK_STR);
+    tok.val.sp = p;
+
+    return tok;
 }
 
 static inline Token read_digit(Lexer *ctx)
@@ -257,7 +259,7 @@ static inline Token read_digit(Lexer *ctx)
     char c = peek_char(ctx);
 
     if (!isdigit(c))
-        return NULL_TOK;
+        return get_tok(ctx, TOK_NULL);
 
     size_t len = get_text_buf_len(ctx);
     read_while(ctx, isdigit, 1);
@@ -265,7 +267,10 @@ static inline Token read_digit(Lexer *ctx)
     int i = atoi(get_text_buf_at(ctx, len));
     set_text_buf_len(ctx, len);
 
-    return (Token){ TOK_INT, { .i = i } };
+    Token tok = get_tok(ctx, TOK_INT);
+    tok.val.i = i;
+
+    return tok;
 }
 
 static Token read_punct(Lexer *ctx, int type, char *s, int n)
@@ -273,14 +278,14 @@ static Token read_punct(Lexer *ctx, int type, char *s, int n)
     Token tok;
 
     if (peek_char(ctx) == EOF_CHAR)
-        return EOF_TOK;
+        return get_tok(ctx, TOK_EOF);
 
     int ret = cmp_nextn(ctx, n, s);
 
     if (ret == 0)
         tok.type = type;
     else
-        return NULL_TOK;
+        return get_tok(ctx, TOK_NULL);
 
     skipn_char(ctx, n);
 
@@ -302,16 +307,17 @@ static Token read_block(Lexer *ctx)
     Token open_tok, body_tok, close_tok;
 
     if ((open_tok = read_block_open(ctx)).type == TOK_NULL)
-        return NULL_TOK;
+        return get_tok(ctx, TOK_NULL);
 
-    body_tok = (Token){ TOK_STR, { .sp = get_text_buf_len(ctx) } };
+    body_tok = get_tok(ctx, TOK_STR);
+    body_tok.val.sp = get_text_buf_len(ctx);
 
     while (1) {
         close_tok = read_block_close(ctx);
 
         if (close_tok.type == TOK_EOF) {
             PARSEERROR(*ctx, "unclosed block");
-            return ERR_TOK;
+            return get_tok(ctx, TOK_ERR);
         } else if (close_tok.type != TOK_NULL) {
             break;
         }
@@ -335,13 +341,14 @@ static Token read_block(Lexer *ctx)
             return t;           \
     } while (0)
 
-#define ATTEMPT_READ_CHAR(ctx, ch, type) \
-    do {                                 \
-        char c = peek_char(ctx);         \
-        if (c == (ch)) {                 \
-            next_char(ctx);              \
-            return (type);               \
-        }                                \
+#define ATTEMPT_READ_CHAR(ctx, tok, ch, type_) \
+    do {                                       \
+        char c = peek_char(ctx);               \
+        if (c == (ch)) {                       \
+            (tok).type = (type_);              \
+            next_char(ctx);                    \
+            return (tok);                      \
+        }                                      \
     } while (0)
 
 Token lexer_get_token(Lexer *ctx)
@@ -351,10 +358,15 @@ Token lexer_get_token(Lexer *ctx)
 
     read_while(ctx, isblank, 0);
 
-    ATTEMPT_READ_CHAR(ctx, EOF_CHAR, EOF_TOK);
-    ATTEMPT_READ_CHAR(ctx, '/', TOK_TYPE(TOK_SLASH));
-    ATTEMPT_READ_CHAR(ctx, '*', TOK_TYPE(TOK_STAR));
-    ATTEMPT_READ_CHAR(ctx, '.', TOK_TYPE(TOK_DOT));
+    ctx->tok_pos.line = ctx->line;
+    ctx->tok_pos.col = ctx->col;
+
+    Token tok = get_tok(ctx, TOK_NULL);
+
+    ATTEMPT_READ_CHAR(ctx, tok, EOF_CHAR, TOK_EOF);
+    ATTEMPT_READ_CHAR(ctx, tok, '/', TOK_SLASH);
+    ATTEMPT_READ_CHAR(ctx, tok, '*', TOK_STAR);
+    ATTEMPT_READ_CHAR(ctx, tok, '.', TOK_DOT);
 
     ATTEMPT_READ(ctx, read_end);
     ATTEMPT_READ(ctx, read_symbol);
@@ -362,7 +374,7 @@ Token lexer_get_token(Lexer *ctx)
     ATTEMPT_READ(ctx, read_block);
 
     PARSEERROR((*ctx), "cannot handle character: %c", peek_char(ctx));
-    return ERR_TOK;
+    return get_tok(ctx, TOK_ERR);
 }
 
 char *lexer_get_string(Lexer *ctx, Token tok)
