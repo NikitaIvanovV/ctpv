@@ -222,13 +222,13 @@ static inline Token get_tok(Lexer *ctx, enum TokenType type)
                     .col = ctx->tok_pos.col };
 }
 
-static inline Token read_end(Lexer *ctx)
+static inline Token read_new_line(Lexer *ctx)
 {
     Token tok = get_tok(ctx, TOK_NULL);
 
     while (peek_char(ctx) == '\n') {
         next_char(ctx);
-        tok.type = TOK_END;
+        tok.type = TOK_NEW_LN;
     }
 
     return tok;
@@ -364,7 +364,7 @@ Token lexer_get_token(Lexer *ctx)
     ATTEMPT_READ_CHAR(ctx, tok, '*', TOK_STAR);
     ATTEMPT_READ_CHAR(ctx, tok, '.', TOK_DOT);
 
-    ATTEMPT_READ(ctx, read_end);
+    ATTEMPT_READ(ctx, read_new_line);
     ATTEMPT_READ(ctx, read_symbol);
     ATTEMPT_READ(ctx, read_digit);
     ATTEMPT_READ(ctx, read_block);
@@ -390,8 +390,8 @@ char *lexer_token_type_str(enum TokenType type)
         return "<end of file>";
     case TOK_ERR:
         return "<TOKEN ERROR>";
-    case TOK_END:
-        return "<end>";
+    case TOK_NEW_LN:
+        return "<newline>";
     case TOK_BLK_OPEN:
         return block_open;
     case TOK_BLK_CLS:

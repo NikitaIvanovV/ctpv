@@ -162,12 +162,12 @@ static int command(void)
 
 static int commands(void)
 {
-    accept(TOK_END);
+    accept(TOK_NEW_LN);
 
     while (1) {
         CHECK_NULL(accept(TOK_EOF));
         CHECK_OK(command());
-        CHECK_OK_NULL(accept(TOK_END));
+        CHECK_OK_NULL(accept(TOK_NEW_LN));
     }
 }
 

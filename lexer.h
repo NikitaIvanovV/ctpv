@@ -11,12 +11,12 @@
 typedef struct Lexer Lexer;
 
 typedef struct {
-    int line, col;
+    unsigned int line, col;
     enum TokenType {
         TOK_NULL,
         TOK_EOF,
         TOK_ERR,
-        TOK_END,
+        TOK_NEW_LN,
         TOK_BLK_OPEN,
         TOK_BLK_CLS,
         TOK_SLASH,
