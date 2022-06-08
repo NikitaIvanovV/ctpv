@@ -32,8 +32,8 @@ struct Lexer {
     VectorChar *text_buf;
 };
 
-static char block_open[] = "{{{",
-            block_close[] = "}}}",
+static char block_open[] = "{{",
+            block_close[] = "}}",
             slash[] = "/",
             star[] = "*",
             dot[] = ".";
