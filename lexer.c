@@ -227,12 +227,8 @@ static inline Token read_end(Lexer *ctx)
     Token tok = get_tok(ctx, TOK_NULL);
 
     while (peek_char(ctx) == '\n') {
-        char c = peek_char(ctx);
-        if (c != '\n')
-            break;
-
         next_char(ctx);
-        tok = get_tok(ctx, TOK_END);
+        tok.type = TOK_END;
     }
 
     return tok;
