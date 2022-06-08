@@ -42,7 +42,7 @@ static void add_preview(char *name, char *script, char *type, char *subtype,
     Preview p = (Preview){
         .name = name,
         .script = script,
-        .script_len = strlen(script),
+        .script_len = strlen(script) + 1,
         .type = type,
         .subtype = subtype,
         .ext = ext,
@@ -168,11 +168,9 @@ static int command(void)
 
 static int end(void)
 {
-    int ret;
-
     while (1) {
-        ret = accept(TOK_NEW_LN);
-        CHECK_OK(ret);
+        if (accept(TOK_NEW_LN) != STAT_OK)
+            break;
     }
 
     return STAT_OK;
