@@ -19,9 +19,9 @@ typedef struct {
     int cache_valid;
 } PreviewArgs;
 
-void init_previews(Preview *ps, size_t len);
-void cleanup_previews(void);
-int run_preview(const char *ext, const char *mimetype, PreviewArgs *pa);
-Preview **get_previews_list(size_t *len);
+void previews_init(Preview *ps, size_t len);
+void previews_cleanup(void);
+int preview_run(const char *ext, const char *mimetype, PreviewArgs *pa);
+Preview **previews_get(size_t *len);
 
 #endif

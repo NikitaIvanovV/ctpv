@@ -35,5 +35,6 @@ int get_cache_dir(char *buf, size_t len, char *name);
 int get_config_dir(char *buf, size_t len, char *name);
 
 int mkpath(char* file_path, mode_t mode);
+const char *get_ext(const char *path);
 
 #endif

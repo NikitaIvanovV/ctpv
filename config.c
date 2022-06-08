@@ -1,3 +1,4 @@
+#include "ctpv.h"
 #include "lexer.h"
 #include "error.h"
 #include "preview.h"
@@ -22,13 +23,18 @@ enum {
 static Lexer *lexer;
 static Token token;
 static VectorPreview *previews;
-static char *any_type;
+
+static void any_type_null(char **s)
+{
+    if (*s && strcmp(*s, any_type) == 0)
+        *s = NULL;
+}
 
 static void add_preview(char *name, char *script, char *type, char *subtype,
                         char *ext)
 {
-    if (type && strcmp(type, any_type) == 0)
-        type = NULL;
+    any_type_null(&type);
+    any_type_null(&subtype);
 
     if (subtype && strcmp(subtype, any_type) == 0)
         subtype = NULL;
@@ -160,6 +166,18 @@ static int command(void)
     return STAT_ERR;
 }
 
+static int end(void)
+{
+    int ret;
+
+    while (1) {
+        ret = accept(TOK_NEW_LN);
+        CHECK_OK(ret);
+    }
+
+    return STAT_OK;
+}
+
 static int commands(void)
 {
     accept(TOK_NEW_LN);
@@ -167,21 +185,31 @@ static int commands(void)
     while (1) {
         CHECK_NULL(accept(TOK_EOF));
         CHECK_OK(command());
-        CHECK_OK(accept(TOK_NEW_LN));
+        CHECK_OK(end());
     }
 }
 
 static int parse(void)
 {
+#ifndef PARSE_DEBUG
     next_token();
-
     if (commands() == STAT_ERR)
         return ERR;
+#endif
+
+#ifdef PARSE_DEBUG
+    while (1) {
+        next_token();
+        if (token.type == TOK_EOF)
+            break;
+        printf("%s\n", lexer_token_type_str(token.type));
+    }
+#endif
 
     return OK;
 }
 
-int config_load(VectorPreview *prevs, char *filename, char *any_type_)
+int config_load(VectorPreview *prevs, char *filename)
 {
     int ret = OK;
 
@@ -190,7 +218,6 @@ int config_load(VectorPreview *prevs, char *filename, char *any_type_)
 
     lexer = lexer_init(f);
     previews = prevs;
-    any_type = any_type_;
 
     ERRCHK_GOTO_OK(parse(), ret, file);
 

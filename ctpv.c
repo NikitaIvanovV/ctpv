@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 #include <openssl/md5.h>
 
+#include "ctpv.h"
 #include "error.h"
 #include "utils.h"
 #include "config.h"
@@ -15,9 +16,7 @@
 #include "preview.h"
 #include "previews.h"
 
-#define ANY_TYPE "*"
-
-static char any_type[] = ANY_TYPE;
+const char any_type[] = ANY_TYPE;
 
 static magic_t magic;
 
@@ -37,7 +36,7 @@ static VectorPreview *previews;
 
 static void cleanup(void)
 {
-    cleanup_previews();
+    previews_cleanup();
     config_cleanup();
     if (magic != NULL)
         magic_close(magic);
@@ -78,17 +77,19 @@ static int get_config_file(char *buf, size_t len)
     return OK;
 }
 
-static int init_previews_v(void)
+static int init_previews(void)
 {
-    previews = vectorPreview_new(LEN(b_previews));
+    /* 20 is some arbitrary number, it's here in order to
+     * to save one realloc() if user has less then 20 custom previews */
+    previews = vectorPreview_new(LEN(b_previews) + 20);
     vectorPreview_append_arr(previews, b_previews, LEN(b_previews));
 
     char config_file[FILENAME_MAX];
     get_config_file(config_file, LEN(config_file));
 
-    ERRCHK_RET_OK(config_load(previews, config_file, any_type));
+    ERRCHK_RET_OK(config_load(previews, config_file));
 
-    init_previews(previews->buf, previews->len);
+    previews_init(previews->buf, previews->len);
 
     return OK;
 }
@@ -102,22 +103,6 @@ static const char *get_mimetype(const char *path)
     }
 
     return r;
-}
-
-static const char *get_ext(const char *path)
-{
-    const char *base;
-
-    if ((base = strrchr(path, '/')))
-        base += sizeof(*base);
-    else
-        base = path;
-
-    const char *dot = strchr(base, '.');
-    if (!dot || dot == base)
-        return NULL;
-
-    return &dot[1];
 }
 
 static int check_file(const char *f)
@@ -207,7 +192,7 @@ static int preview(int argc, char *argv[])
 
     ERRCHK_RET_OK(init_magic());
 
-    ERRCHK_RET_OK(init_previews_v());
+    ERRCHK_RET_OK(init_previews());
 
     const char *mimetype;
     ERRCHK_RET(!(mimetype = get_mimetype(f)));
@@ -223,7 +208,7 @@ static int preview(int argc, char *argv[])
         .cache_file = cache_file, .cache_valid = cache_valid,
     };
 
-    return run_preview(get_ext(f), mimetype, &args);
+    return preview_run(get_ext(f), mimetype, &args);
 }
 
 static int server(void)
@@ -243,10 +228,10 @@ static int end(void)
 
 static int list(void)
 {
-    ERRCHK_RET_OK(init_previews_v());
+    ERRCHK_RET_OK(init_previews());
 
     size_t len;
-    Preview p, **list = get_previews_list(&len);
+    Preview p, **list = previews_get(&len);
     const char *n, *e, *t, *s;
 
     const char header_name[] = "Name", header_ext[] = "Extension",

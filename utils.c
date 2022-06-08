@@ -130,3 +130,19 @@ int mkpath(char* file_path, mode_t mode)
 
     return 0;
 }
+
+const char *get_ext(const char *path)
+{
+    const char *base;
+
+    if ((base = strrchr(path, '/')))
+        base += sizeof(*base);
+    else
+        base = path;
+
+    const char *dot = strchr(base, '.');
+    if (!dot || dot == base)
+        return NULL;
+
+    return &dot[1];
+}

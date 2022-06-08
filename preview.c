@@ -40,7 +40,7 @@ static int cmp_previews(const void *p1, const void *p2)
     return i;
 }
 
-void init_previews(Preview *ps, size_t len)
+void previews_init(Preview *ps, size_t len)
 {
     previews.len = len;
 
@@ -56,7 +56,7 @@ void init_previews(Preview *ps, size_t len)
     qsort(previews.list, previews.len, PREVP_SIZE, cmp_previews);
 }
 
-void cleanup_previews(void)
+void previews_cleanup(void)
 {
     if (!previews.list)
         return;
@@ -156,7 +156,7 @@ static int run(Preview *p, int *exitcode)
                        ERRNOS);                                        \
     } while (0)
 
-int run_preview(const char *ext, const char *mimetype, PreviewArgs *pa)
+int preview_run(const char *ext, const char *mimetype, PreviewArgs *pa)
 {
     if (pa->id || (pa->id = getenv("id")))
         ERRCHK_RET_OK(server_set_fifo_var(pa->id));
@@ -199,7 +199,7 @@ run:
     return exitcode == 0 ? OK : ERR;
 }
 
-Preview **get_previews_list(size_t *len)
+Preview **previews_get(size_t *len)
 {
     check_init_previews();
     *len = previews.len;

@@ -3,7 +3,7 @@
 
 #include "preview.h"
 
-int config_load(VectorPreview *prevs, char *filename, char *any_type_);
+int config_load(VectorPreview *prevs, char *filename);
 void config_cleanup(void);
 
 #endif
