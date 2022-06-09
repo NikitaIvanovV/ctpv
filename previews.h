@@ -1,12 +1,12 @@
 #include <stdlib.h>
 #include <limits.h>
 
-#include "utils.h"
-#include "preview.h"
+#include "src/utils.h"
+#include "src/preview.h"
 #include "gen/prev/scripts.h"
 
 /*
- * This file is supposed to be included in ctpv.c
+ * This file is supposed to be included in src/ctpv.c
  */
 
 #define PNAME(n) prev_scr_##n##_sh
