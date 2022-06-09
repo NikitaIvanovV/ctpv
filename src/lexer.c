@@ -234,6 +234,11 @@ static inline Token read_new_line(Lexer *ctx)
     return tok;
 }
 
+static inline int issymbol(int c)
+{
+    return isalnum(c) || c == '_' || c == '-';
+}
+
 static inline Token read_symbol(Lexer *ctx)
 {
     char c = peek_char(ctx);
@@ -242,7 +247,7 @@ static inline Token read_symbol(Lexer *ctx)
         return get_tok(ctx, TOK_NULL);
 
     size_t p = get_text_buf_len(ctx);
-    read_while(ctx, isalnum, 1);
+    read_while(ctx, issymbol, 1);
 
     Token tok = get_tok(ctx, TOK_STR);
     tok.val.sp = p;
@@ -250,11 +255,16 @@ static inline Token read_symbol(Lexer *ctx)
     return tok;
 }
 
-static inline Token read_digit(Lexer *ctx)
+static inline Token read_int(Lexer *ctx)
 {
-    char c = peek_char(ctx);
+    int positive = 1;
 
-    if (!isdigit(c))
+    if (peek_char(ctx) == '-') {
+        positive = 0;
+        next_char(ctx);
+    }
+
+    if (!isdigit(peek_char(ctx)))
         return get_tok(ctx, TOK_NULL);
 
     size_t len = get_text_buf_len(ctx);
@@ -262,6 +272,9 @@ static inline Token read_digit(Lexer *ctx)
 
     int i = atoi(get_text_buf_at(ctx, len));
     set_text_buf_len(ctx, len);
+
+    if (!positive)
+        i *= -1;
 
     Token tok = get_tok(ctx, TOK_INT);
     tok.val.i = i;
@@ -366,7 +379,7 @@ Token lexer_get_token(Lexer *ctx)
 
     ATTEMPT_READ(ctx, read_new_line);
     ATTEMPT_READ(ctx, read_symbol);
-    ATTEMPT_READ(ctx, read_digit);
+    ATTEMPT_READ(ctx, read_int);
     ATTEMPT_READ(ctx, read_block);
 
     PARSEERROR((*ctx), "cannot handle character: %c", peek_char(ctx));

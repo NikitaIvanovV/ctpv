@@ -9,7 +9,7 @@
 
 typedef struct {
     char *name, *ext, *type, *subtype, *script;
-    int priority;
+    int order, priority;
     size_t script_len;
 } Preview;
 

@@ -50,10 +50,20 @@ static void add_preview(char *name, char *script, char *type, char *subtype,
         .type = type,
         .subtype = subtype,
         .ext = ext,
-        .priority = 1 /* custom previews are always prioritized */
+        .order = 1 /* custom previews are always prioritized */
     };
 
     vectorPreview_append(previews, p);
+}
+
+static void add_priority(char *name, int priority)
+{
+    for (size_t i = 0; i < previews->len; i++) {
+        if (strcmp(previews->buf[i].name, name) != 0)
+            continue;
+
+        previews->buf[i].priority = priority;
+    }
 }
 
 static inline void next_token(void)
@@ -151,8 +161,15 @@ static int new_preview(void)
 
 static int priority(Token tok)
 {
-    PARSEERROR(tok, "priority is not supported yet");
-    return STAT_ERR;
+    Token name = token;
+    EXPECT(TOK_STR);
+
+    Token number = token;
+    EXPECT(TOK_INT);
+
+    add_priority(get_str(name), number.val.i);
+
+    return STAT_OK;
 }
 
 static int command(void)
