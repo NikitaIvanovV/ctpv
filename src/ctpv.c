@@ -14,7 +14,7 @@
 #include "config.h"
 #include "server.h"
 #include "preview.h"
-#include "previews.h"
+#include "../previews.h"
 
 const char any_type[] = ANY_TYPE;
 

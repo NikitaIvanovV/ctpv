@@ -2,7 +2,7 @@
 
 #include "shell.h"
 #include "error.h"
-#include "gen/helpers.h"
+#include "../gen/helpers.h"
 
 /*
  * Returns string with helpers.sh prepended

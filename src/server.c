@@ -9,7 +9,7 @@
 #include "error.h"
 #include "utils.h"
 #include "shell.h"
-#include "gen/server.h"
+#include "../gen/server.h"
 
 #define FIFO_FILENAME_SIZE 256
 

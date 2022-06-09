@@ -7,8 +7,11 @@ DEP := $(OBJ:.o=.d)
 PRE := $(wildcard prev/*.sh)
 GEN := gen/prev/scripts.h gen/server.h gen/helpers.h
 
-CFLAGS  += -I. -Os -MD -Wall -Wextra -Wno-unused-parameter
-LDFLAGS += -lmagic -lcrypto
+O    := -Os
+LIBS := magic crypto
+
+CFLAGS  += $(O) -MD -Wall -Wextra -Wno-unused-parameter
+LDFLAGS += $(LIBS:%=-l%)
 
 all: ctpv
 
@@ -49,7 +52,7 @@ gen/helpers.h: helpers.sh embed/embed
 	embed/embed -p scr_ helpers.sh > $@
 
 embed/embed: make_embed
-	@:
+	@ # do nothing
 
 -include $(DEP)
 
