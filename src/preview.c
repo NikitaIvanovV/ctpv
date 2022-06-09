@@ -81,15 +81,9 @@ static void break_mimetype(char *mimetype, char **type, char **subtype)
     *subtype = &s[1];
 }
 
-#define MIMETYPE_MAX 64
-
-static Preview *find_preview(const char *mimetype, const char *ext, size_t *i)
+static Preview *find_preview(const char *type, const char *subtype, const char *ext, size_t *i)
 {
     Preview *p;
-    char mimetype_c[MIMETYPE_MAX], *t, *s;
-
-    strncpy(mimetype_c, mimetype, MIMETYPE_MAX - 1);
-    break_mimetype(mimetype_c, &t, &s);
 
     for (; *i < previews.len; (*i)++) {
         p = previews.list[*i];
@@ -97,10 +91,10 @@ static Preview *find_preview(const char *mimetype, const char *ext, size_t *i)
         if (p->ext && strcmpnull(p->ext, ext) != 0)
             continue;
 
-        if (p->type && strcmpnull(p->type, t) != 0)
+        if (p->type && strcmpnull(p->type, type) != 0)
             continue;
 
-        if (p->subtype && strcmpnull(p->subtype, s) != 0)
+        if (p->subtype && strcmpnull(p->subtype, subtype) != 0)
             continue;
 
         return p;
@@ -182,9 +176,13 @@ int preview_run(const char *ext, const char *mimetype, PreviewArgs *pa)
     Preview *p;
     size_t i = 0;
     int exitcode;
+    char mimetype_c[MIMETYPE_MAX], *t, *s;
+
+    strncpy(mimetype_c, mimetype, LEN(mimetype_c) - 1);
+    break_mimetype(mimetype_c, &t, &s);
 
 run:
-    p = find_preview(mimetype, ext, &i);
+    p = find_preview(t, s, ext, &i);
     if (!p) {
         puts("ctpv: no previews found");
         return ERR;

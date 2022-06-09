@@ -5,6 +5,8 @@
 
 #include "vector.h"
 
+#define MIMETYPE_MAX 64
+
 typedef struct {
     char *name, *ext, *type, *subtype, *script;
     int priority;
