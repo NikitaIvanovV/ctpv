@@ -202,7 +202,7 @@ static int end(void)
 
 static int commands(void)
 {
-    accept(TOK_NEW_LN);
+    end();
 
     while (1) {
         NOT_ACCEPT(TOK_EOF);

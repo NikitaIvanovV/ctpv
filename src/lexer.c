@@ -195,6 +195,18 @@ static int cmp_nextn(Lexer *ctx, int n, char *s)
         return ((unsigned char)c - *(unsigned char *)s);
 }
 
+static void ignore_comments(Lexer *ctx)
+{
+    char c;
+
+    if (peek_char(ctx) != '#')
+        return;
+
+    do {
+        c = next_char(ctx);
+    } while (c != '\n');
+}
+
 static void read_while(Lexer *ctx, Predicate p, int add)
 {
     char c;
@@ -366,6 +378,7 @@ Token lexer_get_token(Lexer *ctx)
         return remove_token_queue(ctx);
 
     read_while(ctx, isblank, 0);
+    ignore_comments(ctx);
 
     ctx->tok_pos.line = ctx->line;
     ctx->tok_pos.col = ctx->col;
