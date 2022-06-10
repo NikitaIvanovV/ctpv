@@ -118,7 +118,6 @@ static int preview_type_ext(char **ext)
 
 static int preview_type_mime_part(char **s)
 {
-    *s = NULL;
     NOT_ACCEPT(TOK_STAR);
 
     Token t = token;
@@ -148,12 +147,13 @@ static int new_preview(void)
     Token name = token;
     EXPECT(TOK_STR);
 
-    char *type = NULL;
-    char *subtype = NULL;
-    char *ext = NULL;
+    char *type = NULL, *subtype = NULL, *ext = NULL;
     CHECK_OK(preview_type(&type, &subtype, &ext));
 
-    EXPECT(TOK_BLK_OPEN);
+    if (accept(TOK_BLK_OPEN) == STAT_NULL) {
+        CHECK_OK(preview_type(&type, &subtype, &ext));
+        EXPECT(TOK_BLK_OPEN);
+    }
 
     Token script = token;
     EXPECT(TOK_STR);
