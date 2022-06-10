@@ -8,6 +8,7 @@
 #include "preview.h"
 
 #define FAILED_PREVIEW_EC NOTEXIST_EC
+#define ENOUGH_READ_EC    141
 
 #define PREVP_SIZE sizeof(Preview *)
 
@@ -192,9 +193,13 @@ run:
     }
 
     ERRCHK_RET_OK(run(p, &exitcode));
-    if (exitcode == FAILED_PREVIEW_EC) {
+    switch (exitcode) {
+    case FAILED_PREVIEW_EC:
         i++;
         goto run;
+    case ENOUGH_READ_EC:
+        exitcode = 0;
+        break;
     }
 
     return exitcode == 0 ? OK : ERR;
