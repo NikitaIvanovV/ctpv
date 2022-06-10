@@ -56,14 +56,19 @@ static void add_preview(char *name, char *script, char *type, char *subtype,
     vectorPreview_append(previews, p);
 }
 
-static void add_priority(char *name, int priority)
+static int add_priority(char *name, int priority)
 {
+    int found = 0;
+
     for (size_t i = 0; i < previews->len; i++) {
         if (strcmp(previews->buf[i].name, name) != 0)
             continue;
 
         previews->buf[i].priority = priority;
+        found = 1;
     }
+
+    return found ? OK : ERR;
 }
 
 static inline void next_token(void)
@@ -167,7 +172,11 @@ static int priority(Token tok)
     Token number = token;
     EXPECT(TOK_INT);
 
-    add_priority(get_str(name), number.val.i);
+    char *name_str = get_str(name);
+    if (add_priority(name_str, i) != OK) {
+        PARSEERROR(name, "preview '%s' not found", name_str);
+        return STAT_ERR;
+    }
 
     return STAT_OK;
 }
