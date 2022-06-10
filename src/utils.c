@@ -136,7 +136,7 @@ const char *get_ext(const char *path)
     const char *base;
 
     if ((base = strrchr(path, '/')))
-        base += sizeof(*base);
+        base++;
     else
         base = path;
 

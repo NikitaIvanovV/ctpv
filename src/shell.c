@@ -23,7 +23,7 @@ char *prepend_helpers(char *str, size_t len)
     l = helpers_len;
     memcpy(b, scr_helpers_sh, l * sizeof(*b));
 
-    b += l * sizeof(*str);
+    b += l;
     l = len;
     memcpy(b, str, l * sizeof(*b));
 

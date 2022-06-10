@@ -76,13 +76,11 @@ static int peekn_char(Lexer *ctx, unsigned int i)
 
     if (i > 0) {
         assert(i < LEN(b->buf));
-        memmove(b->buf, b->buf + (b->len - i) * sizeof(*b->buf),
-                i * sizeof(*b->buf));
+        memmove(b->buf, b->buf + (b->len - i), i * sizeof(*b->buf));
     }
 
     b->pos = 0;
-    b->len = fread(b->buf + i * sizeof(*b->buf), sizeof(*b->buf),
-                   LEN(b->buf) - i, b->f);
+    b->len = fread(b->buf + i, sizeof(*b->buf), LEN(b->buf) - i, b->f);
 
     if (b->len != LEN(b->buf)) {
         if (feof(b->f))
@@ -185,7 +183,7 @@ static int cmp_nextn(Lexer *ctx, int n, char *s)
         if (i >= n || *s == '\0' || c != *s)
             break;
 
-        s += sizeof(*s);
+        s++;
         i++;
     }
 
