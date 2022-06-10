@@ -196,22 +196,27 @@ static int command(void)
     return STAT_ERR;
 }
 
+static void newlines(void)
+{
+    while (1) {
+        if (accept(TOK_NEW_LN) != STAT_OK)
+            break;
+    }
+}
+
 static int end(void)
 {
     NOT_ACCEPT(TOK_EOF);
     EXPECT(TOK_NEW_LN);
 
-    while (1) {
-        if (accept(TOK_NEW_LN) != STAT_OK)
-            break;
-    }
+    newlines();
 
     return STAT_OK;
 }
 
 static int commands(void)
 {
-    end();
+    newlines();
 
     while (1) {
         NOT_ACCEPT(TOK_EOF);
