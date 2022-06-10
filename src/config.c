@@ -170,7 +170,7 @@ static int priority(Token tok)
     EXPECT(TOK_STR);
 
     Token number = token;
-    EXPECT(TOK_INT);
+    int i = accept(TOK_INT) == STAT_OK ? number.val.i : 1;
 
     char *name_str = get_str(name);
     if (add_priority(name_str, i) != OK) {
