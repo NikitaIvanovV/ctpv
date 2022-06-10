@@ -26,7 +26,7 @@ static void kill_ueberzug(void)
             PRINTINTERR(FUNCFAILED("kill"), ERRNOS);
     }
 
-    spawn_wait(ueberzug_pid, NULL);
+    spawn_wait(ueberzug_pid, NULL, NULL);
 }
 
 static void sig_handler_exit(int s)
@@ -67,7 +67,7 @@ static int listen(char *fifo)
 
     char *args[] = { "ueberzug", "layer", NULL };
     int sp_arg[] = { pipe_fds[1], pipe_fds[0], STDIN_FILENO };
-    if (spawn(args, &ueberzug_pid, NULL, spawn_redirect, sp_arg) != OK)
+    if (spawn(args, &ueberzug_pid, NULL, NULL, spawn_redirect, sp_arg) != OK)
         ret = ERR;
 
     close(pipe_fds[0]);
@@ -126,7 +126,7 @@ exit:
 static int check_ueberzug(int *exitcode)
 {
     char *args[] = SHELL_ARGS("command -v ueberzug > /dev/null");
-    return spawn(args, NULL, exitcode, NULL, NULL);
+    return spawn(args, NULL, exitcode, NULL, NULL, NULL);
 }
 
 static void get_fifo_name(char *buf, size_t len, const char *id_s)
@@ -176,7 +176,7 @@ static int run_script(char *script, size_t script_len, char *arg)
     char *s = prepend_helpers(script, script_len);
     char *args[] = SHELL_ARGS(s, arg);
     int exitcode;
-    ERRCHK_GOTO_OK(spawn(args, NULL, &exitcode, NULL, NULL), ret, cleanup);
+    ERRCHK_GOTO_OK(spawn(args, NULL, &exitcode, NULL, NULL, NULL), ret, cleanup);
 
 cleanup:
     free(s);

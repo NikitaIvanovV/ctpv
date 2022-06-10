@@ -24,9 +24,9 @@
 extern char *program;
 
 int spawn_redirect(const void *arg);
-int spawn_wait(pid_t pid, int *exitcode);
-int spawn(char *args[], pid_t *cpid, int *exitcode, int (*cfunc)(const void *),
-          const void *carg);
+int spawn_wait(pid_t pid, int *exitcode, int *signal);
+int spawn(char *args[], pid_t *cpid, int *exitcode, int *signal,
+          int (*cfunc)(const void *), const void *carg);
 
 int strcmpnull(const char *s1, const char *s2);
 int strlennull(const char *s);

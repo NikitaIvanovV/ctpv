@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <signal.h>
 #include <unistd.h>
 
 #include "utils.h"
@@ -115,7 +116,7 @@ static void check_init_previews(void)
     }
 }
 
-static int run(Preview *p, int *exitcode)
+static int run(Preview *p, int *exitcode, int *signal)
 {
     int pipe_fds[2];
     ERRCHK_RET(pipe(pipe_fds) == -1, FUNCFAILED("pipe"), ERRNOS);
@@ -124,7 +125,7 @@ static int run(Preview *p, int *exitcode)
 
     char *script = prepend_helpers(p->script, p->script_len);
     char *args[] = SHELL_ARGS(script);
-    int ret = spawn(args, NULL, exitcode, spawn_redirect, sp_arg);
+    int ret = spawn(args, NULL, exitcode, signal, spawn_redirect, sp_arg);
 
     free(script);
     close(pipe_fds[1]);
@@ -179,7 +180,7 @@ int preview_run(const char *ext, const char *mimetype, PreviewArgs *pa)
 
     Preview *p;
     size_t i = 0;
-    int exitcode;
+    int exitcode, signal;
     char mimetype_c[MIMETYPE_MAX], *t, *s;
 
     strncpy(mimetype_c, mimetype, LEN(mimetype_c) - 1);
@@ -192,7 +193,8 @@ run:
         return ERR;
     }
 
-    ERRCHK_RET_OK(run(p, &exitcode));
+    ERRCHK_RET_OK(run(p, &exitcode, &signal));
+
     switch (exitcode) {
     case FAILED_PREVIEW_EC:
         i++;
@@ -201,6 +203,9 @@ run:
         exitcode = 0;
         break;
     }
+
+    if (signal == SIGPIPE)
+        exitcode = 0;
 
     return exitcode == 0 ? OK : ERR;
 }

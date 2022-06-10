@@ -20,13 +20,24 @@ int spawn_redirect(const void *arg)
     return OK;
 }
 
-int spawn_wait(pid_t pid, int *exitcode)
+int spawn_wait(pid_t pid, int *exitcode, int *signal)
 {
     int stat;
     ERRCHK_RET(waitpid(pid, &stat, 0) == -1, FUNCFAILED("waitpid"), ERRNOS);
 
-    if (exitcode && WIFEXITED(stat))
-        *exitcode = WEXITSTATUS(stat);
+    if (exitcode)
+        *exitcode = -1;
+
+    if (signal)
+        *signal = -1;
+
+    if (WIFEXITED(stat)) {
+        if (exitcode)
+            *exitcode = WEXITSTATUS(stat);
+    } else if (WIFSIGNALED(stat)) {
+        if (signal)
+            *signal = WTERMSIG(stat);
+    }
 
     return OK;
 }
@@ -39,7 +50,7 @@ int spawn_wait(pid_t pid, int *exitcode)
  *
  * cfunc is a function to call when child process is created
  */
-int spawn(char *args[], pid_t *cpid, int *exitcode, int (*cfunc)(const void *),
+int spawn(char *args[], pid_t *cpid, int *exitcode, int *signal, int (*cfunc)(const void *),
           const void *carg)
 {
     if (exitcode)
@@ -64,8 +75,8 @@ int spawn(char *args[], pid_t *cpid, int *exitcode, int (*cfunc)(const void *),
     if (cpid)
         *cpid = pid;
 
-    if (exitcode)
-        ERRCHK_RET_OK(spawn_wait(pid, exitcode));
+    if (exitcode || signal)
+        ERRCHK_RET_OK(spawn_wait(pid, exitcode, signal));
 
     return OK;
 }
