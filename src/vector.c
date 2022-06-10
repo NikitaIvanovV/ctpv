@@ -86,3 +86,9 @@ void vector_resize(Vector *vec, size_t len)
 
     vec->len = len;
 }
+
+void vector_remove(Vector *vec, size_t i)
+{
+    memcpy(vec->buf + i * vec->size, vec->buf + (--vec->len) * vec->size,
+           vec->size);
+}

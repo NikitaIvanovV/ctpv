@@ -71,6 +71,21 @@ static int add_priority(char *name, int priority)
     return found ? OK : ERR;
 }
 
+static int remove_preview(char *name)
+{
+    int found = 0;
+
+    for (size_t i = 0; i < previews->len; i++) {
+        if (strcmp(previews->buf[i].name, name) != 0)
+            continue;
+
+        vectorPreview_remove(previews, i);
+        found = 1;
+    }
+
+    return found ? OK : ERR;
+}
+
 static inline void next_token(void)
 {
     token = lexer_get_token(lexer);
@@ -142,7 +157,7 @@ static int preview_type(char **type, char **subtype, char **ext)
     return preview_type_mime(type, subtype);
 }
 
-static int new_preview(void)
+static int cmd_preview(void)
 {
     Token name = token;
     EXPECT(TOK_STR);
@@ -164,7 +179,7 @@ static int new_preview(void)
     return STAT_OK;
 }
 
-static int priority(Token tok)
+static int cmd_priority(Token tok)
 {
     Token name = token;
     EXPECT(TOK_STR);
@@ -181,6 +196,20 @@ static int priority(Token tok)
     return STAT_OK;
 }
 
+static int cmd_remove(Token tok)
+{
+    Token name = token;
+    EXPECT(TOK_STR);
+    char *name_str = get_str(name);
+
+    if (remove_preview(name_str) != OK) {
+        PARSEERROR(name, "preview '%s' not found", name_str);
+        return STAT_ERR;
+    }
+
+    return STAT_OK;
+}
+
 static int command(void)
 {
     Token cmd = token;
@@ -188,9 +217,11 @@ static int command(void)
 
     char *cmd_str = get_str(cmd);
     if (strcmp(cmd_str, "preview") == 0)
-        return new_preview();
+        return cmd_preview();
     else if (strcmp(cmd_str, "priority") == 0)
-        return priority(cmd);
+        return cmd_priority(cmd);
+    else if (strcmp(cmd_str, "remove") == 0)
+        return cmd_remove(cmd);
 
     PARSEERROR(cmd, "unknown command: %s", cmd_str);
     return STAT_ERR;
