@@ -15,16 +15,21 @@
 
 Preview b_previews[] = {
     PP(NULL,      NULL,             NULL,             wrapper, INT_MAX),
+    PR(NULL,      NULL,             NULL,             any),
+
+    PR("md",      NULL,             NULL,             markdown),
+
     PR(NULL,      "text",           NULL,             bat),
     PR(NULL,      "text",           NULL,             highlight),
     PR(NULL,      "text",           NULL,             source_highlight),
     PR(NULL,      "text",           NULL,             cat),
-    PR(NULL,      NULL,             NULL,             any),
-    PR("md",      NULL,             NULL,             markdown),
-    PR(NULL,      "application",    "json",           json),
+
     PR(NULL,      "image",          NULL,             image),
     PR(NULL,      "video",          NULL,             video),
+
     PR(NULL,      "application",    "pdf",            pdf),
+    PR(NULL,      "application",    "json",           json),
+
 };
 
 /* vim: set nowrap: */

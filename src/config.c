@@ -297,6 +297,9 @@ exit:
 
 void config_cleanup(void)
 {
-    if (lexer)
-        lexer_free(lexer);
+    if (!lexer)
+        return;
+
+    lexer_free(lexer);
+    lexer = NULL;
 }
