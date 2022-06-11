@@ -261,7 +261,18 @@ static int parse(void)
         next_token();
         if (token.type == TOK_EOF)
             break;
-        printf("%s\n", lexer_token_type_str(token.type));
+        printf("%s", lexer_token_type_str(token.type));
+        switch (token.type) {
+        case TOK_INT:
+            printf(": %d\n", token.val.i);
+            break;
+        case TOK_STR:
+            printf(": %s\n", token.val.s);
+            break;
+        default:
+            puts("");
+            break;
+        }
     }
 #endif
 
