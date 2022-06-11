@@ -27,14 +27,13 @@ typedef struct {
     } type;
     union {
         int i;
-        size_t sp;
+        char *s;
     } val;
 } Token;
 
 Lexer *lexer_init(FILE *f);
 void lexer_free(Lexer *ctx);
 Token lexer_get_token(Lexer *ctx);
-char *lexer_get_string(Lexer *ctx, Token tok);
 char *lexer_token_type_str(enum TokenType type);
 
 #endif

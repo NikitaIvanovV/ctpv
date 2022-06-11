@@ -3,7 +3,7 @@
 
 #include "error.h"
 #include "lexer.h"
-#include "vector.h"
+#include "ulist.h"
 
 #define READ_PUNCT(c, t, s) read_punct((c), (t), (s), LEN(s) - 1)
 
@@ -29,7 +29,7 @@ struct Lexer {
     } tok_pos;
     InputBuffer input_buf;
     TokenQueue tok_queue;
-    VectorChar *text_buf;
+    UList      *text_buf;
 };
 
 static char block_open[] = "{{",
@@ -130,22 +130,17 @@ static void skipn_char(Lexer *ctx, int n)
 
 static inline void add_text_buf(Lexer *ctx, char c)
 {
-    vectorChar_append(ctx->text_buf, c);
+    ulist_append(ctx->text_buf, &c);
 }
 
-static inline char *get_text_buf_at(Lexer *ctx, size_t i)
+static inline void record_text(Lexer *ctx)
 {
-    return vector_get((Vector *)ctx->text_buf, i);
+    ulist_lock(ctx->text_buf);
 }
 
-static inline size_t get_text_buf_len(Lexer *ctx)
+static inline char *get_text(Lexer *ctx)
 {
-    return ctx->text_buf->len;
-}
-
-static inline void set_text_buf_len(Lexer *ctx, size_t len)
-{
-    vectorChar_resize(ctx->text_buf, len);
+    return ulist_unlock(ctx->text_buf);
 }
 
 Lexer *lexer_init(FILE *f)
@@ -158,7 +153,7 @@ Lexer *lexer_init(FILE *f)
     }
 
     init_input_buf(&ctx->input_buf, f);
-    ctx->text_buf = vectorChar_new(1024);
+    ctx->text_buf = ulist_new(sizeof(char), 1024);
     ctx->line = 1;
     ctx->col = 1;
     ctx->tok_queue.back = 0;
@@ -169,7 +164,7 @@ Lexer *lexer_init(FILE *f)
 
 void lexer_free(Lexer *ctx)
 {
-    vectorChar_free(ctx->text_buf);
+    ulist_free(ctx->text_buf);
     free(ctx);
 }
 
@@ -256,11 +251,11 @@ static inline Token read_symbol(Lexer *ctx)
     if (!isalpha(c))
         return get_tok(ctx, TOK_NULL);
 
-    size_t p = get_text_buf_len(ctx);
+    record_text(ctx);
     read_while(ctx, issymbol, 1);
 
     Token tok = get_tok(ctx, TOK_STR);
-    tok.val.sp = p;
+    tok.val.s = get_text(ctx);
 
     return tok;
 }
@@ -277,11 +272,9 @@ static inline Token read_int(Lexer *ctx)
     if (!isdigit(peek_char(ctx)))
         return get_tok(ctx, TOK_NULL);
 
-    size_t len = get_text_buf_len(ctx);
+    record_text(ctx);
     read_while(ctx, isdigit, 1);
-
-    int i = atoi(get_text_buf_at(ctx, len));
-    set_text_buf_len(ctx, len);
+    int i = atoi(get_text(ctx));
 
     if (!positive)
         i *= -1;
@@ -328,8 +321,7 @@ static Token read_block(Lexer *ctx)
     if ((open_tok = read_block_open(ctx)).type == TOK_NULL)
         return get_tok(ctx, TOK_NULL);
 
-    body_tok = get_tok(ctx, TOK_STR);
-    body_tok.val.sp = get_text_buf_len(ctx);
+    record_text(ctx);
 
     while (1) {
         close_tok = read_block_close(ctx);
@@ -345,6 +337,10 @@ static Token read_block(Lexer *ctx)
     }
 
     add_text_buf(ctx, '\0');
+
+    body_tok = get_tok(ctx, TOK_STR);
+    body_tok.val.s = get_text(ctx);
+
     add_token_queue(ctx, body_tok);
 
     if (close_tok.type != TOK_NULL)
@@ -395,14 +391,6 @@ Token lexer_get_token(Lexer *ctx)
 
     PARSEERROR((*ctx), "cannot handle character: %c", peek_char(ctx));
     return get_tok(ctx, TOK_ERR);
-}
-
-char *lexer_get_string(Lexer *ctx, Token tok)
-{
-    if (tok.type != TOK_STR)
-        return NULL;
-
-    return get_text_buf_at(ctx, tok.val.sp);
 }
 
 char *lexer_token_type_str(enum TokenType type)

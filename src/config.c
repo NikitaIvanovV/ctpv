@@ -115,18 +115,13 @@ static int expect(enum TokenType type)
     return STAT_ERR;
 }
 
-static inline char *get_str(Token tok)
-{
-    return lexer_get_string(lexer, tok);
-}
-
 static int preview_type_ext(char **ext)
 {
     ACCEPT(TOK_DOT);
 
     Token tok = token;
     EXPECT(TOK_STR);
-    *ext = get_str(tok);
+    *ext = tok.val.s;
 
     return STAT_OK;
 }
@@ -137,7 +132,7 @@ static int preview_type_mime_part(char **s)
 
     Token t = token;
     EXPECT(TOK_STR);
-    *s = get_str(t);
+    *s = t.val.s;
 
     return STAT_OK;
 }
@@ -175,7 +170,7 @@ static int cmd_preview(void)
 
     EXPECT(TOK_BLK_CLS);
 
-    add_preview(get_str(name), get_str(script), type, subtype, ext);
+    add_preview(name.val.s, script.val.s, type, subtype, ext);
     return STAT_OK;
 }
 
@@ -187,9 +182,8 @@ static int cmd_priority(Token tok)
     Token number = token;
     int i = accept(TOK_INT) == STAT_OK ? number.val.i : 1;
 
-    char *name_str = get_str(name);
-    if (add_priority(name_str, i) != OK) {
-        PARSEERROR(name, "preview '%s' not found", name_str);
+    if (add_priority(name.val.s, i) != OK) {
+        PARSEERROR(name, "preview '%s' not found", name.val.s);
         return STAT_ERR;
     }
 
@@ -200,10 +194,9 @@ static int cmd_remove(Token tok)
 {
     Token name = token;
     EXPECT(TOK_STR);
-    char *name_str = get_str(name);
 
-    if (remove_preview(name_str) != OK) {
-        PARSEERROR(name, "preview '%s' not found", name_str);
+    if (remove_preview(name.val.s) != OK) {
+        PARSEERROR(name, "preview '%s' not found", name.val.s);
         return STAT_ERR;
     }
 
@@ -215,15 +208,14 @@ static int command(void)
     Token cmd = token;
     EXPECT(TOK_STR);
 
-    char *cmd_str = get_str(cmd);
-    if (strcmp(cmd_str, "preview") == 0)
+    if (strcmp(cmd.val.s, "preview") == 0)
         return cmd_preview();
-    else if (strcmp(cmd_str, "priority") == 0)
+    else if (strcmp(cmd.val.s, "priority") == 0)
         return cmd_priority(cmd);
-    else if (strcmp(cmd_str, "remove") == 0)
+    else if (strcmp(cmd.val.s, "remove") == 0)
         return cmd_remove(cmd);
 
-    PARSEERROR(cmd, "unknown command: %s", cmd_str);
+    PARSEERROR(cmd, "unknown command: %s", cmd.val.s);
     return STAT_ERR;
 }
 
