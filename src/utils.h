@@ -10,7 +10,7 @@
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-#define STRINGIZE(x) STRINGIZE2(x)
+#define STRINGIZE(x)  STRINGIZE2(x)
 #define STRINGIZE2(x) #x
 
 #define FORMATTED_STRING(arr, format)                   \
