@@ -79,7 +79,7 @@ static int peekn_char(Lexer *ctx, unsigned int i)
         memmove(b->buf, b->buf + (b->len - i), i * sizeof(*b->buf));
     }
 
-    b->len = fread(b->buf + i, sizeof(*b->buf), LEN(b->buf) - i, b->f);
+    b->len = i + fread(b->buf + i, sizeof(*b->buf), LEN(b->buf) - i, b->f);
     b->pos = 0;
 
     if (b->len != LEN(b->buf)) {
