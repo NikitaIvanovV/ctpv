@@ -16,7 +16,7 @@ setup_fifo() {
 }
 
 exists() {
-	command -v "$1" > /dev/null
+	command -v "$1" >/dev/null
 }
 
 send_image() {

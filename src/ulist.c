@@ -13,7 +13,7 @@
 #define ULIST_NODE_SIZE(cap, size) \
     (sizeof(struct UListNode) - sizeof(void *) + (cap * size))
 
-#define ULIST_BUF(list) ((void *)&(list).buf)
+#define ULIST_BUF(node) ((void *)&(node).buf)
 
 struct UList {
     size_t size;
@@ -62,8 +62,7 @@ UList *ulist_new(size_t size, size_t cap)
 
     l->size = size;
     l->lock_i = NO_LOCK;
-    l->head = ulist_node_new(l, cap);
-    l->tail = l->head;
+    l->head = l->tail = ulist_node_new(l, cap);
 
     return l;
 }

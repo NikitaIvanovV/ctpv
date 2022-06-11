@@ -154,10 +154,8 @@ Lexer *lexer_init(FILE *f)
 
     init_input_buf(&ctx->input_buf, f);
     ctx->text_buf = ulist_new(sizeof(char), 1024);
-    ctx->line = 1;
-    ctx->col = 1;
-    ctx->tok_queue.back = 0;
-    ctx->tok_queue.front = 0;
+    ctx->line = ctx->col = 1;
+    ctx->tok_queue.back = ctx->tok_queue.front = 0;
 
     return ctx;
 }
@@ -170,8 +168,8 @@ void lexer_free(Lexer *ctx)
 
 static int cmp_nextn(Lexer *ctx, int n, char *s)
 {
-    int i = 0;
     char c;
+    int i = 0;
 
     while (1) {
         c = peekn_char(ctx, i);
@@ -182,10 +180,7 @@ static int cmp_nextn(Lexer *ctx, int n, char *s)
         i++;
     }
 
-    if (i == n)
-        return 0;
-    else
-        return ((unsigned char)c - *(unsigned char *)s);
+    return i == n ? 0 : ((unsigned char)c - *(unsigned char *)s);
 }
 
 static void ignore_comments(Lexer *ctx)
@@ -203,12 +198,7 @@ static void read_while(Lexer *ctx, Predicate p, int add)
 {
     char c;
 
-    while (1) {
-        c = peek_char(ctx);
-
-        if (c < 0 || !p(c))
-            break;
-
+    while ((c = peek_char(ctx)) >= 0 && p(c)) {
         if (add)
             add_text_buf(ctx, c);
 
