@@ -192,12 +192,11 @@ static void ignore_comments(Lexer *ctx)
 {
     char c;
 
-    if (peek_char(ctx) != '#')
-        return;
-
-    do {
-        c = next_char(ctx);
-    } while (c != '\n');
+    while (peek_char(ctx) == '#') {
+        do {
+            c = next_char(ctx);
+        } while (c != '\n');
+    }
 }
 
 static void read_while(Lexer *ctx, Predicate p, int add)
