@@ -7,7 +7,7 @@ DEP := $(OBJ:.o=.d)
 PRE := $(wildcard prev/*.sh)
 GEN := gen/prev/scripts.h gen/server.h gen/helpers.h
 
-O    := -Os
+O    := -O2
 LIBS := magic crypto
 
 CFLAGS  += $(O) -MD -Wall -Wextra -Wno-unused-parameter
