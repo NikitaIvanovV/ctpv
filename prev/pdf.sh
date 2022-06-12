@@ -5,6 +5,6 @@ pdf() {
 		-singlefile                 \
 		-jpeg -tiffcompression jpeg \
 		-- "$f" "$cache_f" && mv -- "$cache_f.jpg" "$cache_f"
-	}
+}
 
 convert_and_show_image pdf

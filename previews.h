@@ -17,18 +17,18 @@ Preview b_previews[] = {
     PP(NULL,      NULL,             NULL,             wrapper, INT_MAX),
     PR(NULL,      NULL,             NULL,             any),
 
-    PR("md",      NULL,             NULL,             markdown),
+    PR("md",      NULL,             NULL,             mdcat),
 
     PR(NULL,      "text",           NULL,             bat),
     PR(NULL,      "text",           NULL,             highlight),
     PR(NULL,      "text",           NULL,             source_highlight),
     PR(NULL,      "text",           NULL,             cat),
 
-    PR(NULL,      "image",          NULL,             image),
+    PR(NULL,      "image",          NULL,             ueberzug),
     PR(NULL,      "video",          NULL,             video),
 
     PR(NULL,      "application",    "pdf",            pdf),
-    PR(NULL,      "application",    "json",           json),
+    PR(NULL,      "application",    "json",           jq),
 
 };
 
