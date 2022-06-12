@@ -1,0 +1,1 @@
+diff-so-fancy < "$f"

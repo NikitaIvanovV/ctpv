@@ -1,0 +1,1 @@
+elinks -dump "$f"

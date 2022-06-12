@@ -18,6 +18,7 @@ Preview b_previews[] = {
     PR(NULL,      NULL,             NULL,             any),
 
     PR("md",      NULL,             NULL,             mdcat),
+    PR("torrent", NULL,             NULL,             torrent),
 
     PR(NULL,      "text",           NULL,             bat),
     PR(NULL,      "text",           NULL,             highlight),
@@ -29,6 +30,18 @@ Preview b_previews[] = {
 
     PR(NULL,      "application",    "pdf",            pdf),
     PR(NULL,      "application",    "json",           jq),
+    PR(NULL,      "inode",          "directory",      ls),
+
+    PR(NULL,      "text",           "html",           w3m),
+    PR(NULL,      "text",           "html",           lynx),
+    PR(NULL,      "text",           "html",           elinks),
+
+    PR(NULL,      "text",           "x-diff",         delta),
+    PR(NULL,      "text",           "x-patch",        delta),
+    PR(NULL,      "text",           "x-diff",         diff_so_fancy),
+    PR(NULL,      "text",           "x-patch",        diff_so_fancy),
+    PR(NULL,      "text",           "x-diff",         colordiff),
+    PR(NULL,      "text",           "x-patch",        colordiff),
 
 };
 

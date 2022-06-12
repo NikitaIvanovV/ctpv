@@ -1,0 +1,1 @@
+transmission-show -- "$f"
