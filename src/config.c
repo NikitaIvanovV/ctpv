@@ -74,7 +74,7 @@ static int remove_preview(char *name)
 {
     int found = 0;
 
-    for (size_t i = 0; i < previews->len; i++) {
+    for (ssize_t i = previews->len - 1; i >= 0; i--) {
         if (strcmp(previews->buf[i].name, name) != 0)
             continue;
 
