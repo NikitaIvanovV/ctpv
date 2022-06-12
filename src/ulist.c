@@ -13,7 +13,8 @@
 #define ULIST_NODE_SIZE(cap, size) \
     (sizeof(struct UListNode) - sizeof(void *) + (cap * size))
 
-#define ULIST_BUF(node) ((void *)&(node).buf)
+#define ULIST_BUF(node)             ((void *)&(node).buf)
+#define ULIST_BUF_AT(list, node, i) (ULIST_BUF(node) + i * (list).size)
 
 struct UList {
     size_t size;
@@ -93,7 +94,7 @@ void ulist_append_arr(UList *l, void *arr, size_t len)
 
         if (is_locked(l)) {
             new->len += node->len - l->lock_i;
-            memcpy(ULIST_BUF(*new), ULIST_BUF(*node) + l->lock_i * l->size,
+            memcpy(ULIST_BUF(*new), ULIST_BUF_AT(*l, *node, l->lock_i),
                    new->len * l->size);
 
             node->len = l->lock_i;
@@ -103,7 +104,7 @@ void ulist_append_arr(UList *l, void *arr, size_t len)
         node = l->tail = new;
     }
 
-    memcpy(ULIST_BUF(*node) + node->len * l->size, arr, len * l->size);
+    memcpy(ULIST_BUF_AT(*l, *node, node->len), arr, len * l->size);
     node->len += len;
 }
 
@@ -122,5 +123,5 @@ void *ulist_unlock(UList *l)
     ssize_t i = l->lock_i;
     l->lock_i = NO_LOCK;
 
-    return ULIST_BUF(*l->tail) + i * l->size;
+    return ULIST_BUF_AT(*l, *l->tail, i);
 }
