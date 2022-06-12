@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -144,16 +145,17 @@ int mkpath(char* file_path, mode_t mode)
 
 const char *get_ext(const char *path)
 {
-    const char *base;
+    const char *dot = NULL, *s = path + strlen(path) - 1;
 
-    if ((base = strrchr(path, '/')))
-        base++;
-    else
-        base = path;
+    for (; ; s--) {
+        if (*s == '.') {
+            dot = s + 1;
+            continue;
+        }
 
-    const char *dot = strchr(base, '.');
-    if (!dot || dot == base)
-        return NULL;
+        if (!isalnum(*s) || s == path)
+            break;
+    }
 
-    return &dot[1];
+    return dot;
 }
