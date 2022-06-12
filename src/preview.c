@@ -37,7 +37,7 @@ static int cmp_previews(const void *p1, const void *p2)
         return -i;
 
     if ((i = strcmpnull(pr1->subtype, pr2->subtype)) != 0)
-        return i;
+        return -i;
 
     if ((i = pr2->priority - pr1->priority) != 0)
         return i;
