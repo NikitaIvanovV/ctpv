@@ -6,13 +6,12 @@
 #define CHECK(f, cond) \
     do {               \
         int x = (f);   \
-        if (cond)      \
+        if (!(cond))   \
             return x;  \
     } while (0)
 
-#define CHECK_OK(f)      CHECK(f, x != STAT_OK)
-#define CHECK_NULL(f)    CHECK(f, x != STAT_NULL)
-#define CHECK_OK_NULL(f) CHECK(f, x != STAT_OK || x != STAT_NULL)
+#define CHECK_OK(f)   CHECK(f, x == STAT_OK)
+#define CHECK_NULL(f) CHECK(f, x == STAT_NULL)
 
 #define EXPECT(x)     CHECK_OK(expect(x))
 #define ACCEPT(x)     CHECK_OK(accept(x))
