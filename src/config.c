@@ -249,13 +249,7 @@ static int commands(void)
 
 static int parse(void)
 {
-#ifndef PARSE_DEBUG
-    next_token();
-    if (commands() == STAT_ERR)
-        return ERR;
-#endif
-
-#ifdef PARSE_DEBUG
+#ifdef DEBUG_LEXER
     while (1) {
         next_token();
         if (token.type == TOK_EOF)
@@ -273,6 +267,11 @@ static int parse(void)
             break;
         }
     }
+#endif
+#ifndef DEBUG_LEXER
+    next_token();
+    if (commands() == STAT_ERR)
+        return ERR;
 #endif
 
     return OK;
