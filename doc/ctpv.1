@@ -77,10 +77,19 @@ ctpv \- terminal previewer
 .
 .B ctpv
 is a previewer utility made for integration into other programs.
-It supports a variety of \(lqpreviews\(rq out of the box
-(including one for previewing images with
-.IR ueberzug )
-and an option for defining custom previews.
+It supports a variety of \(lqpreviews\(rq out of the box,
+as well as an option to define custom ones.
+.PP
+.
+When
+.B ctpv
+is given
+.I file
+(and, optionally, other arguments (see
+.IR SYNOPSIS )),
+it determines an appropriate preview for it and runs its script.
+The script produces preview content and prints it to
+.IR stdout .
 .
 .SS Integration
 .
@@ -102,7 +111,7 @@ Initially,
 .B ctpv
 retrieves MIME type and extension from
 .I file
-given in the first argument (MIME type is extracted using
+passed in the first argument (MIME type is extracted using
 .BR magic (5)).
 .PP
 .
@@ -121,7 +130,7 @@ goes through the list starting with the first element
 and checks if a preview matches
 .IR file \(aqs
 extension and MIME type.
-If it does, it runs the preview script.
+If it does, it runs a preview script.
 If the script exits with status 127
 (which usually means that a command was not found),
 the next appropriate preview is selected, and so on.
@@ -160,9 +169,9 @@ Kill server with ID
 .
 The configuration file format somewhat resembles one used by
 .IR lf .
-There are several commands that allow you to customize
-.B ctpv
-behavior.
+There are several commands that 
+behavior of
+.BR ctpv .
 Commands are separated by newlines.
 Comments start with number sign
 .RB ( # )
@@ -262,7 +271,7 @@ preview any_text_example text/* {{
 .
 Setting subtype to
 .B *
-will make the preview work for any file which MIME type starts with
+will make the preview above work for any file which MIME type starts with
 .BR text/ .
 .
 .SS Setting priority
