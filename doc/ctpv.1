@@ -1,0 +1,312 @@
+.ds op \&.\|.\|.\&
+.
+.de Sy
+.SY ctpv
+..
+.
+.de Ys
+.YS
+..
+.
+.de Op
+.RI [ "\\$1" "]\\$2"
+..
+.
+.de Om
+.Op "\\$1" \*(op
+..
+.
+.de Bsi
+\&\fB\\$1\fP \fI\\$2\fP\\$3
+..
+.
+.de Ex
+.PP
+.IP
+.EX
+..
+.
+.de Ee
+.EE
+.PP
+..
+.
+.
+.TH CTPV 1 "June 2022" Linux "User Manuals"
+.SH NAME
+ctpv \- terminal previewer
+.
+.
+.SH SYNOPSIS
+.
+.Sy
+.I file
+.Op w
+.Op h
+.Op x
+.Op y
+.Op id
+.Ys
+.
+.Sy
+.B \-l
+.Ys
+.
+.Sy
+.B \-m
+.Om files
+.Ys
+.
+.Sy
+.B \-s
+.I id
+.Ys
+.
+.Sy
+.B \-c
+.I id
+.Ys
+.
+.Sy
+.B \-e
+.I id
+.Ys
+.
+.
+.SH DESCRIPTION
+.
+.B ctpv
+is a previewer utility made for integration into other programs.
+It supports a variety of \(lqpreviews\(rq out of the box
+(including one for previewing images with
+.IR ueberzug )
+and an option for defining custom previews.
+.
+.SS Integration
+.
+The following snippets should be added to configuration files
+of corresponding programs:
+.
+.TP
+\fIlf\fP file manager:
+.EX
+set previewer ctpv
+set cleaner ctpvclear
+&ctpv -s $id
+cmd on-quit $ctpv -e $id
+.EE
+.
+.SS How previews are selected
+.
+Initially,
+.B ctpv
+retrieves MIME type and extension from
+.I file
+given in the first argument (MIME type is extracted using
+.BR magic (5)).
+.PP
+.
+Then it creates a list of all previews in a special order,
+where previews that are more specific appear at the top
+and more generic ones at the bottom.
+The list can be viewed by using
+.B \-l
+option. The order can be changed, see
+.IR "Setting priority" .
+.PP
+.
+Finally,
+.B ctpv
+goes through the list starting with the first element
+and checks if a preview matches
+.IR file \(aqs
+extension and MIME type.
+If it does, it runs the preview script.
+If the script exits with status 127
+(which usually means that a command was not found),
+the next appropriate preview is selected, and so on.
+.
+.
+.SH OPTIONS
+.
+.TP
+.B \-l
+List all previews.
+.
+.TP
+.Bsi \-m files \*(op
+Print extension and MIME type of specified files.
+.
+.TP
+.Bsi \-s id
+Start server with ID
+.IR id .
+.
+.TP
+.Bsi \-c id
+Send
+.B clear
+command to server with ID
+.I id
+(usually, it removes image from terminal).
+.
+.TP
+.Bsi \-e id
+Kill server with ID
+.IR id .
+.
+.
+.SH CONFIGURATION
+.
+The configuration file format somewhat resembles one used by
+.IR lf .
+There are several commands that allow you to customize
+.B ctpv
+behavior.
+Commands are separated by newlines.
+Comments start with number sign
+.RB ( # )
+like in many other formats.
+.
+.SS Defining custom previews
+.
+A snippet below defines a new preview with name
+.I cow
+that applies to files with extension
+.IR .moo .
+A preview itself is a shell script enclosed within double curly
+braces (this particular one utilizes the famous
+.I cowsay
+program):
+.
+.Ex
+preview cow .moo {{
+	cowsay < "$f"
+}}
+.Ee
+.
+Running
+.I "ctpv\ file.moo"
+where
+.I file.moo
+contains \(lqsome text\(rq will produce the following output:
+.
+.Ex
+\#  ___________ 
+\# < some text >
+\#  ----------- 
+\#         \   ^__^
+\#          \  (oo)\_______
+\#             (__)\       )\/\
+\#                 ||----w |
+\#                 ||     ||
+\& \(ul\(ul\(ul\(ul\(ul\(ul\(ul\(ul\(ul\(ul\(ul 
+\&< some text >
+\& \(mi\(mi\(mi\(mi\(mi\(mi\(mi\(mi\(mi\(mi\(mi 
+\&        \(rs   ^\(ul\(ul^
+\&         \(rs  (oo)\(rs\(ul\(ul\(ul\(ul\(ul\(ul\(ul
+\&            (\(ul\(ul)\(rs       )\(rs/\(rs
+\&                ||\(mi\(mi\(mi\(miw |
+\&                ||     ||
+.Ee
+.
+Variable
+.B $f
+stores
+.IR file
+that was passed as a first argument to
+.BR ctpv .
+It's strongly suggested to enclose
+.B $f
+with double quotes
+.RB ( \(dq$f\(dq )
+because otherwise the script will not work as
+expected if
+.B $f
+stores a filename with whitespace.
+.PP
+.
+There are other variables that are exported into preview
+script environment:
+.BR $w ,
+.BR $h ,
+.BR $x ,
+.BR $y
+and
+.BR $id .
+However, they are rarely used even by built-in previews and
+are only set if corresponding arguments were passed to
+.B ctpv
+command (see
+.IR SYNOPSIS ).
+.PP
+.
+You can specify MIME type instead of filename extension
+in preview definition:
+.
+.Ex
+preview json_example application/json {{
+	# preview json files
+}}
+.Ee
+.
+And you also can omit subtype part of the MIME type
+by replacing it with
+.BR * .
+.
+.Ex
+preview any_text_example text/* {{
+	# this one applies to all text files
+}}
+.Ee
+.
+Setting subtype to
+.B *
+will make the preview work for any file which MIME type starts with
+.BR text/ .
+.
+.SS Setting priority
+If there are several previews that apply to the same file type,
+only the top one in the list is chosen (see
+.IR "How previews are selected" ).
+To alter this behavior, you can use
+.B priority
+command to change preview priority:
+.
+.Ex
+priority cat
+.Ee
+.
+The snippet above sets priority of preview named \(lqcat\(rq to 1,
+thus now it's used for all text files.
+It's possible to specify an integer as the second argument
+to set priority other than 1 (may also be negative).
+.
+.SS Removing previews
+.
+.B remove
+command simply removes a preview (also works for built-in ones):
+.
+.Ex
+remove cat
+.Ee
+.
+.
+.SH FILES
+.
+.TP
+.I $XDG_CONFIG_HOME/ctpv/config
+Configuration file. If
+.I $XDG_CONFIG_HOME
+is empty or not set, defaults to
+.IR $HOME/.config .
+.
+.
+.SH SEE ALSO
+.
+.BR lf (1)
+.
+.
+.SH AUTHOR
+.
+Written by Nikita Ivanov.
