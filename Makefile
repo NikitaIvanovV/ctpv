@@ -1,5 +1,6 @@
 PREFIX    := /usr/local
 BINPREFIX := $(PREFIX)/bin
+MANPREFIX := $(PREFIX)/man/man1
 
 SRC := $(wildcard src/*.c)
 OBJ := $(SRC:.c=.o)
@@ -20,9 +21,15 @@ options:
 	@echo "CFLAGS  = $(CFLAGS)"
 	@echo "LDFLAGS = $(LDFLAGS)"
 
-install: ctpv ctpvclear
+install: install.bin install.man
+
+install.bin: ctpv ctpvclear
 	install -d $(BINPREFIX)
 	install $^ $(BINPREFIX)
+
+install.man: doc/ctpv.1
+	install -d $(MANPREFIX)
+	install -m 0644 $^ $(MANPREFIX)
 
 uninstall:
 	$(RM) $(BINPREFIX)/ctpv $(BINPREFIX)/ctpvclear
@@ -56,6 +63,6 @@ embed/embed: make_embed
 
 -include $(DEP)
 
-.PHONY: all options install uninstall clean make_embed
+.PHONY: all options install install.bin install.man uninstall clean make_embed
 
 .DELETE_ON_ERROR:
