@@ -21,14 +21,13 @@
 ..
 .
 .de Ex
-.PP
-.IP
+.in +4n
 .EX
 ..
 .
 .de Ee
 .EE
-.PP
+.in
 ..
 .
 .
@@ -58,17 +57,7 @@ ctpv \- terminal previewer
 .Ys
 .
 .Sy
-.B \-s
-.I id
-.Ys
-.
-.Sy
-.B \-c
-.I id
-.Ys
-.
-.Sy
-.B \-e
+.RB { \-s | \-c | \-e }
 .I id
 .Ys
 .
@@ -83,27 +72,25 @@ as well as an option to define custom ones.
 .
 When
 .B ctpv
-is given
-.I file
-(and, optionally, other arguments (see
-.IR SYNOPSIS )),
-it determines an appropriate preview for it and runs its script.
-The script produces preview content and prints it to
-.IR stdout .
+is given a file, it determines an appropriate preview for it and
+runs its script.
+The script produces preview content and prints it to standard output.
 .
 .SS Integration
 .
-The following snippets should be added to configuration files
-of corresponding programs:
-.
 .TP
-\fIlf\fP file manager:
-.EX
+\fIlf\fP file manager
+Add this snippet to
+.I lf
+configuration file (usually located at
+.IR \(ti/.config/lf/lfrc ).
+.IP
+.Ex
 set previewer ctpv
 set cleaner ctpvclear
 &ctpv -s $id
 cmd on-quit $ctpv -e $id
-.EE
+.Ee
 .
 .SS How previews are selected
 .
@@ -167,15 +154,20 @@ Kill server with ID
 .
 .SH CONFIGURATION
 .
-The configuration file format somewhat resembles one used by
+.B ctpv
+uses a configuration file usually located at
+.IR \(ti/.config/ctpv/config
+(see
+.IR FILES ).
+Its format somewhat resembles one used by
 .IR lf .
-There are several commands that 
-behavior of
-.BR ctpv .
+There are several \(lqcommands\(rq that can be used to change
+previews or set different settings.
 Commands are separated by newlines.
 Comments start with number sign
 .RB ( # )
 like in many other formats.
+.PP
 .
 .SS Defining custom previews
 .
@@ -188,11 +180,13 @@ braces (this particular one utilizes the famous
 .I cowsay
 program):
 .
+.PP
 .Ex
 preview cow .moo {{
-	cowsay < "$f"
+    cowsay < "$f"
 }}
 .Ee
+.PP
 .
 Running
 .I "ctpv\ file.moo"
@@ -200,6 +194,7 @@ where
 .I file.moo
 contains \(lqsome text\(rq will produce the following output:
 .
+.PP
 .Ex
 \#  ___________ 
 \# < some text >
@@ -218,6 +213,7 @@ contains \(lqsome text\(rq will produce the following output:
 \&                ||\(mi\(mi\(mi\(miw |
 \&                ||     ||
 .Ee
+.PP
 .
 Variable
 .B $f
@@ -253,21 +249,25 @@ command (see
 You can specify MIME type instead of filename extension
 in preview definition:
 .
+.PP
 .Ex
 preview json_example application/json {{
-	# preview json files
+    # preview json files
 }}
 .Ee
+.PP
 .
 And you also can omit subtype part of the MIME type
 by replacing it with
 .BR * .
 .
+.PP
 .Ex
 preview any_text_example text/* {{
-	# this one applies to all text files
+    # this one applies to all text files
 }}
 .Ee
+.PP
 .
 Setting subtype to
 .B *
@@ -282,9 +282,11 @@ To alter this behavior, you can use
 .B priority
 command to change preview priority:
 .
+.PP
 .Ex
 priority cat
 .Ee
+.PP
 .
 The snippet above sets priority of preview named \(lqcat\(rq to 1,
 thus now it's used for all text files.
@@ -296,9 +298,11 @@ to set priority other than 1 (may also be negative).
 .B remove
 command simply removes a preview (also works for built-in ones):
 .
+.PP
 .Ex
 remove cat
 .Ee
+.PP
 .
 .
 .SH FILES
@@ -307,8 +311,8 @@ remove cat
 .I $XDG_CONFIG_HOME/ctpv/config
 Configuration file. If
 .I $XDG_CONFIG_HOME
-is empty or not set, defaults to
-.IR $HOME/.config .
+is not set, defaults to
+.IR \(ti/.config .
 .
 .
 .SH SEE ALSO
