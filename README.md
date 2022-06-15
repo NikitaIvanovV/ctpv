@@ -8,7 +8,7 @@ Terminal previewer
 
 ctpv is an utility for previewing various files (including images with [Überzug](https://github.com/seebye/ueberzug)).
 
-ctpv is a remake of awesome program https://github.com/NikitaIvanovV/ctpv [stpv](https://github.com/Naheel-Azawy/stpv)
+ctpv is a remake of awesome program named [stpv](https://github.com/Naheel-Azawy/stpv)
 but it's written in C.
 stpv worked perfectly for me, except it was kinda sluggish because
 it was written in POSIX shell.
