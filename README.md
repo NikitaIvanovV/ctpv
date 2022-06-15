@@ -13,7 +13,7 @@ ctpv is a remake of awesome program named [stpv](https://github.com/Naheel-Azawy
 but it's written in C.
 stpv worked perfectly for me, except it was kinda sluggish because
 it was written in POSIX shell.
-ctpv is an attempt to make a faster version stpv and add some new features.
+ctpv is an attempt to make a faster version of stpv and add some new features.
 
 Originally it was made for [lf](https://github.com/gokcehan/lf)
 but I assume it should not be hard to integrate ctpv into other
