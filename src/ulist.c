@@ -41,7 +41,7 @@ static struct UListNode *ulist_node_new(UList *l, size_t cap)
         cap = DEFAULT_CAP;
 
     if (!(n = malloc(ULIST_NODE_SIZE(cap, l->size)))) {
-        PRINTINTERR(FUNCFAILED("malloc"), ERRNOS);
+        FUNCFAILED("malloc", strerror(errno));
         abort();
     }
 
@@ -57,7 +57,7 @@ UList *ulist_new(size_t size, size_t cap)
     UList *l;
 
     if (!(l = malloc(sizeof(*l)))) {
-        PRINTINTERR(FUNCFAILED("malloc"), ERRNOS);
+        FUNCFAILED("malloc", strerror(errno));
         abort();
     }
 

@@ -15,8 +15,8 @@ int spawn_redirect(const void *arg)
 {
     int *fds = (int *)arg;
 
-    ERRCHK_RET(close(fds[0]) == -1, FUNCFAILED("close"), ERRNOS);
-    ERRCHK_RET(dup2(fds[1], fds[2]) == -1, FUNCFAILED("dup2"), ERRNOS);
+    ERRCHK_RET_ERN(close(fds[0]) == -1);
+    ERRCHK_RET_ERN(dup2(fds[1], fds[2]) == -1);
 
     return OK;
 }
@@ -24,7 +24,7 @@ int spawn_redirect(const void *arg)
 int spawn_wait(pid_t pid, int *exitcode, int *signal)
 {
     int stat;
-    ERRCHK_RET(waitpid(pid, &stat, 0) == -1, FUNCFAILED("waitpid"), ERRNOS);
+    ERRCHK_RET_ERN(waitpid(pid, &stat, 0) == -1);
 
     if (exitcode)
         *exitcode = -1;
@@ -58,7 +58,7 @@ int spawn(char *args[], pid_t *cpid, int *exitcode, int *signal, int (*cfunc)(co
         *exitcode = -1;
 
     pid_t pid = fork();
-    ERRCHK_RET(pid == -1, FUNCFAILED("fork"), ERRNOS);
+    ERRCHK_RET_ERN(pid == -1);
 
     /* Child process */
     if (pid == 0) {
@@ -69,7 +69,7 @@ int spawn(char *args[], pid_t *cpid, int *exitcode, int *signal, int (*cfunc)(co
         if (errno == ENOENT)
             exit(NOTEXIST_EC);
 
-        PRINTINTERR(FUNCFAILED("exec"), ERRNOS);
+        FUNCFAILED("exec", strerror(errno));
         exit(EXIT_FAILURE);
     }
 

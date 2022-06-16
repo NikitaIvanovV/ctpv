@@ -23,7 +23,7 @@ static void kill_ueberzug(void)
         if (errno == ESRCH)
             print_error("ueberzug is not running");
         else
-            PRINTINTERR(FUNCFAILED("kill"), ERRNOS);
+            FUNCFAILED("kill", strerror(errno));
     }
 
     spawn_wait(ueberzug_pid, NULL, NULL);
@@ -36,13 +36,13 @@ static void sig_handler_exit(int s)
 
 static int register_signal(int sig, __sighandler_t handler)
 {
-    ERRCHK_RET(signal(sig, handler), FUNCFAILED("signal"), ERRNOS);
+    ERRCHK_RET_ERN(signal(sig, handler));
     return OK;
 }
 
 static int open_fifo(int *fd, char *f)
 {
-    ERRCHK_RET((*fd = open(f, O_RDONLY | O_NONBLOCK)) == -1, FUNCFAILED("open"), ERRNOS);
+    ERRCHK_RET_ERN((*fd = open(f, O_RDONLY | O_NONBLOCK)) == -1);
 
     return OK;
 }
@@ -63,7 +63,7 @@ static int listen(char *fifo)
     ERRCHK_GOTO_OK(register_signal(SIGTERM, sig_handler_exit), ret, fifo);
 
     int pipe_fds[2];
-    ERRCHK_GOTO(pipe(pipe_fds) == -1, ret, signal, FUNCFAILED("pipe"), ERRNOS);
+    ERRCHK_GOTO_ERN(pipe(pipe_fds) == -1, ret, signal);
 
     char *args[] = { "ueberzug", "layer", NULL };
     int sp_arg[] = { pipe_fds[1], pipe_fds[0], STDIN_FILENO };
@@ -105,7 +105,7 @@ static int listen(char *fifo)
     }
 
 
-    ERRCHK_GOTO(poll_ret < 0, ret, close, FUNCFAILED("poll"), ERRNOS);
+    ERRCHK_GOTO_ERN(poll_ret < 0, ret, close);
 
 close:
     close(pipe_fds[1]);
@@ -154,7 +154,7 @@ int server_listen(const char *id_s)
         if (errno == EEXIST)
             print_errorf("server with id %s is already running or fifo %s still exists", id_s, fifo);
         else
-            PRINTINTERR(FUNCFAILED("mkfifo"), ERRNOS);
+            FUNCFAILED("mkfifo", strerror(errno));
         ret = ERR;
         goto exit;
     }
@@ -163,7 +163,7 @@ int server_listen(const char *id_s)
 
 fifo:
     if (remove(fifo) == -1 && errno != ENOENT)
-        PRINTINTERR(FUNCFAILED("remove"), ERRNOS);
+        FUNCFAILED("remove", strerror(errno));
 
 exit:
     return ret;
@@ -187,7 +187,7 @@ int server_set_fifo_var(const char *id_s)
 {
     char fifo[FIFO_FILENAME_SIZE];
     get_fifo_name(fifo, LEN(fifo), id_s);
-    ERRCHK_RET(setenv("fifo", fifo, 1) != 0, FUNCFAILED("setenv"), ERRNOS);
+    ERRCHK_RET_ERN(setenv("fifo", fifo, 1) != 0);
 
     return OK;
 }

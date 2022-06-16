@@ -148,7 +148,7 @@ Lexer *lexer_init(FILE *f)
     Lexer *ctx;
 
     if (!(ctx = malloc(sizeof(*ctx)))) {
-        PRINTINTERR(FUNCFAILED("malloc"), ERRNOS);
+        FUNCFAILED("malloc", strerror(errno));
         abort();
     }
 

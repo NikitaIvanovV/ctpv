@@ -15,7 +15,7 @@ char *prepend_helpers(char *str, size_t len)
     size_t l, helpers_len = LEN(scr_helpers_sh) - 1;
 
     if (!(buf = malloc(sizeof(*buf) * (helpers_len + len)))) {
-        PRINTINTERR(FUNCFAILED("malloc"), ERRNOS);
+        FUNCFAILED("malloc", strerror(errno));
         abort();
     }
 

@@ -15,12 +15,12 @@ Vector *vector_new(size_t size, size_t cap)
         cap = DEFAULT_CAP;
 
     if (!(v = malloc(sizeof(*v)))) {
-        PRINTINTERR(FUNCFAILED("malloc"), ERRNOS);
+        FUNCFAILED("malloc", strerror(errno));
         abort();
     }
 
     if (!(v->buf = malloc(size * cap))) {
-        PRINTINTERR(FUNCFAILED("malloc"), ERRNOS);
+        FUNCFAILED("malloc", strerror(errno));
         abort();
     }
 
@@ -50,7 +50,7 @@ static void resize_if_needed(Vector *vec, size_t new_len)
 
     if (!(p = realloc(vec->buf, vec->size * cap))) {
         vector_free(vec);
-        PRINTINTERR(FUNCFAILED("realloc"), ERRNOS);
+        FUNCFAILED("realloc", strerror(errno));
         abort();
     }
 

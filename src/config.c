@@ -281,8 +281,8 @@ int config_load(VectorPreview *prevs, char *filename)
 {
     int ret = OK;
 
-    FILE *f = fopen(filename, "r");
-    ERRCHK_GOTO(!f, ret, exit, FUNCFAILED("fopen"), ERRNOS);
+    FILE *f;
+    ERRCHK_GOTO_ERN(!(f = fopen(filename, "r")), ret, exit);
 
     lexer = lexer_init(f);
     previews = prevs;

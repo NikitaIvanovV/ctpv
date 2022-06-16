@@ -46,11 +46,9 @@ static void cleanup(void)
 
 static int init_magic(void)
 {
-    ERRCHK_RET(!(magic = magic_open(MAGIC_MIME_TYPE)), FUNCFAILED("magic_open"),
-               magic_error(magic));
+    ERRCHK_RET_MSG(!(magic = magic_open(MAGIC_MIME_TYPE)), magic_error(magic));
 
-    ERRCHK_RET(magic_load(magic, NULL) != 0, FUNCFAILED("magic_load"),
-               magic_error(magic));
+    ERRCHK_RET_MSG(magic_load(magic, NULL) != 0, magic_error(magic));
 
     return OK;
 }
@@ -59,7 +57,7 @@ static int create_dir(char *buf, size_t len)
 {
     char dir[len];
     strncpy(dir, buf, LEN(dir) - 1);
-    ERRCHK_RET(mkpath(dir, 0700) == -1, FUNCFAILED("mkpath"), ERRNOS);
+    ERRCHK_RET_ERN(mkpath(dir, 0700) == -1);
 
     return OK;
 }
@@ -98,7 +96,7 @@ static const char *get_mimetype(const char *path)
 {
     const char *r = magic_file(magic, path);
     if (!r) {
-        PRINTINTERR(FUNCFAILED("magic_file"), magic_error(magic));
+        FUNCFAILED("magic_file", magic_error(magic));
         return NULL;
     }
 
@@ -113,7 +111,7 @@ static int check_file(const char *f)
     }
 
     if (access(f, R_OK) != 0) {
-        print_errorf("failed to access '%s': %s", f, ERRNOS);
+        print_errorf("failed to access '%s': %s", f, strerror(errno));
         return ERR;
     }
 
@@ -123,8 +121,8 @@ static int check_file(const char *f)
 static int is_newer(int *resp, char *f1, char *f2)
 {
     struct stat stat1, stat2;
-    ERRCHK_RET(stat(f1, &stat1) == -1, FUNCFAILED("stat"), ERRNOS);
-    ERRCHK_RET(stat(f2, &stat2) == -1, FUNCFAILED("stat"), ERRNOS);
+    ERRCHK_RET_ERN(stat(f1, &stat1) == -1);
+    ERRCHK_RET_ERN(stat(f2, &stat2) == -1);
 
     int sec_d = stat1.st_mtim.tv_sec - stat2.st_mtim.tv_sec;
     if (sec_d < 0)

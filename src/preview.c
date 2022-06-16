@@ -51,7 +51,7 @@ void previews_init(Preview *ps, size_t len)
 
     previews.list = malloc(len * PREVP_SIZE);
     if (!previews.list) {
-        PRINTINTERR(FUNCFAILED("malloc"), ERRNOS);
+        FUNCFAILED("malloc", strerror(errno));
         abort();
     }
 
@@ -119,7 +119,7 @@ static void check_init_previews(void)
 static int run(Preview *p, int *exitcode, int *signal)
 {
     int pipe_fds[2];
-    ERRCHK_RET(pipe(pipe_fds) == -1, FUNCFAILED("pipe"), ERRNOS);
+    ERRCHK_RET_ERN(pipe(pipe_fds) == -1);
 
     int sp_arg[] = { pipe_fds[0], pipe_fds[1], STDERR_FILENO };
 
@@ -138,7 +138,7 @@ static int run(Preview *p, int *exitcode, int *signal)
         }
 
         if (len == -1) {
-            PRINTINTERR(FUNCFAILED("read"), ERRNOS);
+            FUNCFAILED("read", strerror(errno));
             ret = ERR;
         }
     }
@@ -148,11 +148,10 @@ static int run(Preview *p, int *exitcode, int *signal)
     return ret;
 }
 
-#define SET_PENV(n, v)                                                 \
-    do {                                                               \
-        if (v)                                                         \
-            ERRCHK_RET(setenv((n), (v), 1) != 0, FUNCFAILED("setenv"), \
-                       ERRNOS);                                        \
+#define SET_PENV(n, v)                                \
+    do {                                              \
+        if (v)                                        \
+            ERRCHK_RET_ERN(setenv((n), (v), 1) != 0); \
     } while (0)
 
 int preview_run(const char *ext, const char *mimetype, PreviewArgs *pa)
