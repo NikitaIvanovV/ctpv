@@ -73,13 +73,10 @@
     ERRCHK_GOTO_MSG(cond, ret, label, strerror(errno))
 
 /*
- * Shortcut for ERRCHK_RET(expr != OK)
+ * Shortcut for ERRCHK_*_RET(expr != OK)
  */
-#define ERRCHK_RET_OK(expr, ...) \
-    ERRCHK_RET((expr) != OK __VA_OPT__(, ) __VA_ARGS__)
-
-#define ERRCHK_GOTO_OK(expr, ...) \
-    ERRCHK_GOTO((expr) != OK __VA_OPT__(, ) __VA_ARGS__)
+#define ERRCHK_RET_OK(e)        ERRCHK_RET((e) != OK)
+#define ERRCHK_GOTO_OK(e, r, l) ERRCHK_GOTO((e) != OK, r, l)
 
 enum {
     OK,
