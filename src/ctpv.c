@@ -152,14 +152,20 @@ static void md5_string(char *buf, size_t len, char *s)
     }
 }
 
-static int get_cache_file(char *buf, size_t len, char *file)
+static int get_cache_file(char *dir, size_t dir_len, char *filename,
+                          size_t filename_len, char *file)
 {
-    ERRCHK_RET_OK(get_cache_dir(buf, len, "ctpv/"));
-    ERRCHK_RET_OK(create_dir(buf, len));
+    ERRCHK_RET_OK(get_cache_dir(dir, dir_len, "ctpv/"));
+    ERRCHK_RET_OK(create_dir(dir, dir_len));
 
-    char name[64];
-    md5_string(name, LEN(name) - 1, file);
-    strncat(buf, name, len - 1);
+    size_t dir_str_len = strlen(dir);
+
+    memcpy(filename, dir, filename_len);
+
+    md5_string(filename + dir_str_len, filename_len - dir_str_len - 1, file);
+
+    /* Remove dash at the end */
+    dir[dir_str_len-1] = '\0';
 
     return OK;
 }
@@ -195,15 +201,23 @@ static int preview(int argc, char *argv[])
     const char *mimetype;
     ERRCHK_RET(!(mimetype = get_mimetype(f)));
 
-    char cache_file[FILENAME_MAX];
-    ERRCHK_RET_OK(get_cache_file(cache_file, LEN(cache_file), f));
+    char cache_dir[FILENAME_MAX], cache_file[FILENAME_MAX];
+    ERRCHK_RET_OK(get_cache_file(cache_dir, LEN(cache_file), cache_file,
+                                 LEN(cache_file), f));
 
     int cache_valid;
     ERRCHK_RET_OK(check_cache(&cache_valid, f, cache_file));
 
     PreviewArgs args = {
-        .f = f, .w = w, .h = h, .x = x, .y = y, .id = id,
-        .cache_file = cache_file, .cache_valid = cache_valid,
+        .f = f,
+        .w = w,
+        .h = h,
+        .x = x,
+        .y = y,
+        .id = id,
+        .cache_dir = cache_dir,
+        .cache_file = cache_file,
+        .cache_valid = cache_valid,
     };
 
     return preview_run(get_ext(f), mimetype, &args);

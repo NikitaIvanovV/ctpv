@@ -166,6 +166,7 @@ int preview_run(const char *ext, const char *mimetype, PreviewArgs *pa)
     SET_PENV("y", pa->y);
     SET_PENV("id", pa->id);
     SET_PENV("cache_f", pa->cache_file);
+    SET_PENV("cache_d", pa->cache_dir);
 
     {
         char *s = pa->cache_valid ? "1" : "";

@@ -17,7 +17,7 @@ VECTOR_GEN_HEADER(Preview, Preview)
 
 typedef struct {
     char *f, *w, *h, *x, *y, *id;
-    char *cache_file;
+    char *cache_file, *cache_dir;
     int cache_valid;
 } PreviewArgs;
 

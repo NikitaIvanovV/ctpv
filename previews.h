@@ -19,6 +19,7 @@ Preview b_previews[] = {
 
     PR("md",      NULL,             NULL,             mdcat),
     PR("torrent", NULL,             NULL,             torrent),
+    PR("odt",     NULL,             NULL,             odt),
 
     PR(NULL,      "text",           NULL,             bat),
     PR(NULL,      "text",           NULL,             highlight),
