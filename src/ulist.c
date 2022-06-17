@@ -10,9 +10,6 @@
 #define DEFAULT_CAP 256
 #define NO_LOCK     -1
 
-#define ULIST_NODE_SIZE(cap, size) \
-    (sizeof(struct UListNode) - sizeof(void *) + (cap * size))
-
 #define ULIST_BUF(node)             ((void *)&(node).buf)
 #define ULIST_BUF_AT(list, node, i) (ULIST_BUF(node) + i * (list).size)
 
@@ -28,11 +25,6 @@ struct UListNode {
     void *buf;
 };
 
-static inline int is_locked(UList *l)
-{
-    return l->lock_i != NO_LOCK;
-}
-
 static struct UListNode *ulist_node_new(UList *l, size_t cap)
 {
     struct UListNode *n;
@@ -40,7 +32,8 @@ static struct UListNode *ulist_node_new(UList *l, size_t cap)
     if (cap == 0)
         cap = DEFAULT_CAP;
 
-    if (!(n = malloc(ULIST_NODE_SIZE(cap, l->size)))) {
+    /* Store buffer and node data in the same chunk */
+    if (!(n = malloc(sizeof(*n) - sizeof(n->buf) + (cap * l->size)))) {
         FUNCFAILED("malloc", strerror(errno));
         abort();
     }
@@ -81,6 +74,11 @@ void ulist_free(UList *l)
     free(l);
 }
 
+static inline int is_locked(UList *l)
+{
+    return l->lock_i != NO_LOCK;
+}
+
 void ulist_append_arr(UList *l, void *arr, size_t len)
 {
     struct UListNode *new, *node = l->tail;
@@ -113,6 +111,10 @@ void ulist_append(UList *l, void *val)
     ulist_append_arr(l, val, 1);
 }
 
+/*
+ * Ensure that all the elements appended will be placed in memory
+ * will be placed one after another. Useful for storing strings.
+ */
 void ulist_lock(UList *l)
 {
     l->lock_i = l->tail->len;
