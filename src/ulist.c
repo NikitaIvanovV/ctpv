@@ -113,7 +113,7 @@ void ulist_append(UList *l, void *val)
 
 /*
  * Ensure that all the elements appended will be placed in memory
- * will be placed one after another. Useful for storing strings.
+ * one after another. Useful for storing strings.
  */
 void ulist_lock(UList *l)
 {
