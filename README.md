@@ -27,40 +27,18 @@ These programs are needed to make specific previews work.
 If a preview requires some program and it's not found on the system,
 `ctpv` will fallback to other previews.
 
-Image files:
-* `ueberzug`
-
-Videos:
-* `ffmpegthumbnailer`
-
-Text files:
-* `source-highlight`
-* `highlight`
-
-Diff files:
-* `colordiff`
-* `delta`
-* `diff-so-fancy`
-
-Markdown:
-* `mdcat`
-
-JSON files:
-* `jq`
-
-PDF files:
-* `pdftoppm`
-
-Torrent files:
-* `transmission-show`
-
-HTML files:
-* `w3m`
-* `lynx`
-* `elinks`
-
-Any other files:
-* `exiftool`
+| File types | Required programs |
+| ---- | ---- |
+| Text files | `source-highlight` `highlight` |
+| Image files | `ueberzug` |
+| Videos | `ffmpegthumbnailer` |
+| Diff files | `colordiff` `delta` `diff-so-fancy` |
+| Markdown | `mdcat` |
+| JSON files | `jq` |
+| PDF files | `pdftoppm` |
+| Torrent files | `transmission-show` |
+| HTML files | `w3m` `lynx` `elinks` |
+| Any other files | `exiftool` |
 
 ## Installation
 
