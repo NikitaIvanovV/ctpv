@@ -1,6 +1,5 @@
 # libreoffice
 
-
 office() {
 	# File produced by libreoffice
 	jpg="$(printf '%s\n' "$f" | sed 's|^.*/||; s|\..*$||')"
