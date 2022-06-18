@@ -1,6 +1,6 @@
 PREFIX    := /usr/local
-BINPREFIX := $(PREFIX)/bin
-MANPREFIX := $(PREFIX)/man/man1
+BINPREFIX := $(DESTDIR)$(PREFIX)/bin
+MANPREFIX := $(DESTDIR)$(PREFIX)/man/man1
 
 SRC := $(wildcard src/*.c)
 OBJ := $(SRC:.c=.o)
