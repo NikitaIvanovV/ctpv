@@ -50,13 +50,13 @@ gen/prev/scripts.h: $(PRE) embed/embed
 	@mkdir -p $(@D)
 	embed/embed -p prev_scr_ $(PRE) > $@
 
-gen/server.h: clear.sh end.sh embed/embed
+gen/server.h: sh/clear.sh sh/end.sh embed/embed
 	@mkdir -p $(@D)
-	embed/embed -p scr_ clear.sh end.sh > $@
+	embed/embed -p scr_ sh/clear.sh sh/end.sh > $@
 
-gen/helpers.h: helpers.sh embed/embed
+gen/helpers.h: sh/helpers.sh embed/embed
 	@mkdir -p $(@D)
-	embed/embed -p scr_ helpers.sh > $@
+	embed/embed -p scr_ sh/helpers.sh > $@
 
 README.md: $(PRE)
 	./deplist.awk $^ | ./deplist.md.sh | ./deplistadd.sh $@
