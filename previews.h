@@ -33,9 +33,9 @@ Preview b_previews[] = {
     PR(NULL,      "application",    "json",           jq),
     PR(NULL,      "inode",          "directory",      ls),
 
-    PR(NULL,      "text",           "html",           w3m),
-    PR(NULL,      "text",           "html",           lynx),
     PR(NULL,      "text",           "html",           elinks),
+    PR(NULL,      "text",           "html",           lynx),
+    PR(NULL,      "text",           "html",           w3m),
 
     PR(NULL,      "text",           "x-diff",         delta),
     PR(NULL,      "text",           "x-patch",        delta),

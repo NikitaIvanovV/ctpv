@@ -1,1 +1,1 @@
-lynx -dump -- "$f"
+lynx -dump -nonumbers -nolist -width="$w" -- "$f"
