@@ -1,3 +1,5 @@
+# text: bat
+
 if exists bat; then
 	batcmd=bat
 elif exists batcat; then

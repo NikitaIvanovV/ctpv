@@ -23,22 +23,29 @@ external programs like lf does.
 
 ## Dependencies
 
-These programs are needed to make specific previews work.
-If a preview requires some program and it's not found on the system,
-`ctpv` will fallback to other previews.
+All the previews require specific programs to function.
+If a required program is not found on the system, ctpv
+will try to use another preview.
 
-| File types | Required programs |
+<!-- This table is auto generated! -->
+<!--TABLESTART-->
+| File types | Programs |
 | ---- | ---- |
-| Text files | `source-highlight` `highlight` |
-| Image files | `ueberzug` |
-| Videos | `ffmpegthumbnailer` |
-| Diff files | `colordiff` `delta` `diff-so-fancy` |
-| Markdown | `mdcat` |
-| JSON files | `jq` |
-| PDF files | `pdftoppm` |
-| Torrent files | `transmission-show` |
-| HTML files | `w3m` `lynx` `elinks` |
-| Any other files | `exiftool` |
+| any | `exiftool` `cat` |
+| archive | `atool` |
+| diff | `colordiff` `delta` `diff-so-fancy` |
+| directory | `ls` |
+| html | `elinks` `lynx` `w3m` |
+| image | `ueberzug` |
+| json | `jq` |
+| libreoffice | `libreoffice` |
+| markdown | `mdcat` |
+| pdf | `pdftoppm` |
+| text | `bat` `cat` `highlight` `source-highlight` |
+| torrent | `transmission-show` |
+| video | `ffmpegthumbnailer` |
+
+<!--TABLEEND-->
 
 ## Installation
 

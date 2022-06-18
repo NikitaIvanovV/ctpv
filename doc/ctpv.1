@@ -1,3 +1,4 @@
+'\" t
 .ds op \&.\|.\|.\&
 .
 .de Sy
@@ -75,6 +76,61 @@ When
 is given a file, it determines an appropriate preview for it and
 runs its script.
 The script produces preview content and prints it to standard output.
+.
+.SS Dependencies
+.
+All the previews require specific programs to function.
+If a required program is not found on the system,
+.B ctpv
+will try to use another preview.
+\# This table is auto generated!
+\# TABLESTART
+.TS
+allbox;
+lb lb
+l li .
+File type	Programs
+any	T{
+exiftool cat
+T}
+archive	T{
+atool
+T}
+diff	T{
+colordiff delta diff-so-fancy
+T}
+directory	T{
+ls
+T}
+html	T{
+elinks lynx w3m
+T}
+image	T{
+ueberzug
+T}
+json	T{
+jq
+T}
+libreoffice	T{
+libreoffice
+T}
+markdown	T{
+mdcat
+T}
+pdf	T{
+pdftoppm
+T}
+text	T{
+bat cat highlight source-highlight
+T}
+torrent	T{
+transmission-show
+T}
+video	T{
+ffmpegthumbnailer
+T}
+.TE
+\# TABLEEND
 .
 .SS Integration
 .

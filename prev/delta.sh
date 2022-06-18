@@ -1,1 +1,3 @@
+# diff: delta
+
 delta < "$f"

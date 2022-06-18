@@ -1,1 +1,3 @@
+# diff: colordiff
+
 colordiff < "$f"

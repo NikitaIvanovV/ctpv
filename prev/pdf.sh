@@ -1,3 +1,5 @@
+# pdf: pdftoppm
+
 pdf() {
 	pdftoppm -f 1 -l 1              \
 		-scale-to-x 1920            \

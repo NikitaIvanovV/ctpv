@@ -14,7 +14,7 @@ LIBS := magic crypto
 CFLAGS  += $(O) -MD -Wall -Wextra -Wno-unused-parameter
 LDFLAGS += $(LIBS:%=-l%)
 
-all: ctpv
+all: ctpv README.md doc/ctpv.1
 
 options:
 	@echo "CC      = $(CC)"
@@ -57,6 +57,12 @@ gen/server.h: clear.sh end.sh embed/embed
 gen/helpers.h: helpers.sh embed/embed
 	@mkdir -p $(@D)
 	embed/embed -p scr_ helpers.sh > $@
+
+README.md: $(PRE)
+	./deplist.awk $^ | ./deplist.md.sh | ./deplistadd.sh $@
+
+doc/ctpv.1: $(PRE)
+	./deplist.awk $^ | ./deplist.1.sh | ./deplistadd.sh $@
 
 embed/embed: make_embed
 	@ # do nothing
