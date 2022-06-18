@@ -1,4 +1,4 @@
-# libreoffice: libreoffice
+# odt: libreoffice
 
 office() {
 	# File produced by libreoffice

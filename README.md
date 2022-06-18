@@ -38,8 +38,8 @@ will try to use another preview.
 | html | `elinks` `lynx` `w3m` |
 | image | `ueberzug` |
 | json | `jq` |
-| libreoffice | `libreoffice` |
 | markdown | `mdcat` |
+| odt | `libreoffice` |
 | pdf | `pdftoppm` |
 | text | `bat` `cat` `highlight` `source-highlight` |
 | torrent | `transmission-show` |
