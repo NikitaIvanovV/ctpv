@@ -37,7 +37,6 @@ BEGIN {
     for (i = 1; i < ARGC; i++)
         process_file(ARGV[i])
 
-    for (t in types) {
+    for (t in types)
         printf "%s\t%s\n", t, join(types[t], " ")
-    }
 }
