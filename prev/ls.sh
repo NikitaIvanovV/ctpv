@@ -1,1 +1,1 @@
-ls --color --group-directories-first "$f"
+ls --color --group-directories-first -- "$f"

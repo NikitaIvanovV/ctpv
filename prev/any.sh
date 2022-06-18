@@ -1,5 +1,5 @@
 if exists exiftool; then
-	exiftool "$f" || true
+	exiftool -- "$f" || true
 else
-	cat "$f"
+	cat < "$f"
 fi

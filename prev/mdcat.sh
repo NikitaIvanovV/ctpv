@@ -1,1 +1,1 @@
-mdcat --columns "$w" "$f"
+mdcat --columns "$w" -- "$f"
