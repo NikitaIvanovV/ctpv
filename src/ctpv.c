@@ -103,16 +103,30 @@ static const char *get_mimetype(const char *path)
     return r;
 }
 
-static int check_file(const char *f)
+static int check_file(char **f, char *f_link)
 {
     if (!f) {
         print_error("file not given");
         return ERR;
     }
 
-    if (access(f, R_OK) != 0) {
-        print_errorf("failed to access '%s': %s", f, strerror(errno));
-        return ERR;
+    ssize_t f_link_len = readlink(*f, f_link, FILENAME_MAX);
+    if (f_link_len == -1) {
+        switch (errno) {
+        case ENOENT:
+            print_errorf("failed to access '%s': %s", *f, strerror(errno));
+            return ERR;
+        case EINVAL:
+            *f_link = 0;
+            break;
+        default:
+            FUNCFAILED("readlink", strerror(errno));
+            return ERR;
+        }
+    } else {
+        f_link[f_link_len] = '\0';
+        if (access(f_link, R_OK) == 0)
+            *f = f_link;
     }
 
     return OK;
@@ -121,8 +135,8 @@ static int check_file(const char *f)
 static int is_newer(int *resp, char *f1, char *f2)
 {
     struct stat stat1, stat2;
-    ERRCHK_RET_ERN(stat(f1, &stat1) == -1);
-    ERRCHK_RET_ERN(stat(f2, &stat2) == -1);
+    ERRCHK_RET_ERN(lstat(f1, &stat1) == -1);
+    ERRCHK_RET_ERN(lstat(f2, &stat2) == -1);
 
     int sec_d = stat1.st_mtim.tv_sec - stat2.st_mtim.tv_sec;
     if (sec_d < 0)
@@ -185,6 +199,8 @@ static int check_cache(int *resp, char *file, char *cache_file)
 static int preview(int argc, char *argv[])
 {
     char *f, *w, *h, *x, *y, *id;
+    char y_buf[4], h_buf[4];
+
     GET_PARG(f, 0);
     GET_PARG(w, 1);
     GET_PARG(h, 2);
@@ -192,7 +208,24 @@ static int preview(int argc, char *argv[])
     GET_PARG(y, 4);
     GET_PARG(id, 5);
 
-    ERRCHK_RET_OK(check_file(f));
+    char f_link[FILENAME_MAX];
+    ERRCHK_RET_OK(check_file(&f, f_link));
+
+    if (*f_link) {
+        printf("Symlink points to:\n\t%s\n\n", f_link);
+        fflush(stdout);
+
+        if (y && h) {
+            unsigned char y_i = atoi(y);
+            unsigned char h_i = atoi(h);
+            y_i += 3;
+            h_i -= 3;
+            snprintf(y_buf, LEN(y_buf), "%d", y_i);
+            snprintf(h_buf, LEN(h_buf), "%d", h_i);
+            y = y_buf;
+            h = h_buf;
+        }
+    }
 
     ERRCHK_RET_OK(init_magic());
 
@@ -300,7 +333,9 @@ static int list(void)
 
 static int mime(int argc, char *argv[])
 {
-    const char *f, *mimetype;
+    char *f;
+    char f_link[FILENAME_MAX];
+    const char *mimetype;
 
     if (argc <= 0) {
         print_error("files are not specified");
@@ -309,7 +344,7 @@ static int mime(int argc, char *argv[])
 
     for (int i = 0; i < argc; i++) {
         f = argv[i];
-        ERRCHK_RET_OK(check_file(f));
+        ERRCHK_RET_OK(check_file(&f, f_link));
 
         ERRCHK_RET_OK(init_magic());
 

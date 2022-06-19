@@ -10,11 +10,9 @@
  */
 
 #define PNAME(n)          prev_scr_##n##_sh
-#define PP(e, t, s, n, o) { #n, e, t, s, PNAME(n), o, 0, LEN(PNAME(n)) }
-#define PR(e, t, s, n)    PP(e, t, s, n, 0)
+#define PR(e, t, s, n)    { #n, e, t, s, PNAME(n), 0, 0, LEN(PNAME(n)) }
 
 Preview b_previews[] = {
-    PP(NULL,      NULL,             NULL,             wrapper, INT_MAX),
     PR(NULL,      NULL,             NULL,             any),
 
     PR("md",      NULL,             NULL,             mdcat),
@@ -31,7 +29,9 @@ Preview b_previews[] = {
 
     PR(NULL,      "application",    "pdf",            pdf),
     PR(NULL,      "application",    "json",           jq),
+
     PR(NULL,      "inode",          "directory",      ls),
+    PR(NULL,      "inode",          "symlink",        symlink),
 
     PR(NULL,      "text",           "html",           elinks),
     PR(NULL,      "text",           "html",           lynx),
