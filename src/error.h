@@ -23,12 +23,12 @@
     PRINTINTERR(INTERRMSG f "() failed" __VA_OPT__(": %s", __VA_ARGS__))
 
 #ifndef NO_TRACEBACK
-#define ERRCHK_PRINT_(...)                             \
-    do {                                               \
-        int __a = 0;                                   \
-        __VA_OPT__(PRINTINTERR(__VA_ARGS__); __a = 1;) \
-        if (!__a)                                      \
-            PRINTINTERR();                             \
+#define ERRCHK_PRINT_(...)                                                  \
+    do {                                                                    \
+        int __a = 0;                                                        \
+        __VA_OPT__(PRINTINTERR(__VA_ARGS__); __a = err_internal_error = 1;) \
+        if (!__a && err_internal_error)                                     \
+            PRINTINTERR();                                                  \
     } while (0)
 #endif
 #ifdef NO_TRACEBACK
@@ -77,6 +77,8 @@
  */
 #define ERRCHK_RET_OK(e)        ERRCHK_RET((e) != OK)
 #define ERRCHK_GOTO_OK(e, r, l) ERRCHK_GOTO((e) != OK, r, l)
+
+extern int err_internal_error;
 
 enum {
     OK,

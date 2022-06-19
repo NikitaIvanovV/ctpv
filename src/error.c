@@ -3,6 +3,8 @@
 #include "error.h"
 #include "utils.h"
 
+int err_internal_error = 0;
+
 void print_error(const char *error_msg)
 {
     /* We print errors to stdout because lf file manager
