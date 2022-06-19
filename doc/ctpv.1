@@ -80,11 +80,20 @@ Symbolic links are dereferenced.
 .
 .SS Dependencies
 .
-All the previews require specific programs to function.
-If a required program is not found on the system,
+Previewing each file type requires specific programs.
+If a program is not found on the system,
 .B ctpv
-will try to use another preview.
+will try to use another one.
+Only one program is required for each file type.
+For example, you only need either
+.IR elinks ,
+.IR lynx
+or
+.IR w3m
+installed on your system to view HTML files.
+.
 \# This table is auto generated!
+.
 \# TABLESTART
 .TS
 allbox;

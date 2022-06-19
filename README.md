@@ -23,9 +23,12 @@ external programs like lf does.
 
 ## Dependencies
 
-All the previews require specific programs to function.
-If a required program is not found on the system, ctpv
-will try to use another preview.
+Previewing each file type requires specific programs.
+If a program is not found on the system, ctpv
+will try to use another one.
+Only one program is required for each file type.
+For example, you only need either `elinks`, `lynx` or
+`w3m` installed on your system to view HTML files.
 
 <!-- This table is auto generated! -->
 <!--TABLESTART-->
