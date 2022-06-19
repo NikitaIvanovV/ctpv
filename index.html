@@ -66,12 +66,14 @@
     as well as an option to define custom ones.</p>
 <p class="Pp">When <b>ctpv</b> is given a file, it determines an appropriate
     preview for it and runs its script. The script produces preview content and
-    prints it to standard output.</p>
+    prints it to standard output. Symbolic links are dereferenced.</p>
 <section class="Ss">
 <h2 class="Ss" id="Dependencies"><a class="permalink" href="#Dependencies">Dependencies</a></h2>
-<p class="Pp">All the previews require specific programs to function. If a
-    required program is not found on the system, <b>ctpv</b> will try to use
-    another preview.</p>
+<p class="Pp">Previewing each file type requires specific programs. If a program
+    is not found on the system, <b>ctpv</b> will try to use another one. Only
+    one program is required for each file type. For example, you only need
+    either <i>elinks</i>, <i>lynx</i> or <i>w3m</i> installed on your system to
+    view HTML files.</p>
 <table class="tbl" border="1" style="border-style: solid;">
   <tr>
     <td><b>File type</b></td>
