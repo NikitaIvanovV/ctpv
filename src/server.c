@@ -36,7 +36,7 @@ static void sig_handler_exit(int s)
 
 static int register_signal(int sig, __sighandler_t handler)
 {
-    ERRCHK_RET_ERN(signal(sig, handler));
+    ERRCHK_RET_ERN(signal(sig, handler) == SIG_ERR);
     return OK;
 }
 
