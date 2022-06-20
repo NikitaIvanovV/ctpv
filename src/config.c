@@ -17,6 +17,19 @@
 #define ACCEPT(x)     CHECK_OK(accept(x))
 #define NOT_ACCEPT(x) CHECK_NULL(accept(x))
 
+struct Option {
+    char *name;
+    enum {
+        OPTION_BOOL,
+        OPTION_INT,
+        OPTION_STR,
+    } arg_type;
+    union {
+        int *i;
+        char **s;
+    } arg_val;
+};
+
 enum {
     STAT_OK,
     STAT_ERR,
@@ -27,6 +40,10 @@ static Lexer *lexer;
 static Token token;
 static VectorPreview *previews;
 
+static struct Option options[] = {
+    { "forcekitty", OPTION_BOOL, { .i = &ctpv.opts.force_kitty } },
+};
+
 static void any_type_null(char **s)
 {
     if (*s && strcmp(*s, any_type) == 0)
@@ -36,6 +53,9 @@ static void any_type_null(char **s)
 static void add_preview(char *name, char *script, char *type, char *subtype,
                         char *ext)
 {
+    if (!previews)
+        return;
+
     any_type_null(&type);
     any_type_null(&subtype);
 
@@ -57,6 +77,9 @@ static void add_preview(char *name, char *script, char *type, char *subtype,
 
 static int add_priority(char *name, int priority)
 {
+    if (!previews)
+        return OK;
+
     int found = 0;
 
     for (size_t i = 0; i < previews->len; i++) {
@@ -72,6 +95,9 @@ static int add_priority(char *name, int priority)
 
 static int remove_preview(char *name)
 {
+    if (!previews)
+        return OK;
+
     int found = 0;
 
     for (ssize_t i = previews->len - 1; i >= 0; i--) {
@@ -151,6 +177,49 @@ static int preview_type(char **type, char **subtype, char **ext)
     return preview_type_mime(type, subtype);
 }
 
+static struct Option *get_option(char *name)
+{
+    for (size_t i = 0; i < LEN(options); i++) {
+        if (strcmp(name, options[i].name) == 0)
+            return options + i;
+    }
+
+    return NULL;
+}
+
+static int cmd_set(void)
+{
+    Token name = token;
+    EXPECT(TOK_STR);
+
+    struct Option *opt = get_option(name.val.s);
+    if (!opt) {
+        PARSEERROR(name, "option '%s' does not exist", name.val.s);
+        return STAT_ERR;
+    }
+
+    Token value = token;
+
+    switch (opt->arg_type) {
+    case OPTION_BOOL:
+        *opt->arg_val.i = accept(TOK_INT) == STAT_OK ? value.val.i : 1;
+        break;
+    case OPTION_INT:
+        EXPECT(TOK_INT);
+        *opt->arg_val.i = value.val.i;
+        break;
+    case OPTION_STR:
+        EXPECT(TOK_STR);
+        *opt->arg_val.s = value.val.s;
+        break;
+    default:
+        PRINTINTERR("unknowm type: %d", opt->arg_type);
+        abort();
+    }
+
+    return STAT_OK;
+}
+
 static int cmd_preview(void)
 {
     Token name = token;
@@ -207,7 +276,9 @@ static int command(void)
     Token cmd = token;
     EXPECT(TOK_STR);
 
-    if (strcmp(cmd.val.s, "preview") == 0)
+    if (strcmp(cmd.val.s, "set") == 0)
+        return cmd_set();
+    else if (strcmp(cmd.val.s, "preview") == 0)
         return cmd_preview();
     else if (strcmp(cmd.val.s, "priority") == 0)
         return cmd_priority(cmd);

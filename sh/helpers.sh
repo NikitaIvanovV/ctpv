@@ -11,7 +11,7 @@ use_ueberzug() {
 }
 
 use_kitty() {
-	use_ueberzug && return 1
+	[ -z "$force_kitty" ] && use_ueberzug && return 1
 	is_kitty
 }
 

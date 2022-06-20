@@ -21,12 +21,14 @@
         va_end(args);                                   \
     } while (0)
 
+typedef int (*SpawnProg)(const void *);
+
 extern char *program;
 
 int spawn_redirect(const void *arg);
 int spawn_wait(int pid, int *exitcode, int *signal);
 int spawn(char *args[], int *cpid, int *exitcode, int *signal,
-          int (*cfunc)(const void *), const void *carg);
+          SpawnProg cfunc, const void *carg);
 
 int strcmpnull(const char *s1, const char *s2);
 int strlennull(const char *s);

@@ -169,18 +169,9 @@ exit:
     return ret;
 }
 
-static int run_script(char *script, size_t script_len, char *arg)
+static inline int run_server_script(char *script, size_t script_len, char *arg)
 {
-    int ret = OK;
-
-    char *s = prepend_helpers(script, script_len);
-    char *args[] = SHELL_ARGS(s, arg);
-    int exitcode;
-    ERRCHK_GOTO_OK(spawn(args, NULL, &exitcode, NULL, NULL, NULL), ret, cleanup);
-
-cleanup:
-    free(s);
-    return ret;
+    return run_script(script, script_len, NULL, NULL, NULL, NULL);
 }
 
 int server_set_fifo_var(const char *id_s)
@@ -196,12 +187,12 @@ int server_clear(const char *id_s)
 {
     ERRCHK_RET_OK(server_set_fifo_var(id_s));
 
-    return run_script(scr_clear_sh, LEN(scr_clear_sh), (char *)id_s);
+    return run_server_script(scr_clear_sh, LEN(scr_clear_sh), (char *)id_s);
 }
 
 int server_end(const char *id_s)
 {
     ERRCHK_RET_OK(server_set_fifo_var(id_s));
 
-    return run_script(scr_end_sh, LEN(scr_end_sh), (char *)id_s);
+    return run_server_script(scr_end_sh, LEN(scr_end_sh), (char *)id_s);
 }

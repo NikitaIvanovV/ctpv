@@ -16,21 +16,11 @@
 #include "preview.h"
 #include "../previews.h"
 
+struct CTPV ctpv;
+
 const char any_type[] = ANY_TYPE;
 
 static magic_t magic;
-
-static struct {
-    enum {
-        MODE_PREVIEW,
-        MODE_SERVER,
-        MODE_CLEAR,
-        MODE_END,
-        MODE_LIST,
-        MODE_MIME,
-    } mode;
-    char *server_id_s;
-} ctpv = { .mode = MODE_PREVIEW };
 
 static VectorPreview *previews;
 
@@ -75,6 +65,16 @@ static int get_config_file(char *buf, size_t len)
     return OK;
 }
 
+static int config(int prevs)
+{
+    char config_file[FILENAME_MAX];
+    get_config_file(config_file, LEN(config_file));
+
+    ERRCHK_RET_OK(config_load(prevs ? previews : NULL, config_file));
+
+    return OK;
+}
+
 static int init_previews(void)
 {
     /* 20 is some arbitrary number, it's here in order to
@@ -82,10 +82,7 @@ static int init_previews(void)
     previews = vectorPreview_new(LEN(b_previews) + 20);
     vectorPreview_append_arr(previews, b_previews, LEN(b_previews));
 
-    char config_file[FILENAME_MAX];
-    get_config_file(config_file, LEN(config_file));
-
-    ERRCHK_RET_OK(config_load(previews, config_file));
+    ERRCHK_RET_OK(config(1));
 
     previews_init(previews->buf, previews->len);
 
@@ -263,11 +260,13 @@ static int server(void)
 
 static int clear(void)
 {
+    ERRCHK_RET_OK(config(0));
     return server_clear(ctpv.server_id_s);
 }
 
 static int end(void)
 {
+    ERRCHK_RET_OK(config(0));
     return server_end(ctpv.server_id_s);
 }
 

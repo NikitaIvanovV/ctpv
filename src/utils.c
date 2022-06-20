@@ -51,7 +51,7 @@ int spawn_wait(int pid, int *exitcode, int *signal)
  *
  * cfunc is a function to call when child process is created
  */
-int spawn(char *args[], int *cpid, int *exitcode, int *signal, int (*cfunc)(const void *),
+int spawn(char *args[], int *cpid, int *exitcode, int *signal, SpawnProg cfunc,
           const void *carg)
 {
     if (exitcode)

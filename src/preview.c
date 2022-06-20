@@ -123,11 +123,8 @@ static int run(Preview *p, int *exitcode, int *signal)
 
     int sp_arg[] = { pipe_fds[0], pipe_fds[1], STDERR_FILENO };
 
-    char *script = prepend_helpers(p->script, p->script_len);
-    char *args[] = SHELL_ARGS(script);
-    int ret = spawn(args, NULL, exitcode, signal, spawn_redirect, sp_arg);
+    int ret = run_script(p->script, p->script_len, exitcode, signal, spawn_redirect, sp_arg);
 
-    free(script);
     close(pipe_fds[1]);
 
     if (*exitcode != FAILED_PREVIEW_EC) {
