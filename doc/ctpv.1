@@ -159,6 +159,27 @@ set cleaner ctpvclear
 cmd on-quit $ctpv -e $id
 .Ee
 .
+.SS Image previews
+.
+Image previews are enabled by either installing
+.I Überzug
+(as seen in
+.IR Dependencies )
+or using built-in image preview functionality of
+.I Kitty
+terminal.
+.PP
+.
+Note: if you use
+.I Kitty
+but
+.I Überzug
+is installed on the system, the latter will be the preferred
+method for previewing images. It can be changed using
+.B forcekitty
+option (see
+.IR "Preview options" ).
+.
 .SS How previews are selected
 .
 Initially,
@@ -182,7 +203,7 @@ Finally,
 .B ctpv
 goes through the list starting with the first element
 and checks if a preview matches
-.IR file \(aqs
+.IR file 's
 extension and MIME type.
 If it does, it runs a preview script.
 If the script exits with status 127
@@ -234,6 +255,18 @@ Commands are separated by newlines.
 Comments start with number sign
 .RB ( # )
 like in many other formats.
+.
+.SS Preview options
+.
+An option can be set using
+.B set
+command.
+.
+.TP
+.B forcekitty
+Always use
+.I Kitty
+terminal's built-in method of previewing images.
 .
 .SS Defining custom previews
 .
