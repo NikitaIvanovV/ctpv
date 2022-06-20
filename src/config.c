@@ -41,7 +41,7 @@ static Token token;
 static VectorPreview *previews;
 
 static struct Option options[] = {
-    { "forcekitty", OPTION_BOOL, { .i = &ctpv.opts.force_kitty } },
+    { "forcekitty", OPTION_BOOL, { .i = &ctpv.opts.forcekitty } },
 };
 
 static void any_type_null(char **s)

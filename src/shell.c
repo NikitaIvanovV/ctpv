@@ -34,7 +34,7 @@ static char *prepend_helpers(char *str, size_t len)
 int run_script(char *script, size_t script_len, int *exitcode, int *signal,
                SpawnProg sp, void *sp_arg)
 {
-    ERRCHK_RET_ERN(setenv("force_kitty", ctpv.opts.force_kitty ? "1" : "", 1) == -1);
+    ERRCHK_RET_ERN(setenv("forcekitty", ctpv.opts.forcekitty ? "1" : "", 1) == -1);
 
     char *scr = prepend_helpers(script, script_len);
     char *args[] = SHELL_ARGS(scr);
