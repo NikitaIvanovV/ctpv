@@ -5,7 +5,7 @@ MANPREFIX := $(DESTDIR)$(PREFIX)/man/man1
 SRC := $(wildcard src/*.c)
 OBJ := $(SRC:.c=.o)
 DEP := $(OBJ:.o=.d)
-PRE := $(wildcard prev/*.sh)
+PRE := $(wildcard sh/prev/*)
 GEN := gen/prev/scripts.h gen/server.h gen/helpers.h
 
 O    := -O2
