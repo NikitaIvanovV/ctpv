@@ -156,7 +156,7 @@ cmd on-quit $ctpv -e $id
   previews are selected</a></h2>
 <p class="Pp">Initially, <b>ctpv</b> retrieves MIME type and extension from
     <i>file</i> passed in the first argument (MIME type is extracted using
-    <b>magic</b>(5)).</p>
+    <b>libmagic</b>(3)).</p>
 <p class="Pp">Then it creates a list of all previews in a special order, where
     previews that are more specific appear at the top and more generic ones at
     the bottom. The list can be viewed by using <b>-l</b> option. The order can
