@@ -152,6 +152,17 @@ cmd on-quit $ctpv -e $id
 </dl>
 </section>
 <section class="Ss">
+<h2 class="Ss" id="Image_previews"><a class="permalink" href="#Image_previews">Image
+  previews</a></h2>
+<p class="Pp">Image previews are enabled by either installing
+    <i>&#x00DC;berzug</i> (as seen in <a href="#Dependencies"><i>Dependencies</i></a>) or using built-in
+    image preview functionality of <i>Kitty</i> terminal.</p>
+<p class="Pp">Note: if you use <i>Kitty</i> but <i>&#x00DC;berzug</i> is
+    installed on the system, the latter will be the preferred method for
+    previewing images. It can be changed using <b>forcekitty</b> option (see
+    <a href="#Preview_options"><i>Preview options</i></a>).</p>
+</section>
+<section class="Ss">
 <h2 class="Ss" id="How_previews_are_selected"><a class="permalink" href="#How_previews_are_selected">How
   previews are selected</a></h2>
 <p class="Pp">Initially, <b>ctpv</b> retrieves MIME type and extension from
@@ -192,6 +203,16 @@ cmd on-quit $ctpv -e $id
     that can be used to change previews or set different settings. Commands are
     separated by newlines. Comments start with number sign (<b>#</b>) like in
     many other formats.</p>
+<section class="Ss">
+<h2 class="Ss" id="Preview_options"><a class="permalink" href="#Preview_options">Preview
+  options</a></h2>
+<p class="Pp">An option can be set using <b>set</b> command.</p>
+<dl class="Bl-tag">
+  <dt id="forcekitty"><a class="permalink" href="#forcekitty"><b>forcekitty</b></a></dt>
+  <dd>Always use <i>Kitty</i> terminal's built-in method of previewing
+    images.</dd>
+</dl>
+</section>
 <section class="Ss">
 <h2 class="Ss" id="Defining_custom_previews"><a class="permalink" href="#Defining_custom_previews">Defining
   custom previews</a></h2>
