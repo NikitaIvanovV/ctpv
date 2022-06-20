@@ -24,8 +24,8 @@
 extern char *program;
 
 int spawn_redirect(const void *arg);
-int spawn_wait(pid_t pid, int *exitcode, int *signal);
-int spawn(char *args[], pid_t *cpid, int *exitcode, int *signal,
+int spawn_wait(int pid, int *exitcode, int *signal);
+int spawn(char *args[], int *cpid, int *exitcode, int *signal,
           int (*cfunc)(const void *), const void *carg);
 
 int strcmpnull(const char *s1, const char *s2);
@@ -34,7 +34,7 @@ int strlennull(const char *s);
 int get_cache_dir(char *buf, size_t len, char *name);
 int get_config_dir(char *buf, size_t len, char *name);
 
-int mkpath(char* file_path, mode_t mode);
+int mkpath(char* file_path, int mode);
 const char *get_ext(const char *path);
 
 #endif

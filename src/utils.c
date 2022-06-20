@@ -21,7 +21,7 @@ int spawn_redirect(const void *arg)
     return OK;
 }
 
-int spawn_wait(pid_t pid, int *exitcode, int *signal)
+int spawn_wait(int pid, int *exitcode, int *signal)
 {
     int stat;
     ERRCHK_RET_ERN(waitpid(pid, &stat, 0) == -1);
@@ -51,13 +51,13 @@ int spawn_wait(pid_t pid, int *exitcode, int *signal)
  *
  * cfunc is a function to call when child process is created
  */
-int spawn(char *args[], pid_t *cpid, int *exitcode, int *signal, int (*cfunc)(const void *),
+int spawn(char *args[], int *cpid, int *exitcode, int *signal, int (*cfunc)(const void *),
           const void *carg)
 {
     if (exitcode)
         *exitcode = -1;
 
-    pid_t pid = fork();
+    int pid = fork();
     ERRCHK_RET_ERN(pid == -1);
 
     /* Child process */
@@ -125,7 +125,7 @@ int get_config_dir(char *buf, size_t len, char *name)
     return get_xdg_dir(buf, len, "XDG_CONFIG_HOME", ".config", name);
 }
 
-int mkpath(char* file_path, mode_t mode)
+int mkpath(char* file_path, int mode)
 {
     for (char* p = strchr(file_path + 1, '/'); p; p = strchr(p + 1, '/')) {
         *p = '\0';

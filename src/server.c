@@ -13,7 +13,7 @@
 
 #define FIFO_FILENAME_SIZE 256
 
-static pid_t ueberzug_pid;
+static int ueberzug_pid;
 
 static volatile int do_exit = 0;
 
