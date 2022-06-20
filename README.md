@@ -6,8 +6,12 @@ Terminal previewer
 
 ----
 
-ctpv is an utility for previewing various files
-(including images with [Überzug](https://github.com/seebye/ueberzug)).
+ctpv is an utility for previewing various files.
+
+Image previews powered by:
+
+ * [Überzug](https://github.com/seebye/ueberzug)
+ * [Kitty terminal](https://github.com/kovidgoyal/kitty)
 
 ctpv is a remake of an awesome program named
 [stpv](https://github.com/Naheel-Azawy/stpv) written in C.
@@ -78,5 +82,6 @@ cmd on-quit $ctpv -e $id
 
 ## Documentation
 
-Full documentation for the program can be found here:
-https://nikitaivanovv.github.io/ctpv/
+Full documentation on command line options,
+configuration and how to define custom previews
+can be found here: https://nikitaivanovv.github.io/ctpv/
