@@ -42,6 +42,7 @@ static VectorPreview *previews;
 
 static struct Option options[] = {
     { "forcekitty", OPTION_BOOL, { .i = &ctpv.opts.forcekitty } },
+    { "noimages", OPTION_BOOL, { .i = &ctpv.opts.noimages } },
 };
 
 static void any_type_null(char **s)

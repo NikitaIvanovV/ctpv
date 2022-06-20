@@ -15,6 +15,10 @@ use_kitty() {
 	is_kitty
 }
 
+noimages() {
+	[ -n "$noimages" ]
+}
+
 fifo_open() {
 	# https://unix.stackexchange.com/a/522940/183147
 	dd oflag=nonblock conv=notrunc,nocreat count=0 of="$1" \
@@ -39,6 +43,8 @@ check_exists() {
 }
 
 send_image() {
+	noimages && return 127
+
 	if use_kitty; then
 		kitty +kitten icat --transfer-mode file --align left \
 			--place "${w}x${h}@${x}x${y}" "$1"
@@ -53,6 +59,7 @@ send_image() {
 }
 
 convert_and_show_image() {
+	noimages && exit 127
 	setup_fifo
 	[ -n "$cache_valid" ] || "$@" || exit "$?"
 	send_image "$cache_f"
