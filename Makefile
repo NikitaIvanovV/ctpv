@@ -32,7 +32,7 @@ install.man: doc/ctpv.1
 	install -m 0644 $^ $(MANPREFIX)
 
 uninstall:
-	$(RM) $(BINPREFIX)/ctpv $(BINPREFIX)/ctpvclear
+	$(RM) $(BINPREFIX)/ctpv $(BINPREFIX)/ctpvclear $(MANPREFIX)/ctpv.1
 
 clean:
 	$(RM) ctpv $(OBJ) $(DEP) $(GEN)
