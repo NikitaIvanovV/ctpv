@@ -7,7 +7,8 @@ is_kitty() {
 }
 
 use_ueberzug() {
-	exists ueberzug
+	[ -n "$WAYLAND_DISPLAY" ] && return 1
+	[ -n "$DISPLAY" ] && exists ueberzug
 }
 
 use_kitty() {
