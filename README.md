@@ -27,6 +27,13 @@ external programs like lf does.
 
 ## Dependencies
 
+### Libraries
+
+* `libcrypto`
+* `libmagic`
+
+### Previews
+
 Previewing each file type requires specific programs.
 If a program is not found on the system, ctpv
 will try to use another one.
