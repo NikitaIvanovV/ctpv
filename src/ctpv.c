@@ -122,6 +122,25 @@ static int check_file(char **f, char *f_link)
         }
     } else {
         f_link[f_link_len] = '\0';
+
+        /* If link is not an absolute path, get absolute path */
+        if (f_link[0] != '/') {
+            char f_link_tmp[FILENAME_MAX];
+            strncpy(f_link_tmp, f_link, f_link_len);
+
+            ERRCHK_RET_ERN(getcwd(f_link, FILENAME_MAX) == NULL);
+
+            f_link_len = strlen(f_link);
+
+            if (f_link[f_link_len-1] != '/') {
+                f_link[f_link_len] = '/';
+                f_link[f_link_len+1] = '\0';
+                f_link_len++;
+            }
+
+            strcpy(f_link + f_link_len, f_link_tmp);
+        }
+
         if (access(f_link, R_OK) == 0)
             *f = f_link;
     }
