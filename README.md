@@ -66,6 +66,15 @@ sudo make install
 
 Uninstall with `sudo make uninstall`
 
+### AUR
+
+If you are an Arch Linux user, you can install
+[`ctpv-git`](https://aur.archlinux.org/packages/ctpv-git) AUR package.
+
+```sh
+yay -S ctpv-git
+```
+
 ## Integration
 
 ### lf file manager
