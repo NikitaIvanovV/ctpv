@@ -163,6 +163,8 @@ cmd on-quit $ctpv -e $id
 .
 Image previews are enabled by either installing
 .I Überzug
+or
+.I Chafa
 (as seen in
 .IR Dependencies )
 or using built-in image preview functionality of
@@ -170,14 +172,16 @@ or using built-in image preview functionality of
 terminal.
 .PP
 .
-Note: if you use
-.I Kitty
-but
+When possible,
+.B ctpv
+will prefer
 .I Überzug
-is installed on the system, the latter will be the preferred
-method for previewing images. It can be changed using
+over others image preview methods. You can override this
+behavior by using
 .B forcekitty
-option (see
+or
+.B forcechafa
+options (see
 .IR "Preview options" ).
 .
 .SS How previews are selected
@@ -267,6 +271,12 @@ command.
 Always use
 .I Kitty
 terminal's built-in method of previewing images.
+.
+.TP
+.B forcechafa
+Always use
+.I Chafa
+for image previews.
 .
 .TP
 .B noimages
