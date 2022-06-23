@@ -24,7 +24,7 @@ Preview b_previews[] = {
     PR(NULL,      "text",           NULL,             source_highlight),
     PR(NULL,      "text",           NULL,             cat),
 
-    PR(NULL,      "image",          NULL,             ueberzug),
+    PR(NULL,      "image",          NULL,             image),
     PR(NULL,      "video",          NULL,             video),
 
     PR(NULL,      "application",    "pdf",            pdf),

@@ -50,7 +50,7 @@ For example, you only need either `elinks`, `lynx` or
 | diff | `colordiff` `delta` `diff-so-fancy` |
 | directory | `ls` |
 | html | `elinks` `lynx` `w3m` |
-| image | `ueberzug` |
+| image | `ueberzug` `chafa` |
 | json | `jq` |
 | markdown | `mdcat` |
 | odt | `libreoffice` |

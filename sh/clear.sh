@@ -1,7 +1,10 @@
-setup_fifo 1
+setup_image 1
 
-if use_kitty; then
-	kitty +kitten icat --clear --transfer-mode file
-elif use_ueberzug; then
-	printf '{"action": "remove", "identifier": "preview"}\n' > "$fifo"
-fi
+case "$image_method" in
+	"$image_method_ueberzug")
+		printf '{"action": "remove", "identifier": "preview"}\n' > "$fifo"
+		;;
+	"$image_method_kitty")
+		kitty +kitten icat --clear --transfer-mode file
+		;;
+esac

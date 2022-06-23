@@ -1,4 +1,4 @@
-setup_fifo 1
+setup_image 1
 
 # tell ctpv server to exit
-use_ueberzug && printf '\0' > "$fifo"
+[ "$image_method" = "$image_method_ueberzug" ] && printf '\0' > "$fifo"

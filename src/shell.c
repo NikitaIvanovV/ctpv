@@ -35,6 +35,7 @@ int run_script(char *script, size_t script_len, int *exitcode, int *signal,
                SpawnProg sp, void *sp_arg)
 {
     ERRCHK_RET_ERN(setenv("forcekitty", ctpv.opts.forcekitty ? "1" : "", 1) == -1);
+    ERRCHK_RET_ERN(setenv("forcechafa", ctpv.opts.forcechafa ? "1" : "", 1) == -1);
     ERRCHK_RET_ERN(setenv("noimages", ctpv.opts.noimages ? "1" : "", 1) == -1);
 
     char *scr = prepend_helpers(script, script_len);

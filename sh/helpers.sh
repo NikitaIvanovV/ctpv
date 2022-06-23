@@ -1,38 +1,9 @@
+image_method_ueberzug='U'
+image_method_kitty='K'
+image_method_chafa='C'
+
 echo_err() {
 	echo "$@" >&2
-}
-
-is_kitty() {
-	[ -n "$KITTY_PID" ]
-}
-
-use_ueberzug() {
-	[ -n "$WAYLAND_DISPLAY" ] && return 1
-	[ -n "$DISPLAY" ] && exists ueberzug
-}
-
-use_kitty() {
-	[ -z "$forcekitty" ] && use_ueberzug && return 1
-	is_kitty
-}
-
-noimages() {
-	[ -n "$noimages" ]
-}
-
-fifo_open() {
-	# https://unix.stackexchange.com/a/522940/183147
-	dd oflag=nonblock conv=notrunc,nocreat count=0 of="$1" \
-		>/dev/null 2>/dev/null
-}
-
-setup_fifo() {
-	use_ueberzug || return 1
-
-	exit_code="${1:-127}"
-	[ -n "$fifo" ] || exit "$exit_code"
-	[ -e "$fifo" ] || exit "$exit_code"
-	fifo_open "$fifo" || exit "$exit_code"
 }
 
 exists() {
@@ -43,25 +14,71 @@ check_exists() {
 	exists "$@" || exit 127
 }
 
+noimages() {
+	[ -n "$noimages" ]
+}
+
+is_kitty() {
+	[ -n "$KITTY_PID" ]
+}
+
+fifo_open() {
+	# https://unix.stackexchange.com/a/522940/183147
+	dd oflag=nonblock conv=notrunc,nocreat count=0 of="$1" \
+		>/dev/null 2>/dev/null
+}
+
+set_image_method() {
+	image_method=
+
+	[ -n "$forcekitty" ] && is_kitty && { image_method="$image_method_kitty"; return 0; }
+	[ -n "$forcechafa" ] && exists chafa && { image_method="$image_method_chafa"; return 0; }
+
+	[ -n "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ] && exists ueberzug &&
+		[ -n "$fifo" ] && [ -e "$fifo" ] &&
+		{ image_method="$image_method_ueberzug"; return 0; }
+
+	is_kitty && { image_method="$image_method_kitty"; return 0; }
+
+	exists chafa && { image_method="$image_method_chafa"; return 0; }
+}
+
+setup_fifo() {
+	fifo_open "$fifo" || exit "${1:-127}"
+}
+
+setup_image() {
+	set_image_method
+
+	[ "$image_method" = "$image_method_ueberzug" ] && setup_fifo "$@"
+}
+
 send_image() {
 	noimages && return 127
 
-	if use_kitty; then
-		kitty +kitten icat --transfer-mode file --align left \
-			--place "${w}x${h}@${x}x${y}" "$1"
-		return 1
-	elif use_ueberzug; then
-		path="$(printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g')"
-		printf '{ "action": "add", "identifier": "preview", "x": %d, "y": %d, "width": %d, "height": %d, "scaler": "contain", "scaling_position_x": 0.5, "scaling_position_y": 0.5, "path": "%s"}\n' "$x" "$y" "$w" "$h" "$path" > "$fifo"
-		return 1
-	else
-		return 127
-	fi
+	case "$image_method" in
+		"$image_method_ueberzug")
+			path="$(printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g')"
+			printf '{ "action": "add", "identifier": "preview", "x": %d, "y": %d, "width": %d, "height": %d, "scaler": "contain", "scaling_position_x": 0.5, "scaling_position_y": 0.5, "path": "%s"}\n' "$x" "$y" "$w" "$h" "$path" > "$fifo"
+			return 1
+			;;
+		"$image_method_kitty")
+			kitty +kitten icat --transfer-mode file --align left \
+				--place "${w}x${h}@${x}x${y}" "$1"
+			return 1
+			;;
+		"$image_method_chafa")
+			chafa --animate off -s "${w}x${h}" "$1"
+			;;
+		*)
+			return 127
+			;;
+	esac
 }
 
 convert_and_show_image() {
-	noimages && exit 127
-	setup_fifo
+	noimages && return 127
+	setup_image
 	[ -n "$cache_valid" ] || "$@" || exit "$?"
 	send_image "$cache_f"
 }
