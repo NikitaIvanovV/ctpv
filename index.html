@@ -101,7 +101,7 @@
   </tr>
   <tr>
     <td>image</td>
-    <td><i>ueberzug</i></td>
+    <td><i>ueberzug chafa</i></td>
   </tr>
   <tr>
     <td>json</td>
@@ -155,12 +155,12 @@ cmd on-quit $ctpv -e $id
 <h2 class="Ss" id="Image_previews"><a class="permalink" href="#Image_previews">Image
   previews</a></h2>
 <p class="Pp">Image previews are enabled by either installing
-    <i>&#x00DC;berzug</i> (as seen in <a href="#Dependencies"><i>Dependencies</i></a>) or using built-in
-    image preview functionality of <i>Kitty</i> terminal.</p>
-<p class="Pp">Note: if you use <i>Kitty</i> but <i>&#x00DC;berzug</i> is
-    installed on the system, the latter will be the preferred method for
-    previewing images. It can be changed using <b>forcekitty</b> option (see
-    <a href="#Preview_options"><i>Preview options</i></a>).</p>
+    <i>&#x00DC;berzug</i> or <i>Chafa</i> (as seen in <a href="#Dependencies"><i>Dependencies</i></a>) or
+    using built-in image preview functionality of <i>Kitty</i> terminal.</p>
+<p class="Pp">When possible, <b>ctpv</b> will prefer <i>&#x00DC;berzug</i> over
+    others image preview methods. You can override this behavior by using
+    <b>forcekitty</b> or <b>forcechafa</b> options (see <i>Preview
+  options</i>).</p>
 </section>
 <section class="Ss">
 <h2 class="Ss" id="How_previews_are_selected"><a class="permalink" href="#How_previews_are_selected">How
@@ -211,6 +211,8 @@ cmd on-quit $ctpv -e $id
   <dt id="forcekitty"><a class="permalink" href="#forcekitty"><b>forcekitty</b></a></dt>
   <dd>Always use <i>Kitty</i> terminal's built-in method of previewing
     images.</dd>
+  <dt id="forcechafa"><a class="permalink" href="#forcechafa"><b>forcechafa</b></a></dt>
+  <dd>Always use <i>Chafa</i> for image previews.</dd>
   <dt id="noimages"><a class="permalink" href="#noimages"><b>noimages</b></a></dt>
   <dd>Print only text and do not use any image previewing method.</dd>
 </dl>
