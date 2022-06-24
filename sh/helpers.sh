@@ -40,7 +40,28 @@ set_image_method() {
 
 	is_kitty && { image_method="$image_method_kitty"; return 0; }
 
-	exists chafa && { image_method="$image_method_chafa"; return 0; }
+	exists chafa && exists convert && { image_method="$image_method_chafa"; return 0; }
+}
+
+is_anim_image() {
+	case "$m" in
+		image/apng|image/gif|image/avif|image/webp)
+			return 0 ;;
+		*)
+			return 1 ;;
+	esac
+}
+
+prepare_anim_img() {
+	if [ "$1" != "$cache_f" ] && is_anim_image "$1"; then
+		convert "${1}[0]" "jpg:${cache_f}" && printf '%s\n' "$cache_f"
+	else
+		printf '%s\n' "$1"
+	fi
+}
+
+chafa_run() {
+	_f="$(prepare_anim_img "$1")" && chafa -s "${w}x${h}" "$_f"
 }
 
 setup_fifo() {
@@ -68,7 +89,7 @@ send_image() {
 			return 1
 			;;
 		"$image_method_chafa")
-			chafa --animate off -s "${w}x${h}" "$1"
+			chafa_run "$1"
 			;;
 		*)
 			return 127
