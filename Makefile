@@ -42,7 +42,7 @@ make_embed:
 	$(MAKE) -C embed
 
 ctpv: $(OBJ)
-	$(CC) $(LDFLAGS) $+ -o $@
+	$(CC) -o $@ $+ $(LDFLAGS)
 
 src/ctpv.c: $(GEN)
 
