@@ -14,7 +14,7 @@ LIBS := magic crypto
 CFLAGS  += $(O) -MD -Wall -Wextra -Wno-unused-parameter
 LDFLAGS += $(LIBS:%=-l%)
 
-all: ctpv README.md doc/ctpv.1
+all: ctpv
 
 options:
 	@echo "CC      = $(CC)"
@@ -37,6 +37,8 @@ uninstall:
 clean:
 	$(RM) ctpv $(OBJ) $(DEP) $(GEN)
 	$(MAKE) -C embed clean
+
+docs: README.md doc/ctpv.1
 
 make_embed:
 	$(MAKE) -C embed
@@ -69,6 +71,7 @@ embed/embed: make_embed
 
 -include $(DEP)
 
-.PHONY: all options install install.bin install.man uninstall clean make_embed
+.PHONY: all options install install.bin install.man uninstall \
+	clean docs make_embed
 
 .DELETE_ON_ERROR:
