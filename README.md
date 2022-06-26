@@ -10,8 +10,9 @@ ctpv is an utility for previewing various files.
 
 Image previews powered by:
 
- * [Überzug](https://github.com/seebye/ueberzug)
- * [Kitty terminal](https://github.com/kovidgoyal/kitty)
+* [Überzug](https://github.com/seebye/ueberzug)
+* [Kitty terminal](https://github.com/kovidgoyal/kitty)
+* [Chafa](https://github.com/hpjansson/chafa)
 
 ctpv is a remake of an awesome program named
 [stpv](https://github.com/Naheel-Azawy/stpv) written in C.
