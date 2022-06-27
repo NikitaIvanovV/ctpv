@@ -16,6 +16,10 @@
 #include "preview.h"
 #include "../previews.h"
 
+struct InputFile {
+    char link[PATH_MAX], path[PATH_MAX];
+};
+
 struct CTPV ctpv;
 
 const char any_type[] = ANY_TYPE;
@@ -100,50 +104,32 @@ static const char *get_mimetype(const char *path)
     return r;
 }
 
-static int check_file(char **f, char *f_link)
+static inline void file_access_err(char *f, int errno_)
+{
+    print_errorf("failed to access '%s': %s", f, strerror(errno_));
+}
+
+static int get_input_file(char *f, struct InputFile *input_f)
 {
     if (!f) {
         print_error("file not given");
         return ERR;
     }
 
-    ssize_t f_link_len = readlink(*f, f_link, FILENAME_MAX);
-    if (f_link_len == -1) {
-        switch (errno) {
-        case ENOENT:
-            print_errorf("failed to access '%s': %s", *f, strerror(errno));
-            return ERR;
-        case EINVAL:
-            *f_link = 0;
-            break;
-        default:
-            FUNCFAILED("readlink", strerror(errno));
-            return ERR;
-        }
-    } else {
-        f_link[f_link_len] = '\0';
+    input_f->link[0] = input_f->path[0] = '\0';
 
-        /* If link is not an absolute path, get absolute path */
-        if (f_link[0] != '/') {
-            char f_link_tmp[FILENAME_MAX];
-            strncpy(f_link_tmp, f_link, f_link_len);
-
-            ERRCHK_RET_ERN(getcwd(f_link, FILENAME_MAX) == NULL);
-
-            f_link_len = strlen(f_link);
-
-            if (f_link[f_link_len-1] != '/') {
-                f_link[f_link_len] = '/';
-                f_link[f_link_len+1] = '\0';
-                f_link_len++;
-            }
-
-            strcpy(f_link + f_link_len, f_link_tmp);
-        }
-
-        if (access(f_link, R_OK) == 0)
-            *f = f_link;
+    if (realpath(f, input_f->path) == NULL) {
+        file_access_err(input_f->path, errno);
+        return ERR;
     }
+
+    ssize_t link_len = readlink(f, input_f->link, LEN(input_f->link));
+    if (link_len == -1 && errno != EINVAL) {
+        FUNCFAILED("readlink", strerror(errno));
+        return ERR;
+    }
+
+    input_f->link[link_len] = '\0';
 
     return OK;
 }
@@ -176,7 +162,7 @@ static void md5_string(char *buf, size_t len, char *s)
     MD5((const unsigned char *)s, strlen(s), out);
 
     buf[0] = '\0';
-    for(unsigned int i = 0; i < LEN(out); i++) {
+    for (unsigned int i = 0; i < LEN(out); i++) {
         snprintf(b, LEN(b)-1, "%02x", out[i]);
         strncat(buf, b, len);
     }
@@ -210,7 +196,7 @@ static int check_cache(int *resp, char *file, char *cache_file)
     return is_newer(resp, cache_file, file);
 }
 
-#define GET_PARG(a, i) (a) = argc > (i) ? argv[i] : NULL
+#define GET_PARG(a, i) (a) = (argc > (i) ? argv[i] : NULL)
 
 static int preview(int argc, char *argv[])
 {
@@ -224,11 +210,11 @@ static int preview(int argc, char *argv[])
     GET_PARG(y, 4);
     GET_PARG(id, 5);
 
-    char f_link[FILENAME_MAX];
-    ERRCHK_RET_OK(check_file(&f, f_link));
+    struct InputFile input_f;
+    ERRCHK_RET_OK(get_input_file(f, &input_f));
 
-    if (*f_link) {
-        printf("Symlink points to:\n\t%s\n\n", f_link);
+    if (*input_f.link) {
+        printf("\033[1;36mSymlink points to:\033[m\n\t%s\n\n", input_f.link);
         fflush(stdout);
 
         if (y && h) {
@@ -248,17 +234,17 @@ static int preview(int argc, char *argv[])
     ERRCHK_RET_OK(init_previews());
 
     const char *mimetype;
-    ERRCHK_RET(!(mimetype = get_mimetype(f)));
+    ERRCHK_RET(!(mimetype = get_mimetype(input_f.path)));
 
     char cache_dir[FILENAME_MAX], cache_file[FILENAME_MAX];
     ERRCHK_RET_OK(get_cache_file(cache_dir, LEN(cache_file), cache_file,
-                                 LEN(cache_file), f));
+                                 LEN(cache_file), input_f.path));
 
     int cache_valid;
-    ERRCHK_RET_OK(check_cache(&cache_valid, f, cache_file));
+    ERRCHK_RET_OK(check_cache(&cache_valid, input_f.path, cache_file));
 
     PreviewArgs args = {
-        .f = f,
+        .f = input_f.path,
         .w = w,
         .h = h,
         .x = x,
@@ -269,7 +255,7 @@ static int preview(int argc, char *argv[])
         .cache_valid = cache_valid,
     };
 
-    return preview_run(get_ext(f), mimetype, &args);
+    return preview_run(get_ext(input_f.path), mimetype, &args);
 }
 
 static int server(void)
@@ -351,28 +337,26 @@ static int list(void)
 
 static int mime(int argc, char *argv[])
 {
-    char *f;
-    char f_link[FILENAME_MAX];
     const char *mimetype;
+    struct InputFile input_f;
 
     if (argc <= 0) {
         print_error("files are not specified");
         return ERR;
     }
 
+    ERRCHK_RET_OK(init_magic());
+
     for (int i = 0; i < argc; i++) {
-        f = argv[i];
-        ERRCHK_RET_OK(check_file(&f, f_link));
+        ERRCHK_RET_OK(get_input_file(argv[i], &input_f));
 
-        ERRCHK_RET_OK(init_magic());
-
-        mimetype = get_mimetype(f);
+        mimetype = get_mimetype(input_f.path);
         ERRCHK_RET(!mimetype);
 
         if (argc > 1)
-            printf("%s:\t", f);
+            printf("%s:\t", argv[i]);
 
-        printf(".%s ", get_ext(f));
+        printf(".%s ", get_ext(input_f.path));
         puts(mimetype);
     }
 
