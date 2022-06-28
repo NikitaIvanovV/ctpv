@@ -10,6 +10,7 @@ void print_error(const char *error_msg)
     /* We print errors to stdout because lf file manager
      * doesn't print stderr in the preview window. */
     fprintf(stdout, "%s: %s\n", program, error_msg);
+    fflush(stdout);
 }
 
 void print_errorf(const char *format, ...)
