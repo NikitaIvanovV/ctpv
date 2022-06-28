@@ -210,10 +210,12 @@ static int preview(int argc, char *argv[])
     GET_PARG(y, 4);
     GET_PARG(id, 5);
 
+    ERRCHK_RET_OK(init_previews());
+
     struct InputFile input_f;
     ERRCHK_RET_OK(get_input_file(f, &input_f));
 
-    if (*input_f.link) {
+    if (!ctpv.opts.nosymlinkinfo && *input_f.link) {
         printf("\033[1;36mSymlink points to:\033[m\n\t%s\n\n", input_f.link);
         fflush(stdout);
 
@@ -230,8 +232,6 @@ static int preview(int argc, char *argv[])
     }
 
     ERRCHK_RET_OK(init_magic());
-
-    ERRCHK_RET_OK(init_previews());
 
     const char *mimetype;
     ERRCHK_RET(!(mimetype = get_mimetype(input_f.path)));

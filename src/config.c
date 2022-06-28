@@ -17,6 +17,11 @@
 #define ACCEPT(x)     CHECK_OK(accept(x))
 #define NOT_ACCEPT(x) CHECK_NULL(accept(x))
 
+#define DEF_OPTION(name, type, val) { (#name), (type), { .val = &ctpv.opts.name } }
+#define DEF_OPTION_BOOL(name)       DEF_OPTION(name, OPTION_BOOL, i)
+#define DEF_OPTION_INT(name)        DEF_OPTION(name, OPTION_INT, i)
+#define DEF_OPTION_STR(name)        DEF_OPTION(name, OPTION_STR, s)
+
 struct Option {
     char *name;
     enum {
@@ -41,9 +46,10 @@ static Token token;
 static VectorPreview *previews;
 
 static struct Option options[] = {
-    { "forcekitty", OPTION_BOOL, { .i = &ctpv.opts.forcekitty } },
-    { "forcechafa", OPTION_BOOL, { .i = &ctpv.opts.forcechafa } },
-    { "noimages", OPTION_BOOL, { .i = &ctpv.opts.noimages } },
+    DEF_OPTION_BOOL(forcekitty),
+    DEF_OPTION_BOOL(forcechafa),
+    DEF_OPTION_BOOL(noimages),
+    DEF_OPTION_BOOL(nosymlinkinfo),
 };
 
 static void any_type_null(char **s)

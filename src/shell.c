@@ -31,12 +31,16 @@ static char *prepend_helpers(char *str, size_t len)
     return buf;
 }
 
+#define OPT_SETENV(name) \
+    ERRCHK_RET_ERN(setenv((#name), ctpv.opts.name ? "1" : "", 1) == -1)
+
 int run_script(char *script, size_t script_len, int *exitcode, int *signal,
                SpawnProg sp, void *sp_arg)
 {
-    ERRCHK_RET_ERN(setenv("forcekitty", ctpv.opts.forcekitty ? "1" : "", 1) == -1);
-    ERRCHK_RET_ERN(setenv("forcechafa", ctpv.opts.forcechafa ? "1" : "", 1) == -1);
-    ERRCHK_RET_ERN(setenv("noimages", ctpv.opts.noimages ? "1" : "", 1) == -1);
+    OPT_SETENV(forcechafa);
+    OPT_SETENV(forcekitty);
+    OPT_SETENV(noimages);
+    OPT_SETENV(nosymlinkinfo);
 
     char *scr = prepend_helpers(script, script_len);
     char *args[] = SHELL_ARGS(scr);
