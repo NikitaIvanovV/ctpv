@@ -1,3 +1,3 @@
 # markdown: mdcat
 
-mdcat --columns "$w" -- "$f"
+MDCAT_PAGER= PAGER=cat mdcat -p -l --columns "$w" -- "$f"
