@@ -3,7 +3,7 @@
 
 #include "src/utils.h"
 #include "src/preview.h"
-#include "gen/prev/scripts.h"
+#include "gen/previews.h"
 
 /*
  * This file is supposed to be included in src/ctpv.c

@@ -6,7 +6,7 @@ SRC := $(wildcard src/*.c)
 OBJ := $(SRC:.c=.o)
 DEP := $(OBJ:.o=.d)
 PRE := $(wildcard sh/prev/*)
-GEN := gen/prev/scripts.h gen/server.h gen/helpers.h
+GEN := gen/previews.h gen/server.h gen/helpers.h
 
 O    := -O2
 LIBS := magic crypto
@@ -47,11 +47,11 @@ ctpv: $(OBJ)
 	$(CC) -o $@ $+ $(LDFLAGS)
 
 # Exclicit rules for generated header files
-src/ctpv.c: gen/prev/scripts.h
+src/ctpv.c: gen/previews.h
 src/shell.c: gen/helpers.h
 src/server.c: gen/server.h
 
-gen/prev/scripts.h: $(PRE) embed/embed
+gen/previews.h: $(PRE) embed/embed
 	@mkdir -p $(@D)
 	embed/embed -p prev_scr_ $(PRE) > $@
 
