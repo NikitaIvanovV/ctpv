@@ -46,7 +46,10 @@ make_embed:
 ctpv: $(OBJ)
 	$(CC) -o $@ $+ $(LDFLAGS)
 
-src/ctpv.c: $(GEN)
+# Exclicit rules for generated header files
+src/ctpv.c: gen/prev/scripts.h
+src/shell.c: gen/helpers.h
+src/server.c: gen/server.h
 
 gen/prev/scripts.h: $(PRE) embed/embed
 	@mkdir -p $(@D)
