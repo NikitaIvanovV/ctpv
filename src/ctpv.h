@@ -14,7 +14,7 @@ struct CTPV {
     } mode;
     char *server_id_s;
     struct {
-        int forcekitty, forcechafa, noimages, nosymlinkinfo;
+        int forcekitty, forcekittyanim, forcechafa, noimages, nosymlinkinfo;
     } opts;
 };
 

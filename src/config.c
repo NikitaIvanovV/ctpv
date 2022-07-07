@@ -47,6 +47,7 @@ static VectorPreview *previews;
 
 static struct Option options[] = {
     DEF_OPTION_BOOL(forcekitty),
+    DEF_OPTION_BOOL(forcekittyanim),
     DEF_OPTION_BOOL(forcechafa),
     DEF_OPTION_BOOL(noimages),
     DEF_OPTION_BOOL(nosymlinkinfo),

@@ -32,6 +32,7 @@ set_image_method() {
 	image_method=
 
 	[ -n "$forcekitty" ] && is_kitty && { image_method="$image_method_kitty"; return 0; }
+	[ -n "$forcekittyanim" ] && is_kitty && is_anim_image && { image_method="$image_method_kitty"; return 0; }
 	[ -n "$forcechafa" ] && exists chafa && { image_method="$image_method_chafa"; return 0; }
 
 	[ -n "$DISPLAY" ] && [ -z "$WAYLAND_DISPLAY" ] && exists ueberzug &&

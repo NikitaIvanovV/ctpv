@@ -37,8 +37,9 @@ static char *prepend_helpers(char *str, size_t len)
 int run_script(char *script, size_t script_len, int *exitcode, int *signal,
                SpawnProg sp, void *sp_arg)
 {
-    OPT_SETENV(forcechafa);
     OPT_SETENV(forcekitty);
+    OPT_SETENV(forcekittyanim);
+    OPT_SETENV(forcechafa);
     OPT_SETENV(noimages);
     OPT_SETENV(nosymlinkinfo);
 
