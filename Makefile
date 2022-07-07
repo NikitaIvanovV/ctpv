@@ -69,8 +69,7 @@ README.md: $(PRE)
 doc/ctpv.1: $(PRE)
 	./deplist.awk $^ | ./deplist.1.sh | ./deplistadd.sh $@
 
-embed/embed: make_embed
-	@ # do nothing
+embed/embed: make_embed ;
 
 -include $(DEP)
 
