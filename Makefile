@@ -39,6 +39,8 @@ clean:
 	$(MAKE) -C embed clean
 
 docs: README.md doc/ctpv.1
+	./deplist.awk $(PRE) | ./deplist.md.sh | ./deplistadd.sh README.md
+	./deplist.awk $(PRE) | ./deplist.1.sh | ./deplistadd.sh doc/ctpv.1
 
 make_embed:
 	$(MAKE) -C embed
@@ -62,12 +64,6 @@ gen/server.h: sh/clear.sh sh/end.sh embed/embed
 gen/helpers.h: sh/helpers.sh embed/embed
 	@mkdir -p $(@D)
 	embed/embed -p scr_ sh/helpers.sh > $@
-
-README.md: $(PRE)
-	./deplist.awk $^ | ./deplist.md.sh | ./deplistadd.sh $@
-
-doc/ctpv.1: $(PRE)
-	./deplist.awk $^ | ./deplist.1.sh | ./deplistadd.sh $@
 
 embed/embed: make_embed ;
 
