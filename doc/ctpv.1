@@ -271,12 +271,12 @@ Example:
 .Ex
 # Set an option
 set forcekitty
-
+.IP
 # Add a new preview for man pages (like this one)
 preview manpage .1 {{
-    \&groff -man -tep -Tutf8 -rLL="${w}n" "${f}" | col -x
+\&    groff -man -tep -Tutf8 -rLL="${w}n" "${f}" | col -x
 }}
-
+.IP
 # Remove some previews
 remove w3m
 remove lynx
