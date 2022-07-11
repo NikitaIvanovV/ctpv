@@ -23,7 +23,8 @@ typedef struct {
 } TokenQueue;
 
 struct Lexer {
-    unsigned int line, col;
+    enum LexerOpts opts;
+    unsigned line, col;
     struct {
         unsigned int line, col;
     } tok_pos;
@@ -153,11 +154,17 @@ Lexer *lexer_init(FILE *f)
     }
 
     init_input_buf(&ctx->input_buf, f);
+    lexer_set_opts(ctx, LEX_OPT_NONE);
     ctx->text_buf = ulist_new(sizeof(char), 1024);
     ctx->line = ctx->col = 1;
     ctx->tok_queue.back = ctx->tok_queue.front = 0;
 
     return ctx;
+}
+
+void lexer_set_opts(Lexer *ctx, enum LexerOpts flags)
+{
+    ctx->opts = flags;
 }
 
 void lexer_free(Lexer *ctx)
@@ -263,12 +270,23 @@ static inline Token read_int(Lexer *ctx)
 
     record_text(ctx);
     read_while(ctx, isdigit, 1);
-    int i = atoi(get_text(ctx));
+
+    Token tok;
+    char *text = get_text(ctx);
+
+    /* If NUMISTEXT option is set, do not convert string to integer */
+    if (ctx->opts & LEX_OPT_NUMISTEXT) {
+        tok = get_tok(ctx, TOK_STR);
+        tok.val.s = text;
+        return tok;
+    }
+
+    int i = atoi(text);
 
     if (!positive)
         i *= -1;
 
-    Token tok = get_tok(ctx, TOK_INT);
+    tok = get_tok(ctx, TOK_INT);
     tok.val.i = i;
 
     return tok;

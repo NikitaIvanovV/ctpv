@@ -180,10 +180,30 @@ static int preview_type_mime(char **type, char **subtype)
     return STAT_OK;
 }
 
+static inline void num_is_text(void)
+{
+    lexer_set_opts(lexer, LEX_OPT_NUMISTEXT);
+}
+
+static inline void reset_lexer_opts(void)
+{
+    lexer_set_opts(lexer, LEX_OPT_NONE);
+}
+
 static int preview_type(char **type, char **subtype, char **ext)
 {
-    CHECK_NULL(preview_type_ext(ext));
-    return preview_type_mime(type, subtype);
+    int ret;
+
+    num_is_text();
+
+    if ((ret = preview_type_ext(ext)) != STAT_NULL)
+        goto exit;
+
+    ret = preview_type_mime(type, subtype);
+
+exit:
+    reset_lexer_opts();
+    return ret;
 }
 
 static struct Option *get_option(char *name)

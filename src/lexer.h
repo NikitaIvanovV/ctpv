@@ -10,6 +10,11 @@
 
 typedef struct Lexer Lexer;
 
+enum LexerOpts {
+    LEX_OPT_NONE = 0,
+    LEX_OPT_NUMISTEXT = 1 << 0,
+};
+
 typedef struct {
     unsigned int line, col;
     enum TokenType {
@@ -32,6 +37,7 @@ typedef struct {
 } Token;
 
 Lexer *lexer_init(FILE *f);
+void lexer_set_opts(Lexer *ctx, enum LexerOpts flags);
 void lexer_free(Lexer *ctx);
 Token lexer_get_token(Lexer *ctx);
 char *lexer_token_type_str(enum TokenType type);
