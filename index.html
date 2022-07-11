@@ -30,7 +30,7 @@
 <div class="manual-text">
 <section class="Sh">
 <h1 class="Sh" id="NAME"><a class="permalink" href="#NAME">NAME</a></h1>
-<p class="Pp">ctpv &#x2014; terminal previewer</p>
+<p class="Pp">ctpv - terminal previewer</p>
 </section>
 <section class="Sh">
 <h1 class="Sh" id="SYNOPSIS"><a class="permalink" href="#SYNOPSIS">SYNOPSIS</a></h1>
@@ -62,13 +62,14 @@
 <section class="Sh">
 <h1 class="Sh" id="DESCRIPTION"><a class="permalink" href="#DESCRIPTION">DESCRIPTION</a></h1>
 <p class="Pp"><b>ctpv</b> is a previewer utility made for integration into other
-    programs. It supports a variety of &#x201C;previews&#x201D; out of the box,
-    as well as an option to define custom ones.</p>
-<p class="Pp">When <b>ctpv</b> is given a file, it determines an appropriate
-    preview for it and runs its script. The script produces preview content and
-    prints it to standard output. Symbolic links are dereferenced.</p>
+    programs like <i>lf</i>.</p>
+<p class="Pp">When <b>ctpv</b> is given a <i>file</i>, it determines an
+    appropriate preview for it and runs it. Depending on the preview and
+    installed programs, it can print some text to standard output or display an
+    image. Symbolic links are dereferenced.</p>
 <section class="Ss">
-<h2 class="Ss" id="Dependencies"><a class="permalink" href="#Dependencies">Dependencies</a></h2>
+<h2 class="Ss" id="Built-in_previews_and_dependencies"><a class="permalink" href="#Built-in_previews_and_dependencies">Built-in
+  previews and dependencies</a></h2>
 <p class="Pp">Previewing each file type requires specific programs. If a program
     is not found on the system, <b>ctpv</b> will try to use another one. Only
     one program is required for each file type. For example, you only need
@@ -155,8 +156,9 @@ cmd on-quit $ctpv -e $id
 <h2 class="Ss" id="Image_previews"><a class="permalink" href="#Image_previews">Image
   previews</a></h2>
 <p class="Pp">Image previews are enabled by either installing
-    <i>&#x00DC;berzug</i> or <i>Chafa</i> (as seen in <a href="#Dependencies"><i>Dependencies</i></a>) or
-    using built-in image preview functionality of <i>Kitty</i> terminal.</p>
+    <i>&#x00DC;berzug</i> or <i>Chafa</i> (as seen in <i>Built-in previews and
+    dependencies</i>) or using built-in image preview functionality of
+    <i>Kitty</i> terminal.</p>
 <p class="Pp">When possible, <b>ctpv</b> will prefer <i>&#x00DC;berzug</i> over
     others image preview methods. You can override this behavior by using
     <b>forcekitty</b> or <b>forcechafa</b> options (see <i>Preview
@@ -166,17 +168,20 @@ cmd on-quit $ctpv -e $id
 <h2 class="Ss" id="How_previews_are_selected"><a class="permalink" href="#How_previews_are_selected">How
   previews are selected</a></h2>
 <p class="Pp">Initially, <b>ctpv</b> retrieves MIME type and extension from
-    <i>file</i> passed in the first argument (MIME type is extracted using
+    <i>file</i> passed as the first argument (MIME type is extracted using
     <b>libmagic</b>(3)).</p>
-<p class="Pp">Then it creates a list of all previews in a special order, where
-    previews that are more specific appear at the top and more generic ones at
-    the bottom. The list can be viewed by using <b>-l</b> option. The order can
-    be changed, see <a href="#Setting_priority"><i>Setting priority</i></a>.</p>
+<p class="Pp">Then it creates a list of all previews respecting user
+    configuration in a special order, where previews that are more specific
+    appear at the top and more generic ones at the bottom. The list can be
+    viewed by using <b>-l</b> option. The order can be changed (see <i>Setting
+    priority</i>).</p>
 <p class="Pp">Finally, <b>ctpv</b> goes through the list starting with the first
     element and checks if a preview matches <i>file</i>'s extension and MIME
     type. If it does, it runs a preview script. If the script exits with status
-    127 (which usually means that a command was not found), the next appropriate
-    preview is selected, and so on.</p>
+    127 (which usually means that a program that is necessary for generating a
+    preview content is not installed on the system), <b>ctpv</b> attempts to run
+    another appropriate preview and so on. If the script exists with 0 or a any
+    other status, both standard output and standard error are printed.</p>
 </section>
 </section>
 <section class="Sh">
@@ -201,8 +206,25 @@ cmd on-quit $ctpv -e $id
     <i>~/.config/ctpv/config</i> (see <a href="#FILES"><i>FILES</i></a>). Its format somewhat
     resembles one used by <i>lf</i>. There are several &#x201C;commands&#x201D;
     that can be used to change previews or set different settings. Commands are
-    separated by newlines. Comments start with number sign (<b>#</b>) like in
-    many other formats.</p>
+    separated by newlines. Comments start with number sign (<b>#</b>).</p>
+<p class="Pp">Example:</p>
+<dl class="Bl-tag">
+  <dt></dt>
+  <dd>
+    <pre># Set an option
+set forcekitty
+# Add a new preview for man pages (like this one)
+preview manpage .1 {{
+<br/>
+    groff -man -tep -Tutf8 -rLL=&quot;${w}n&quot; &quot;${f}&quot; | col -x
+}}
+# Remove some previews
+remove w3m
+remove lynx
+remove elinks
+    </pre>
+  </dd>
+</dl>
 <section class="Ss">
 <h2 class="Ss" id="Preview_options"><a class="permalink" href="#Preview_options">Preview
   options</a></h2>
@@ -262,7 +284,8 @@ cmd on-quit $ctpv -e $id
     environment: <b>$w</b>, <b>$h</b>, <b>$x</b>, <b>$y</b> and <b>$id</b>.
     However, they are rarely used even by built-in previews and are only set if
     corresponding arguments were passed to <b>ctpv</b> command (see
-    <a href="#SYNOPSIS"><i>SYNOPSIS</i></a>).</p>
+    <a href="#SYNOPSIS"><i>SYNOPSIS</i></a>). There are also <b>$m</b> and <b>$e</b> which store MIME
+    type and extension of <i>file</i>.</p>
 <p class="Pp">You can specify MIME type instead of filename extension in preview
     definition:</p>
 <dl class="Bl-tag">
@@ -302,7 +325,7 @@ cmd on-quit $ctpv -e $id
     </pre>
   </dd>
 </dl>
-<p class="Pp">The snippet above sets priority of preview named
+<p class="Pp">The snippet above sets priority of a built-in preview named
     &#x201C;cat&#x201D; to 1, thus now it's used for all text files. It's
     possible to specify an integer as the second argument to set priority other
     than 1 (may also be negative).</p>
@@ -319,6 +342,8 @@ cmd on-quit $ctpv -e $id
     </pre>
   </dd>
 </dl>
+<p class="Pp">It's useful if you have a program installed on your system but you
+    don't want <b>ctpv</b> to use it for generating previews.</p>
 </section>
 </section>
 <section class="Sh">
@@ -341,7 +366,7 @@ cmd on-quit $ctpv -e $id
 </div>
 <table class="foot">
   <tr>
-    <td class="foot-date">June 2022</td>
+    <td class="foot-date">July 2022</td>
     <td class="foot-os">Linux</td>
   </tr>
 </table>
