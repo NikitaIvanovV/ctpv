@@ -6,9 +6,12 @@ Terminal previewer
 
 ----
 
-ctpv is an utility for previewing various files.
+ctpv is a previewer utility for terminals.
 
-Image previews powered by:
+It supports previews for source code, archives, PDF files, images
+and videos (see [Previews](#previews)).
+
+Image previews are powered by one of these:
 
 * [Überzug](https://github.com/seebye/ueberzug)
 * [Kitty terminal](https://github.com/kovidgoyal/kitty)
@@ -23,8 +26,9 @@ new features.
 
 Originally it was made for [lf](https://github.com/gokcehan/lf)
 file manager but I believe that it can be easily integrated into
-other programs as well if they support previews provided by
-external programs like lf does.
+other programs as well
+(either via configuration file like in lf or a simple wrapper
+script).
 
 ## Dependencies
 

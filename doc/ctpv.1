@@ -1,10 +1,10 @@
 '\" t
 .ds op \&.\|.\|.\&
+.ds ue \(:Uberzug
 .
 .de Sy
 .SY ctpv
 ..
-.
 .de Ys
 .YS
 ..
@@ -30,10 +30,11 @@
 ..
 .
 .
-.TH CTPV 1 "June 2022" Linux "User Manuals"
+.TH CTPV 1 "July 2022" Linux "User Manuals"
+.
 .
 .SH NAME
-ctpv \(em terminal previewer
+ctpv \- terminal previewer
 .
 .
 .SH SYNOPSIS
@@ -65,19 +66,20 @@ ctpv \(em terminal previewer
 .SH DESCRIPTION
 .
 .B ctpv
-is a previewer utility made for integration into other programs.
-It supports a variety of \(lqpreviews\(rq out of the box,
-as well as an option to define custom ones.
-.PP
+is a previewer utility made for integration into other programs like
+.IR lf .
 .
+.PP
 When
 .B ctpv
-is given a file, it determines an appropriate preview for it and
-runs its script.
-The script produces preview content and prints it to standard output.
+is given a
+.IR file ,
+it determines an appropriate preview for it and runs it.
+Depending on the preview and installed programs, it can print
+some text to standard output or display an image.
 Symbolic links are dereferenced.
 .
-.SS Dependencies
+.SS Built-in previews and dependencies
 .
 Previewing each file type requires specific programs.
 If a program is not found on the system,
@@ -149,8 +151,8 @@ Add this snippet to
 .I lf
 configuration file (usually located at
 .IR \(ti/.config/lf/lfrc ).
-.PP
 .
+.PP
 .Ex
 set previewer ctpv
 set cleaner ctpvclear
@@ -161,20 +163,20 @@ cmd on-quit $ctpv -e $id
 .SS Image previews
 .
 Image previews are enabled by either installing
-.I Überzug
+.I \*(ue
 or
 .I Chafa
 (as seen in
-.IR Dependencies )
+.IR "Built-in previews and dependencies" )
 or using built-in image preview functionality of
 .I Kitty
 terminal.
-.PP
 .
+.PP
 When possible,
 .B ctpv
 will prefer
-.I Überzug
+.I \*(ue
 over others image preview methods. You can override this
 behavior by using
 .B forcekitty
@@ -189,19 +191,19 @@ Initially,
 .B ctpv
 retrieves MIME type and extension from
 .I file
-passed in the first argument (MIME type is extracted using
+passed as the first argument (MIME type is extracted using
 .BR libmagic (3)).
-.PP
 .
-Then it creates a list of all previews in a special order,
-where previews that are more specific appear at the top
-and more generic ones at the bottom.
+.PP
+Then it creates a list of all previews respecting user
+configuration in a special order, where previews that are
+more specific appear at the top and more generic ones at the bottom.
 The list can be viewed by using
 .B \-l
-option. The order can be changed, see
-.IR "Setting priority" .
-.PP
+option. The order can be changed (see
+.IR "Setting priority" ).
 .
+.PP
 Finally,
 .B ctpv
 goes through the list starting with the first element
@@ -210,8 +212,12 @@ and checks if a preview matches
 extension and MIME type.
 If it does, it runs a preview script.
 If the script exits with status 127
-(which usually means that a command was not found),
-the next appropriate preview is selected, and so on.
+(which usually means that a program that is necessary for generating
+a preview content is not installed on the system),
+.B ctpv
+attempts to run another appropriate preview and so on.
+If the script exists with 0 or a any other status, both standard output
+and standard error are printed.
 .
 .
 .SH OPTIONS
@@ -256,8 +262,26 @@ There are several \(lqcommands\(rq that can be used to change
 previews or set different settings.
 Commands are separated by newlines.
 Comments start with number sign
-.RB ( # )
-like in many other formats.
+.RB ( # ).
+.
+.PP
+Example:
+.
+.PP
+.Ex
+# Set an option
+set forcekitty
+
+# Add a new preview for man pages (like this one)
+preview manpage .1 {{
+    \&groff -man -tep -Tutf8 -rLL="${w}n" "${f}" | col -x
+}}
+
+# Remove some previews
+remove w3m
+remove lynx
+remove elinks
+.Ee
 .
 .SS Preview options
 .
@@ -302,22 +326,22 @@ A preview itself is a shell script enclosed within double curly
 braces (this particular one utilizes the famous
 .I cowsay
 program):
-.PP
 .
+.PP
 .Ex
 preview cow .moo {{
 \&    cowsay < "$f"
 }}
 .Ee
-.PP
 .
+.PP
 Running
 .I "ctpv\ file.moo"
 where
 .I file.moo
 contains \(lqsome text\(rq will produce the following output:
-.PP
 .
+.PP
 .Ex
 \& ___________ 
 \&< some text >
@@ -328,8 +352,8 @@ contains \(lqsome text\(rq will produce the following output:
 \&                ||----w |
 \&                ||     ||
 .Ee
-.PP
 .
+.PP
 Variable
 .B $f
 stores
@@ -344,8 +368,8 @@ because otherwise the script will not work as
 expected if
 .B $f
 stores a filename with whitespace.
-.PP
 .
+.PP
 There are other variables that are exported into preview
 script environment:
 .BR $w ,
@@ -359,31 +383,37 @@ are only set if corresponding arguments were passed to
 .B ctpv
 command (see
 .IR SYNOPSIS ).
-.PP
+There are also
+.B $m
+and
+.B $e
+which store MIME type and extension of
+.IR file .
 .
+.PP
 You can specify MIME type instead of filename extension
 in preview definition:
-.PP
 .
+.PP
 .Ex
 preview json_example application/json {{
 \&    # preview json files
 }}
 .Ee
-.PP
 .
+.PP
 And you also can omit subtype part of the MIME type
 by replacing it with
 .BR * .
-.PP
 .
+.PP
 .Ex
 preview any_text_example text/* {{
 \&    # this one applies to all text files
 }}
 .Ee
-.PP
 .
+.PP
 Setting subtype to
 .B *
 will make the preview above work for any file which MIME type starts with
@@ -397,15 +427,15 @@ only the top one in the list is chosen (see
 To alter this behavior, you can use
 .B priority
 command to change preview priority:
-.PP
 .
+.PP
 .Ex
 priority cat
 .Ee
-.PP
 .
-The snippet above sets priority of preview named \(lqcat\(rq to 1,
-thus now it's used for all text files.
+.PP
+The snippet above sets priority of a built-in preview named \(lqcat\(rq
+to 1, thus now it's used for all text files.
 It's possible to specify an integer as the second argument
 to set priority other than 1 (may also be negative).
 .
@@ -413,13 +443,17 @@ to set priority other than 1 (may also be negative).
 .
 .B remove
 command simply removes a preview (also works for built-in ones):
-.PP
 .
+.PP
 .Ex
 remove cat
 .Ee
-.PP
 .
+.PP
+It's useful if you have a program installed on your system but you
+don't want
+.B ctpv
+to use it for generating previews.
 .
 .SH FILES
 .
