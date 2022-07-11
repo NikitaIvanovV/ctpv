@@ -9,6 +9,19 @@ newf() {
 	mktemp --tmpdir="$tmpd" 'XXX'
 }
 
+# Make paragraphs one line so sed can properly process it
+norm() {
+	sed '
+		/^<p/ {
+			:a
+			\|</p>|b
+			N
+			s/\n\s*/ /
+			ba
+		}
+	'
+}
+
 html="$(newf)"
 cmds="$(newf)"
 
@@ -30,4 +43,4 @@ sed -n '
 ' "$html" > "$cmds"
 
 # Run generated commands
-sed -f "$cmds" "$html"
+norm < "$html" | sed -f "$cmds"
