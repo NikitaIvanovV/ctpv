@@ -182,13 +182,18 @@ cmd on-quit $ctpv -e $id
   <dt></dt>
   <dd>
     <pre># Set an option
-set forcekitty
-# Add a new preview for man pages (like this one)
+set forcekitty</pre>
+  </dd>
+  <dt></dt>
+  <dd>
+    <pre># Add a new preview for man pages (like this one)
 preview manpage .1 {{
-<br/>
     groff -man -tep -Tutf8 -rLL=&quot;${w}n&quot; &quot;${f}&quot; | col -x
-}}
-# Remove some previews
+}}</pre>
+  </dd>
+  <dt></dt>
+  <dd>
+    <pre># Remove some previews
 remove w3m
 remove lynx
 remove elinks
