@@ -113,6 +113,9 @@ T}
 directory	T{
 ls
 T}
+gpg-encrypted	T{
+gpg
+T}
 html	T{
 elinks lynx w3m
 T}
@@ -315,6 +318,13 @@ Print only text and do not use any image previewing method.
 .TP
 .B nosymlinkinfo
 Do not print resolved path of symbolic links.
+.
+.TP
+.B showgpg
+Preview
+.BR gpg (1)
+encrypted files.
+Filename must have \(lq.gpg\(rq extension.
 .
 .SS Defining custom previews
 .

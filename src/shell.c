@@ -42,6 +42,7 @@ int run_script(char *script, size_t script_len, int *exitcode, int *signal,
     OPT_SETENV(forcechafa);
     OPT_SETENV(noimages);
     OPT_SETENV(nosymlinkinfo);
+    OPT_SETENV(showgpg);
 
     char *scr = prepend_helpers(script, script_len);
     char *args[] = SHELL_ARGS(scr);

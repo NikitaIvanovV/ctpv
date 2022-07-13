@@ -51,6 +51,7 @@ static struct Option options[] = {
     DEF_OPTION_BOOL(forcechafa),
     DEF_OPTION_BOOL(noimages),
     DEF_OPTION_BOOL(nosymlinkinfo),
+    DEF_OPTION_BOOL(showgpg),
 };
 
 static void any_type_null(char **s)
@@ -78,6 +79,7 @@ static void add_preview(char *name, char *script, char *type, char *subtype,
         .type = type,
         .subtype = subtype,
         .ext = ext,
+        .attrs = PREV_ATTR_NONE,
         .order = 1 /* custom previews are always prioritized */
     };
 

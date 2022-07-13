@@ -24,7 +24,7 @@ function process_file(file,   i, line, arr, t, p, p_len) {
         return
     }
 
-    if (match(line, /^#\s*(\w+):\s*(.*)/, arr) == 0)
+    if (match(line, /^#\s*([a-zA-Z0-9_-]+):\s*(.*)/, arr) == 0)
         return
 
     t = arr[1]

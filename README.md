@@ -54,6 +54,7 @@ For example, you only need either `elinks`, `lynx` or
 | archive | `atool` |
 | diff | `colordiff` `delta` `diff-so-fancy` |
 | directory | `ls` |
+| gpg-encrypted | `gpg` |
 | html | `elinks` `lynx` `w3m` |
 | image | `ueberzug` `chafa` |
 | json | `jq` |

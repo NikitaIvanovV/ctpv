@@ -89,11 +89,19 @@ static void break_mimetype(char *mimetype, char **type, char **subtype)
 static Preview *find_preview(const char *type, const char *subtype, const char *ext, size_t *i)
 {
     Preview *p;
+    const char *rext;
 
     for (; *i < previews.len; (*i)++) {
         p = previews.list[*i];
 
-        if (p->ext && strcmpnull(p->ext, ext) != 0)
+        if (p->attrs & PREV_ATTR_EXT_SHORT) {
+            if ((rext = strrchr(ext, '.')))
+                rext += 1;
+        } else {
+            rext = ext;
+        }
+
+        if (p->ext && strcmpnull(p->ext, rext) != 0)
             continue;
 
         if (p->type && strcmpnull(p->type, type) != 0)

@@ -7,9 +7,15 @@
 
 #define MIMETYPE_MAX 64
 
+enum PreviewAttr {
+    PREV_ATTR_NONE = 0,
+    PREV_ATTR_EXT_SHORT = 1 << 0,
+};
+
 typedef struct {
     char *name, *ext, *type, *subtype, *script;
     int order, priority;
+    enum PreviewAttr attrs;
     size_t script_len;
 } Preview;
 
