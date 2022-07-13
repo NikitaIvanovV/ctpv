@@ -248,23 +248,23 @@ uses a configuration file usually located at
 .IR FILES ).
 Its format somewhat resembles one used by
 .IR lf .
-There are several \(lqcommands\(rq that can be used to change
+There are several commands that can be used to add
 previews or set different settings.
 Commands are separated by newlines.
 Comments start with number sign
-.RB ( # ).
+.RB \(lq # \(rq.
 .
 .PP
 Example:
 .
-.IP
 .EX
+.IP
 # Set an option
 set forcekitty
 .IP
-# Add a new preview for man pages (like this one)
-preview manpage .1 {{
-\&    groff -man -tep -Tutf8 -rLL="${w}n" "${f}" | col -x
+# Add a new preview
+preview cow .moo {{
+\&    cowsay < "$f"
 }}
 .IP
 # Remove some previews
@@ -315,39 +315,43 @@ Filename must have \(lq.gpg\(rq extension.
 .
 .SS Defining custom previews
 .
-A snippet below defines a new preview with name
-.I cow
-that applies to files with extension
-.IR .moo .
+User-defined previews are added with
+.B preview
+command.
+.
+.PP
+An example below defines a new preview with name \(lqmanpage\(rq
+that applies to files with extension \(lq.1\(rq.
 A preview itself is a shell script enclosed within double curly
-braces (this particular one utilizes the famous
-.I cowsay
-program):
+braces.
 .
 .IP
 .EX
-preview cow .moo {{
-\&    cowsay < "$f"
+preview manpage .1 {{
+\&    groff -man -tep -Tutf8 -rLL="${w}n" "${f}" | col -x
 }}
 .EE
 .
 .PP
 Running
-.I "ctpv\ file.moo"
+.I "ctpv\ file.1"
 where
-.I file.moo
-contains \(lqsome text\(rq will produce the following output:
+.I file.1
+is a source code for a manpage will run
+.BR groff (1)
+to produce a formatted manpage like the one you are reading.
+.
+.PP
+Manpages filenames may also end with other extensions:
+\(lq.2\(rq,\(lq.3\(rq,\(lq.4\(rq and so on.
+It's possible to make user-defines previews apply to several
+file types at once:
 .
 .IP
 .EX
-\& ___________ 
-\&< some text >
-\& ----------- 
-\&        \\   ^__^
-\&         \\  (oo)\\_______
-\&            (__)\\       )\\/\\
-\&                ||----w |
-\&                ||     ||
+preview manpage .1 .2 .3 .4 .5 .6 .7 .8 {{
+\&    # groff command
+}}
 .EE
 .
 .PP
@@ -401,7 +405,7 @@ preview json_example application/json {{
 .PP
 You can omit subtype part of the MIME type
 by replacing it with
-.BR * .
+.RB \(lq * \(rq.
 .
 .IP
 .EX
@@ -412,8 +416,8 @@ preview any_text_example text/* {{
 .
 .PP
 Setting subtype to
-.B *
-will make the preview above work for any file which MIME type starts with
+.RB \(lq * \(rq
+will make the preview above apply to any file which MIME type starts with
 .BR text/ .
 .
 .SS Setting priority
