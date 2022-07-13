@@ -182,7 +182,7 @@ cmd on-quit $ctpv -e $id
 </section>
 <section class="Sh">
 <h1 class="Sh" id="CONFIGURATION"><a class="permalink" href="#CONFIGURATION">CONFIGURATION</a></h1>
-<p class="Pp"><b>ctpv</b> uses a configuration file usually located at <i>~/.config/ctpv/config</i> (see <a href="#FILES"><i>FILES</i></a>). Its format somewhat resembles one used by <i>lf</i>. There are several &#x201C;commands&#x201D; that can be used to change previews or set different settings. Commands are separated by newlines. Comments start with number sign (<b>#</b>).</p>
+<p class="Pp"><b>ctpv</b> uses a configuration file usually located at <i>~/.config/ctpv/config</i> (see <a href="#FILES"><i>FILES</i></a>). Its format somewhat resembles one used by <i>lf</i>. There are several commands that can be used to add previews or set different settings. Commands are separated by newlines. Comments start with number sign &#x201C;<b>#</b>&#x201D;.</p>
 <p class="Pp">Example:</p>
 <dl class="Bl-tag">
   <dt></dt>
@@ -192,9 +192,9 @@ set forcekitty</pre>
   </dd>
   <dt></dt>
   <dd>
-    <pre># Add a new preview for man pages (like this one)
-preview manpage .1 {{
-    groff -man -tep -Tutf8 -rLL=&quot;${w}n&quot; &quot;${f}&quot; | col -x
+    <pre># Add a new preview
+preview cow .moo {{
+    cowsay &lt; &quot;$f&quot;
 }}</pre>
   </dd>
   <dt></dt>
@@ -231,28 +231,25 @@ remove elinks
 <section class="Ss">
 <h2 class="Ss" id="Defining_custom_previews"><a class="permalink" href="#Defining_custom_previews">Defining
   custom previews</a></h2>
-<p class="Pp">A snippet below defines a new preview with name <i>cow</i> that applies to files with extension <i>.moo</i>. A preview itself is a shell script enclosed within double curly braces (this particular one utilizes the famous <i>cowsay</i> program):</p>
+<p class="Pp">User-defined previews are added with <b>preview</b> command.</p>
+<p class="Pp">An example below defines a new preview with name &#x201C;manpage&#x201D; that applies to files with extension &#x201C;.1&#x201D;. A preview itself is a shell script enclosed within double curly braces.</p>
 <dl class="Bl-tag">
   <dt></dt>
   <dd>
-    <pre>preview cow .moo {{
-    cowsay &lt; &quot;$f&quot;
+    <pre>preview manpage .1 {{
+    groff -man -tep -Tutf8 -rLL=&quot;${w}n&quot; &quot;${f}&quot; | col -x
 }}
     </pre>
   </dd>
 </dl>
-<p class="Pp">Running <i>ctpv&#x00A0;file.moo</i> where <i>file.moo</i> contains &#x201C;some text&#x201D; will produce the following output:</p>
+<p class="Pp">Running <i>ctpv&#x00A0;file.1</i> where <i>file.1</i> is a source code for a manpage will run <b>groff</b>(1) to produce a formatted manpage like the one you are reading.</p>
+<p class="Pp">Manpages filenames may also end with other extensions: &#x201C;.2&#x201D;,&#x201C;.3&#x201D;,&#x201C;.4&#x201D; and so on. It's possible to make user-defines previews apply to several file types at once:</p>
 <dl class="Bl-tag">
   <dt></dt>
   <dd>
-    <pre> ___________ 
-&lt; some text &gt;
- ----------- 
-        \   ^__^
-         \  (oo)\_______
-            (__)\       )\/\
-                ||----w |
-                ||     ||
+    <pre>preview manpage .1 .2 .3 .4 .5 .6 .7 .8 {{
+    # groff command
+}}
     </pre>
   </dd>
 </dl>
@@ -268,7 +265,7 @@ remove elinks
     </pre>
   </dd>
 </dl>
-<p class="Pp">You can omit subtype part of the MIME type by replacing it with <b>*</b>.</p>
+<p class="Pp">You can omit subtype part of the MIME type by replacing it with &#x201C;<b>*</b>&#x201D;.</p>
 <dl class="Bl-tag">
   <dt></dt>
   <dd>
@@ -278,7 +275,7 @@ remove elinks
     </pre>
   </dd>
 </dl>
-<p class="Pp">Setting subtype to <b>*</b> will make the preview above work for any file which MIME type starts with <b>text/</b>.</p>
+<p class="Pp">Setting subtype to &#x201C;<b>*</b>&#x201D; will make the preview above apply to any file which MIME type starts with <b>text/</b>.</p>
 </section>
 <section class="Ss">
 <h2 class="Ss" id="Setting_priority"><a class="permalink" href="#Setting_priority">Setting
