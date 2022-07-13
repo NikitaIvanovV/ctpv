@@ -302,7 +302,7 @@ static Token read_punct(Lexer *ctx, int type, char *s, int n)
     int ret = cmp_nextn(ctx, n, s);
 
     if (ret == 0)
-        tok.type = type;
+        tok = get_tok(ctx, type);
     else
         return get_tok(ctx, TOK_NULL);
 
