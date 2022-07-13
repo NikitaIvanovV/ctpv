@@ -89,6 +89,10 @@
     <td><i>ls</i></td>
   </tr>
   <tr>
+    <td>gpg-encrypted</td>
+    <td><i>gpg</i></td>
+  </tr>
+  <tr>
     <td>html</td>
     <td><i>elinks lynx w3m</i></td>
   </tr>
@@ -133,6 +137,7 @@
   <dd>Add this snippet to <i>lf</i> configuration file (usually located at
       <i>~/.config/lf/lfrc</i>).</dd>
 </dl>
+<div class="Bd-indent">
 <dl class="Bl-tag">
   <dt></dt>
   <dd>
@@ -143,6 +148,7 @@ cmd on-quit $ctpv -e $id
     </pre>
   </dd>
 </dl>
+</div>
 </section>
 <section class="Ss">
 <h2 class="Ss" id="Image_previews"><a class="permalink" href="#Image_previews">Image
@@ -217,6 +223,9 @@ remove elinks
   <dd>Print only text and do not use any image previewing method.</dd>
   <dt id="nosymlinkinfo"><a class="permalink" href="#nosymlinkinfo"><b>nosymlinkinfo</b></a></dt>
   <dd>Do not print resolved path of symbolic links.</dd>
+  <dt id="showgpg"><a class="permalink" href="#showgpg"><b>showgpg</b></a></dt>
+  <dd>Preview <b>gpg</b>(1) encrypted files. Filename must have
+      &#x201C;.gpg&#x201D; extension.</dd>
 </dl>
 </section>
 <section class="Ss">
@@ -259,7 +268,7 @@ remove elinks
     </pre>
   </dd>
 </dl>
-<p class="Pp">And you also can omit subtype part of the MIME type by replacing it with <b>*</b>.</p>
+<p class="Pp">You can omit subtype part of the MIME type by replacing it with <b>*</b>.</p>
 <dl class="Bl-tag">
   <dt></dt>
   <dd>
