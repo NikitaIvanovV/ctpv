@@ -22,6 +22,8 @@
 #define DEF_OPTION_INT(name)        DEF_OPTION(name, OPTION_INT, i)
 #define DEF_OPTION_STR(name)        DEF_OPTION(name, OPTION_STR, s)
 
+#define TYPE_SET_EMPTY (struct TypeSet){ NULL, NULL, NULL }
+
 struct Option {
     char *name;
     enum {
@@ -33,6 +35,10 @@ struct Option {
         int *i;
         char **s;
     } arg_val;
+};
+
+struct TypeSet {
+    char *type, *subtype, *ext;
 };
 
 enum {
@@ -60,30 +66,32 @@ static void any_type_null(char **s)
         *s = NULL;
 }
 
-static void add_preview(char *name, char *script, char *type, char *subtype,
-                        char *ext)
+static void add_preview(char *name, char *script, struct TypeSet *set,
+                        unsigned int set_len)
 {
     if (!previews)
         return;
 
-    any_type_null(&type);
-    any_type_null(&subtype);
+    size_t script_len = strlen(script) + 1;
 
-    if (subtype && strcmp(subtype, any_type) == 0)
-        subtype = NULL;
+    for (unsigned int i = 0; i < set_len; i++) {
+        any_type_null(&set[i].type);
+        any_type_null(&set[i].subtype);
 
-    Preview p = (Preview){
-        .name = name,
-        .script = script,
-        .script_len = strlen(script) + 1,
-        .type = type,
-        .subtype = subtype,
-        .ext = ext,
-        .attrs = PREV_ATTR_NONE,
-        .order = 1 /* custom previews are always prioritized */
-    };
+        Preview p = (Preview){
+            .name = name,
+            .script = script,
+            .script_len = script_len,
+            .ext = set[i].ext,
+            .type = set[i].type,
+            .subtype = set[i].subtype,
+            .attrs = PREV_ATTR_NONE,
+            .order = 1, /* custom previews are always prioritized */
+            .priority = 0
+        };
 
-    vectorPreview_append(previews, p);
+        vectorPreview_append(previews, p);
+    }
 }
 
 static int add_priority(char *name, int priority)
@@ -166,9 +174,9 @@ static int preview_type_mime_part(char **s)
 {
     NOT_ACCEPT(TOK_STAR);
 
-    Token t = token;
+    Token tok = token;
     EXPECT(TOK_STR);
-    *s = t.val.s;
+    *s = tok.val.s;
 
     return STAT_OK;
 }
@@ -192,16 +200,18 @@ static inline void reset_lexer_opts(void)
     lexer_set_opts(lexer, LEX_OPT_NONE);
 }
 
-static int preview_type(char **type, char **subtype, char **ext)
+static int preview_type(struct TypeSet *set)
 {
     int ret;
 
+    *set = TYPE_SET_EMPTY;
+
     num_is_text();
 
-    if ((ret = preview_type_ext(ext)) != STAT_NULL)
+    if ((ret = preview_type_ext(&set->ext)) != STAT_NULL)
         goto exit;
 
-    ret = preview_type_mime(type, subtype);
+    ret = preview_type_mime(&set->type, &set->subtype);
 
 exit:
     reset_lexer_opts();
@@ -256,12 +266,17 @@ static int cmd_preview(void)
     Token name = token;
     EXPECT(TOK_STR);
 
-    char *type = NULL, *subtype = NULL, *ext = NULL;
-    CHECK_OK(preview_type(&type, &subtype, &ext));
+    struct TypeSet types[16];
+    unsigned int types_len = 0;
 
-    if (accept(TOK_BLK_OPEN) == STAT_NULL) {
-        CHECK_OK(preview_type(&type, &subtype, &ext));
-        EXPECT(TOK_BLK_OPEN);
+    while (accept(TOK_BLK_OPEN) == STAT_NULL) {
+        if (types_len >= LEN(types)) {
+            PARSEERROR(name, "a preview can only have up through %lu types",
+                       LEN(types));
+            return STAT_ERR;
+        }
+
+        CHECK_OK(preview_type(types + types_len++));
     }
 
     Token script = token;
@@ -269,7 +284,7 @@ static int cmd_preview(void)
 
     EXPECT(TOK_BLK_CLS);
 
-    add_preview(name.val.s, script.val.s, type, subtype, ext);
+    add_preview(name.val.s, script.val.s, types, types_len);
     return STAT_OK;
 }
 
