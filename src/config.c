@@ -146,8 +146,8 @@ static int expect(enum TokenType type)
         return STAT_ERR;
 
     PARSEERROR(token, "unexpected token: %s, expected: %s",
-                 lexer_token_type_str(token.type),
-                 lexer_token_type_str(type));
+               lexer_token_type_str(token.type),
+               lexer_token_type_str(type));
     return STAT_ERR;
 }
 

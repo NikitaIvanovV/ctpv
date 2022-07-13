@@ -2,13 +2,6 @@
 .ds op \&.\|.\|.\&
 .ds ue \(:Uberzug
 .
-.de Sy
-.SY ctpv
-..
-.de Ys
-.YS
-..
-.
 .de Op
 .RI [ "\\$1" "]\\$2"
 ..
@@ -21,14 +14,6 @@
 \&\fB\\$1\fP \fI\\$2\fP\\$3
 ..
 .
-.de Ex
-.IP
-.EX
-..
-.de Ee
-.EE
-..
-.
 .
 .TH CTPV 1 "July 2022" Linux "User Manuals"
 .
@@ -39,28 +24,28 @@ ctpv \- terminal previewer
 .
 .SH SYNOPSIS
 .
-.Sy
+.SY ctpv
 .I file
 .Op w
 .Op h
 .Op x
 .Op y
 .Op id
-.Ys
+.YS
 .
-.Sy
+.SY ctpv
 .B \-l
-.Ys
+.YS
 .
-.Sy
+.SY ctpv
 .B \-m
 .Om files
-.Ys
+.YS
 .
-.Sy
+.SY ctpv
 .RB { \-s | \-c | \-e }
 .I id
-.Ys
+.YS
 .
 .
 .SH DESCRIPTION
@@ -155,13 +140,15 @@ Add this snippet to
 configuration file (usually located at
 .IR \(ti/.config/lf/lfrc ).
 .
-.PP
-.Ex
+.RS 4
+.IP
+.EX
 set previewer ctpv
 set cleaner ctpvclear
 &ctpv -s $id
 cmd on-quit $ctpv -e $id
-.Ee
+.EE
+.RE
 .
 .SS Image previews
 .
@@ -270,8 +257,8 @@ Comments start with number sign
 .PP
 Example:
 .
-.PP
-.Ex
+.IP
+.EX
 # Set an option
 set forcekitty
 .IP
@@ -284,7 +271,7 @@ preview manpage .1 {{
 remove w3m
 remove lynx
 remove elinks
-.Ee
+.EE
 .
 .SS Preview options
 .
@@ -337,12 +324,12 @@ braces (this particular one utilizes the famous
 .I cowsay
 program):
 .
-.PP
-.Ex
+.IP
+.EX
 preview cow .moo {{
 \&    cowsay < "$f"
 }}
-.Ee
+.EE
 .
 .PP
 Running
@@ -351,8 +338,8 @@ where
 .I file.moo
 contains \(lqsome text\(rq will produce the following output:
 .
-.PP
-.Ex
+.IP
+.EX
 \& ___________ 
 \&< some text >
 \& ----------- 
@@ -361,7 +348,7 @@ contains \(lqsome text\(rq will produce the following output:
 \&            (__)\\       )\\/\\
 \&                ||----w |
 \&                ||     ||
-.Ee
+.EE
 .
 .PP
 Variable
@@ -404,24 +391,24 @@ which store MIME type and extension of
 You can specify MIME type instead of filename extension
 in preview definition:
 .
-.PP
-.Ex
+.IP
+.EX
 preview json_example application/json {{
 \&    # preview json files
 }}
-.Ee
+.EE
 .
 .PP
-And you also can omit subtype part of the MIME type
+You can omit subtype part of the MIME type
 by replacing it with
 .BR * .
 .
-.PP
-.Ex
+.IP
+.EX
 preview any_text_example text/* {{
 \&    # this one applies to all text files
 }}
-.Ee
+.EE
 .
 .PP
 Setting subtype to
@@ -438,10 +425,10 @@ To alter this behavior, you can use
 .B priority
 command to change preview priority:
 .
-.PP
-.Ex
+.IP
+.EX
 priority cat
-.Ee
+.EE
 .
 .PP
 The snippet above sets priority of a built-in preview named \(lqcat\(rq
@@ -454,10 +441,10 @@ to set priority other than 1 (may also be negative).
 .B remove
 command simply removes a preview (also works for built-in ones):
 .
-.PP
-.Ex
+.IP
+.EX
 remove cat
-.Ee
+.EE
 .
 .PP
 It's useful if you have a program installed on your system but you

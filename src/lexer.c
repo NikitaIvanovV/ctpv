@@ -30,7 +30,7 @@ struct Lexer {
     } tok_pos;
     InputBuffer input_buf;
     TokenQueue tok_queue;
-    UList      *text_buf;
+    UList *text_buf;
 };
 
 static char block_open[] = "{{",
