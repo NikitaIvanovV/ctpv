@@ -94,7 +94,7 @@ static Preview *find_preview(const char *type, const char *subtype, const char *
     for (; *i < previews.len; (*i)++) {
         p = previews.list[*i];
 
-        if (p->attrs & PREV_ATTR_EXT_SHORT) {
+        if (ext && (p->attrs & PREV_ATTR_EXT_SHORT)) {
             if ((rext = strrchr(ext, '.')))
                 rext += 1;
         } else {
