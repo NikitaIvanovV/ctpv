@@ -86,7 +86,8 @@ static void break_mimetype(char *mimetype, char **type, char **subtype)
     *subtype = &s[1];
 }
 
-static Preview *find_preview(const char *type, const char *subtype, const char *ext, size_t *i)
+static Preview *find_preview(const char *type, const char *subtype,
+                             const char *ext, size_t *i)
 {
     Preview *p;
     const char *rext;
