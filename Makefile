@@ -14,6 +14,8 @@ LIBS := magic crypto
 CFLAGS  += $(O) -MD -Wall -Wextra -Wno-unused-parameter
 LDFLAGS += $(addprefix -l,$(LIBS))
 
+INSTALL := install
+
 all: ctpv
 
 options:
@@ -24,12 +26,12 @@ options:
 install: install.bin install.man
 
 install.bin: ctpv ctpvclear
-	install -d $(BINPREFIX)
-	install $^ $(BINPREFIX)
+	$(INSTALL) -d $(BINPREFIX)
+	$(INSTALL) $^ $(BINPREFIX)
 
 install.man: doc/ctpv.1
-	install -d $(MANPREFIX)
-	install -m 0644 $^ $(MANPREFIX)
+	$(INSTALL) -d $(MANPREFIX)
+	$(INSTALL) -m 0644 $^ $(MANPREFIX)
 
 uninstall:
 	$(RM) $(BINPREFIX)/ctpv $(BINPREFIX)/ctpvclear $(MANPREFIX)/ctpv.1
