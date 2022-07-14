@@ -1,6 +1,7 @@
 #include "ctpv.h"
 #include "lexer.h"
 #include "error.h"
+#include "config.h"
 #include "preview.h"
 
 #define CHECK(f, cond) \
@@ -13,9 +14,9 @@
 #define CHECK_OK(f)   CHECK(f, x == STAT_OK)
 #define CHECK_NULL(f) CHECK(f, x == STAT_NULL)
 
-#define EXPECT(x)     CHECK_OK(expect(x))
-#define ACCEPT(x)     CHECK_OK(accept(x))
-#define NOT_ACCEPT(x) CHECK_NULL(accept(x))
+#define EXPECT(c, x)     CHECK_OK(expect(c, x))
+#define ACCEPT(c, x)     CHECK_OK(accept(c, x))
+#define NOT_ACCEPT(c, x) CHECK_NULL(accept(c, x))
 
 #define DEF_OPTION(name, type, val) { (#name), (type), { .val = &ctpv.opts.name } }
 #define DEF_OPTION_BOOL(name)       DEF_OPTION(name, OPTION_BOOL, i)
@@ -23,6 +24,12 @@
 #define DEF_OPTION_STR(name)        DEF_OPTION(name, OPTION_STR, s)
 
 #define TYPE_SET_EMPTY (struct TypeSet){ NULL, NULL, NULL }
+
+struct Parser {
+    Lexer *lexer;
+    Token token;
+    VectorPreview *previews;
+};
 
 struct Option {
     char *name;
@@ -47,10 +54,6 @@ enum {
     STAT_NULL,
 };
 
-static Lexer *lexer;
-static Token token;
-static VectorPreview *previews;
-
 static struct Option options[] = {
     DEF_OPTION_BOOL(forcekitty),
     DEF_OPTION_BOOL(forcekittyanim),
@@ -66,10 +69,10 @@ static void any_type_null(char **s)
         *s = NULL;
 }
 
-static void add_preview(char *name, char *script, struct TypeSet *set,
+static void add_preview(Parser *ctx, char *name, char *script, struct TypeSet *set,
                         unsigned int set_len)
 {
-    if (!previews)
+    if (!ctx->previews)
         return;
 
     size_t script_len = strlen(script) + 1;
@@ -90,131 +93,131 @@ static void add_preview(char *name, char *script, struct TypeSet *set,
             .priority = 0
         };
 
-        vectorPreview_append(previews, p);
+        vectorPreview_append(ctx->previews, p);
     }
 }
 
-static int add_priority(char *name, int priority)
+static int add_priority(Parser *ctx, char *name, int priority)
 {
-    if (!previews)
+    if (!ctx->previews)
         return OK;
 
     int found = 0;
 
-    for (size_t i = 0; i < previews->len; i++) {
-        if (strcmp(previews->buf[i].name, name) != 0)
+    for (size_t i = 0; i < ctx->previews->len; i++) {
+        if (strcmp(ctx->previews->buf[i].name, name) != 0)
             continue;
 
-        previews->buf[i].priority = priority;
+        ctx->previews->buf[i].priority = priority;
         found = 1;
     }
 
     return found ? OK : ERR;
 }
 
-static int remove_preview(char *name)
+static int remove_preview(Parser *ctx, char *name)
 {
-    if (!previews)
+    if (!ctx->previews)
         return OK;
 
     int found = 0;
 
-    for (ssize_t i = previews->len - 1; i >= 0; i--) {
-        if (strcmp(previews->buf[i].name, name) != 0)
+    for (ssize_t i = ctx->previews->len - 1; i >= 0; i--) {
+        if (strcmp(ctx->previews->buf[i].name, name) != 0)
             continue;
 
-        vectorPreview_remove(previews, i);
+        vectorPreview_remove(ctx->previews, i);
         found = 1;
     }
 
     return found ? OK : ERR;
 }
 
-static inline void next_token(void)
+static inline void next_token(Parser *ctx)
 {
-    token = lexer_get_token(lexer);
+    ctx->token = lexer_get_token(ctx->lexer);
 }
 
-static int accept(enum TokenType type)
+static int accept(Parser *ctx, enum TokenType type)
 {
-    if (token.type == type) {
-        next_token();
+    if (ctx->token.type == type) {
+        next_token(ctx);
         return STAT_OK;
     }
 
     return STAT_NULL;
 }
 
-static int expect(enum TokenType type)
+static int expect(Parser *ctx, enum TokenType type)
 {
-    if (accept(type) == STAT_OK)
+    if (accept(ctx, type) == STAT_OK)
         return STAT_OK;
 
-    if (token.type == TOK_ERR)
+    if (ctx->token.type == TOK_ERR)
         return STAT_ERR;
 
-    PARSEERROR(token, "unexpected token: %s, expected: %s",
-               lexer_token_type_str(token.type),
+    PARSEERROR(ctx->token, "unexpected token: %s, expected: %s",
+               lexer_token_type_str(ctx->token.type),
                lexer_token_type_str(type));
     return STAT_ERR;
 }
 
-static int preview_type_ext(char **ext)
+static int preview_type_ext(Parser *ctx, char **ext)
 {
-    ACCEPT(TOK_DOT);
+    ACCEPT(ctx, TOK_DOT);
 
-    Token tok = token;
-    EXPECT(TOK_STR);
+    Token tok = ctx->token;
+    EXPECT(ctx, TOK_STR);
     *ext = tok.val.s;
 
     return STAT_OK;
 }
 
-static int preview_type_mime_part(char **s)
+static int preview_type_mime_part(Parser *ctx, char **s)
 {
-    NOT_ACCEPT(TOK_STAR);
+    NOT_ACCEPT(ctx, TOK_STAR);
 
-    Token tok = token;
-    EXPECT(TOK_STR);
+    Token tok = ctx->token;
+    EXPECT(ctx, TOK_STR);
     *s = tok.val.s;
 
     return STAT_OK;
 }
 
-static int preview_type_mime(char **type, char **subtype)
+static int preview_type_mime(Parser *ctx, char **type, char **subtype)
 {
-    CHECK_OK(preview_type_mime_part(type));
-    EXPECT(TOK_SLASH);
-    CHECK_OK(preview_type_mime_part(subtype));
+    CHECK_OK(preview_type_mime_part(ctx, type));
+    EXPECT(ctx, TOK_SLASH);
+    CHECK_OK(preview_type_mime_part(ctx, subtype));
 
     return STAT_OK;
 }
 
-static inline void num_is_text(void)
+static inline void num_is_text(Parser *ctx)
 {
-    lexer_set_opts(lexer, LEX_OPT_NUMISTEXT);
+    lexer_set_opts(ctx->lexer, LEX_OPT_NUMISTEXT);
 }
 
-static inline void reset_lexer_opts(void)
+static inline void reset_lexer_opts(Parser *ctx)
 {
-    lexer_set_opts(lexer, LEX_OPT_NONE);
+    lexer_set_opts(ctx->lexer, LEX_OPT_NONE);
 }
 
-static int preview_type(struct TypeSet *set)
+static int preview_type(Parser *ctx, struct TypeSet *set)
 {
     int ret;
 
     *set = TYPE_SET_EMPTY;
 
-    num_is_text();
+    num_is_text(ctx);
 
-    if ((ret = preview_type_ext(&set->ext)) != STAT_NULL)
+    if ((ret = preview_type_ext(ctx, &set->ext)) != STAT_NULL)
         goto exit;
 
-    ret = preview_type_mime(&set->type, &set->subtype);
+    ret = preview_type_mime(ctx, &set->type, &set->subtype);
 
 exit:
-    reset_lexer_opts();
+    reset_lexer_opts(ctx);
     return ret;
 }
 
@@ -228,10 +231,10 @@ static struct Option *get_option(char *name)
     return NULL;
 }
 
-static int cmd_set(void)
+static int cmd_set(Parser *ctx)
 {
-    Token name = token;
-    EXPECT(TOK_STR);
+    Token name = ctx->token;
+    EXPECT(ctx, TOK_STR);
 
     struct Option *opt = get_option(name.val.s);
     if (!opt) {
@@ -239,18 +242,18 @@ static int cmd_set(void)
         return STAT_ERR;
     }
 
-    Token value = token;
+    Token value = ctx->token;
 
     switch (opt->arg_type) {
     case OPTION_BOOL:
-        *opt->arg_val.i = accept(TOK_INT) == STAT_OK ? value.val.i : 1;
+        *opt->arg_val.i = accept(ctx, TOK_INT) == STAT_OK ? value.val.i : 1;
         break;
     case OPTION_INT:
-        EXPECT(TOK_INT);
+        EXPECT(ctx, TOK_INT);
         *opt->arg_val.i = value.val.i;
         break;
     case OPTION_STR:
-        EXPECT(TOK_STR);
+        EXPECT(ctx, TOK_STR);
         *opt->arg_val.s = value.val.s;
         break;
     default:
@@ -261,42 +264,42 @@ static int cmd_set(void)
     return STAT_OK;
 }
 
-static int cmd_preview(void)
+static int cmd_preview(Parser *ctx)
 {
-    Token name = token;
-    EXPECT(TOK_STR);
+    Token name = ctx->token;
+    EXPECT(ctx, TOK_STR);
 
     struct TypeSet types[16];
     unsigned int types_len = 0;
 
-    while (accept(TOK_BLK_OPEN) == STAT_NULL) {
+    while (accept(ctx, TOK_BLK_OPEN) == STAT_NULL) {
         if (types_len >= LEN(types)) {
             PARSEERROR(name, "a preview can only have up through %lu types",
                        LEN(types));
             return STAT_ERR;
         }
 
-        CHECK_OK(preview_type(types + types_len++));
+        CHECK_OK(preview_type(ctx, types + types_len++));
     }
 
-    Token script = token;
-    EXPECT(TOK_STR);
+    Token script = ctx->token;
+    EXPECT(ctx, TOK_STR);
 
-    EXPECT(TOK_BLK_CLS);
+    EXPECT(ctx, TOK_BLK_CLS);
 
-    add_preview(name.val.s, script.val.s, types, types_len);
+    add_preview(ctx, name.val.s, script.val.s, types, types_len);
     return STAT_OK;
 }
 
-static int cmd_priority(Token tok)
+static int cmd_priority(Parser *ctx)
 {
-    Token name = token;
-    EXPECT(TOK_STR);
+    Token name = ctx->token;
+    EXPECT(ctx, TOK_STR);
 
-    Token number = token;
-    int i = accept(TOK_INT) == STAT_OK ? number.val.i : 1;
+    Token number = ctx->token;
+    int i = accept(ctx, TOK_INT) == STAT_OK ? number.val.i : 1;
 
-    if (add_priority(name.val.s, i) != OK) {
+    if (add_priority(ctx, name.val.s, i) != OK) {
         PARSEERROR(name, "preview '%s' not found", name.val.s);
         return STAT_ERR;
     }
@@ -304,12 +307,12 @@ static int cmd_priority(Token tok)
     return STAT_OK;
 }
 
-static int cmd_remove(Token tok)
+static int cmd_remove(Parser *ctx)
 {
-    Token name = token;
-    EXPECT(TOK_STR);
+    Token name = ctx->token;
+    EXPECT(ctx, TOK_STR);
 
-    if (remove_preview(name.val.s) != OK) {
+    if (remove_preview(ctx, name.val.s) != OK) {
         PARSEERROR(name, "preview '%s' not found", name.val.s);
         return STAT_ERR;
     }
@@ -317,58 +320,58 @@ static int cmd_remove(Token tok)
     return STAT_OK;
 }
 
-static int command(void)
+static int command(Parser *ctx)
 {
-    Token cmd = token;
-    EXPECT(TOK_STR);
+    Token cmd = ctx->token;
+    EXPECT(ctx, TOK_STR);
 
     if (strcmp(cmd.val.s, "set") == 0)
-        return cmd_set();
+        return cmd_set(ctx);
     else if (strcmp(cmd.val.s, "preview") == 0)
-        return cmd_preview();
+        return cmd_preview(ctx);
     else if (strcmp(cmd.val.s, "priority") == 0)
-        return cmd_priority(cmd);
+        return cmd_priority(ctx);
     else if (strcmp(cmd.val.s, "remove") == 0)
-        return cmd_remove(cmd);
+        return cmd_remove(ctx);
 
     PARSEERROR(cmd, "unknown command: %s", cmd.val.s);
     return STAT_ERR;
 }
 
-static void newlines(void)
+static void newlines(Parser *ctx)
 {
     while (1) {
-        if (accept(TOK_NEW_LN) != STAT_OK)
+        if (accept(ctx, TOK_NEW_LN) != STAT_OK)
             break;
     }
 }
 
-static int end(void)
+static int end(Parser *ctx)
 {
-    NOT_ACCEPT(TOK_EOF);
-    EXPECT(TOK_NEW_LN);
+    NOT_ACCEPT(ctx, TOK_EOF);
+    EXPECT(ctx, TOK_NEW_LN);
 
-    newlines();
+    newlines(ctx);
 
     return STAT_OK;
 }
 
-static int commands(void)
+static int commands(Parser *ctx)
 {
-    newlines();
+    newlines(ctx);
 
     while (1) {
-        NOT_ACCEPT(TOK_EOF);
-        CHECK_OK(command());
-        CHECK_OK(end());
+        NOT_ACCEPT(ctx, TOK_EOF);
+        CHECK_OK(command(ctx));
+        CHECK_OK(end(ctx));
     }
 }
 
-static int parse(void)
+static int parse(Parser *ctx)
 {
 #ifdef DEBUG_LEXER
     while (1) {
-        next_token();
+        next_token(ctx);
         if (token.type == TOK_EOF)
             break;
         printf("%s", lexer_token_type_str(token.type));
@@ -386,25 +389,30 @@ static int parse(void)
     }
 #endif
 #ifndef DEBUG_LEXER
-    next_token();
-    if (commands() == STAT_ERR)
+    next_token(ctx);
+    if (commands(ctx) == STAT_ERR)
         return ERR;
 #endif
 
     return OK;
 }
 
-int config_load(VectorPreview *prevs, char *filename)
+int config_load(Parser **ctx, VectorPreview *prevs, char *filename)
 {
     int ret = OK;
 
     FILE *f;
     ERRCHK_GOTO_ERN(!(f = fopen(filename, "r")), ret, exit);
 
-    lexer = lexer_init(f);
-    previews = prevs;
+    if (!(*ctx = malloc(sizeof(**ctx)))) {
+        FUNCFAILED("malloc", strerror(errno));
+        abort();
+    }
 
-    ERRCHK_GOTO_OK(parse(), ret, file);
+    (*ctx)->lexer = lexer_init(f);
+    (*ctx)->previews = prevs;
+
+    ERRCHK_GOTO_OK(parse(*ctx), ret, file);
 
 file:
     fclose(f);
@@ -413,11 +421,13 @@ exit:
     return ret;
 }
 
-void config_cleanup(void)
+void config_cleanup(Parser *ctx)
 {
-    if (!lexer)
+    if (!ctx->lexer)
         return;
 
-    lexer_free(lexer);
-    lexer = NULL;
+    lexer_free(ctx->lexer);
+    ctx->lexer = NULL;
+
+    free(ctx);
 }

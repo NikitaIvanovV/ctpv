@@ -26,12 +26,15 @@ const char any_type[] = ANY_TYPE;
 
 static magic_t magic;
 
+static Parser *parser;
+
 static VectorPreview *previews;
 
 static void cleanup(void)
 {
     previews_cleanup();
-    config_cleanup();
+    if (parser)
+        config_cleanup(parser);
     if (magic != NULL)
         magic_close(magic);
     if (previews)
@@ -74,7 +77,7 @@ static int config(int prevs)
     char config_file[FILENAME_MAX];
     get_config_file(config_file, LEN(config_file));
 
-    ERRCHK_RET_OK(config_load(prevs ? previews : NULL, config_file));
+    ERRCHK_RET_OK(config_load(&parser, prevs ? previews : NULL, config_file));
 
     return OK;
 }
