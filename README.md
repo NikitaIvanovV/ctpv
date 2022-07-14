@@ -24,7 +24,7 @@ it was written in POSIX shell.
 ctpv is an attempt to make a faster version of stpv and add some
 new features.
 
-Originally it was made for [lf](https://github.com/gokcehan/lf)
+Originally it was made for [lf][lf]
 file manager but I believe that it can be easily integrated into
 other programs as well
 (either via configuration file like in lf or a simple wrapper
@@ -93,7 +93,12 @@ yay -S ctpv-git
 ### lf file manager
 
 Add these lines to your lf config
-(usually located at `~/.config/lf/lfrc`):
+(usually located at `~/.config/lf/lfrc`).
+
+Note: `on-quit` command is not a part of
+[lf r27 release](https://github.com/gokcehan/lf/releases/tag/r27)
+yet, so I strongly suggest you to install the latest version [from the GitHub page][lf]
+(or [`lf-git`](https://aur.archlinux.org/packages/lf-git) AUR package if you use Arch Linux).
 
 ```
 set previewer ctpv
@@ -107,3 +112,5 @@ cmd on-quit $ctpv -e $id
 Full documentation on command line options,
 configuration and how to define custom previews
 can be found here: https://nikitaivanovv.github.io/ctpv/
+
+[lf]: https://github.com/gokcehan/lf
