@@ -12,7 +12,7 @@ O    := -O2
 LIBS := magic crypto
 
 CFLAGS  += $(O) -MD -Wall -Wextra -Wno-unused-parameter
-LDFLAGS += $(LIBS:%=-l%)
+LDFLAGS += $(addprefix -l,$(LIBS))
 
 all: ctpv
 
@@ -42,9 +42,6 @@ docs: README.md doc/ctpv.1
 	./deplist.awk $(PRE) | ./deplist.md.sh | ./deplistadd.sh README.md
 	./deplist.awk $(PRE) | ./deplist.1.sh | ./deplistadd.sh doc/ctpv.1
 
-make_embed:
-	$(MAKE) -C embed
-
 ctpv: $(OBJ)
 	$(CC) -o $@ $+ $(LDFLAGS)
 
@@ -54,22 +51,25 @@ src/shell.c: gen/helpers.h
 src/server.c: gen/server.h
 
 gen/previews.h: $(PRE) embed/embed
-	@mkdir -p $(@D)
 	embed/embed -p prev_scr_ $(PRE) > $@
 
 gen/server.h: sh/clear.sh sh/end.sh embed/embed
-	@mkdir -p $(@D)
 	embed/embed -p scr_ sh/clear.sh sh/end.sh > $@
 
 gen/helpers.h: sh/helpers.sh embed/embed
-	@mkdir -p $(@D)
 	embed/embed -p scr_ sh/helpers.sh > $@
 
-embed/embed: make_embed ;
+$(GEN): | gen
+
+gen:
+	mkdir $@
+
+embed/embed: .force
+	$(MAKE) -C embed
 
 -include $(DEP)
 
 .PHONY: all options install install.bin install.man uninstall \
-	clean docs make_embed
+	clean docs .force
 
 .DELETE_ON_ERROR:

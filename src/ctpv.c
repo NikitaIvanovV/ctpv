@@ -112,7 +112,7 @@ static inline void file_access_err(char *f, int errno_)
     print_errorf("failed to access '%s': %s", f, strerror(errno_));
 }
 
-static int get_input_file(char *f, struct InputFile *input_f)
+static int get_input_file(struct InputFile *input_f, char *f)
 {
     if (!f) {
         print_error("file not given");
@@ -216,7 +216,7 @@ static int preview(int argc, char *argv[])
     ERRCHK_RET_OK(init_previews());
 
     struct InputFile input_f;
-    ERRCHK_RET_OK(get_input_file(f, &input_f));
+    ERRCHK_RET_OK(get_input_file(&input_f, f));
 
     if (!ctpv.opts.nosymlinkinfo && *input_f.link) {
         printf("\033[1;36mSymlink points to:\033[m\n\t%s\n\n", input_f.link);
@@ -351,7 +351,7 @@ static int mime(int argc, char *argv[])
     ERRCHK_RET_OK(init_magic());
 
     for (int i = 0; i < argc; i++) {
-        ERRCHK_RET_OK(get_input_file(argv[i], &input_f));
+        ERRCHK_RET_OK(get_input_file(&input_f, argv[i]));
 
         mimetype = get_mimetype(input_f.path);
         ERRCHK_RET(!mimetype);
