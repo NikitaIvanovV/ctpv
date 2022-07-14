@@ -1,11 +1,14 @@
 #!/bin/sh
 
+set -e
+
+tmp="$(mktemp XXXXXX)"
 table="$(mktemp XXXXXX)"
 trap 'rm "$table"' EXIT
 
 cat > "$table"
 
-sed -i "
+sed "
 	/TABLESTART/,/TABLEEND/ {
 		/TABLESTART/ {
 			r $table
@@ -13,4 +16,6 @@ sed -i "
 		}
 		/TABLEEND/!d
 	}
-" "$1"
+" "$1" > "$tmp"
+
+mv -- "$tmp" "$1"
