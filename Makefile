@@ -48,9 +48,9 @@ ctpv: $(OBJ)
 	$(CC) -o $@ $+ $(LDFLAGS)
 
 # Exclicit rules for generated header files
-src/ctpv.c: gen/previews.h
-src/shell.c: gen/helpers.h
-src/server.c: gen/server.h
+src/ctpv.o: gen/previews.h
+src/shell.o: gen/helpers.h
+src/server.o: gen/server.h
 
 gen/previews.h: $(PRE) embed/embed
 	embed/embed -p prev_scr_ $(PRE) > $@
