@@ -22,6 +22,10 @@ is_kitty() {
 	[ -n "$KITTY_PID" ]
 }
 
+kitty_clear() {
+	kitty +kitten icat --clear --transfer-mode file
+}
+
 fifo_open() {
 	# https://unix.stackexchange.com/a/522940/183147
 	dd oflag=nonblock conv=notrunc,nocreat count=0 of="$1" \
@@ -75,6 +79,10 @@ setup_image() {
 	[ "$image_method" = "$image_method_ueberzug" ] && setup_fifo "$@"
 }
 
+kitty_icat_pid() {
+	printf '/tmp/ctpvicat.%d' "$id"
+}
+
 send_image() {
 	noimages && return 127
 
@@ -86,7 +94,9 @@ send_image() {
 			;;
 		"$image_method_kitty")
 			kitty +kitten icat --transfer-mode file --align left \
-				--place "${w}x${h}@${x}x${y}" "$1"
+				--place "${w}x${h}@${x}x${y}" "$1" &
+			printf '%d\n' "$!" > "$(kitty_icat_pid)"
+			wait
 			return 1
 			;;
 		"$image_method_chafa")
