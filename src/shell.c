@@ -6,7 +6,7 @@
 #include "../gen/helpers.h"
 
 /*
- * Returns string with helpers.sh prepended
+ * Returns string with sh/helpers.sh prepended
  *
  * User must call free()
  */
