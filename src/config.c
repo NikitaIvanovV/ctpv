@@ -4,11 +4,11 @@
 #include "config.h"
 #include "preview.h"
 
-#define CHECK(f, cond) \
-    do {               \
-        int x = (f);   \
-        if (!(cond))   \
-            return x;  \
+#define CHECK(f, cond)       \
+    do {                     \
+        enum Status x = (f); \
+        if (!(cond))         \
+            return x;        \
     } while (0)
 
 #define CHECK_OK(f)   CHECK(f, x == STAT_OK)
@@ -48,7 +48,7 @@ struct TypeSet {
     char *type, *subtype, *ext;
 };
 
-enum {
+enum Status {
     STAT_OK,
     STAT_ERR,
     STAT_NULL,
@@ -138,7 +138,7 @@ static inline void next_token(Parser *ctx)
     ctx->token = lexer_get_token(ctx->lexer);
 }
 
-static int accept(Parser *ctx, enum TokenType type)
+static enum Status accept(Parser *ctx, enum TokenType type)
 {
     if (ctx->token.type == type) {
         next_token(ctx);
@@ -148,7 +148,7 @@ static int accept(Parser *ctx, enum TokenType type)
     return STAT_NULL;
 }
 
-static int expect(Parser *ctx, enum TokenType type)
+static enum Status expect(Parser *ctx, enum TokenType type)
 {
     if (accept(ctx, type) == STAT_OK)
         return STAT_OK;
@@ -162,7 +162,7 @@ static int expect(Parser *ctx, enum TokenType type)
     return STAT_ERR;
 }
 
-static int preview_type_ext(Parser *ctx, char **ext)
+static enum Status preview_type_ext(Parser *ctx, char **ext)
 {
     ACCEPT(ctx, TOK_DOT);
 
@@ -173,7 +173,7 @@ static int preview_type_ext(Parser *ctx, char **ext)
     return STAT_OK;
 }
 
-static int preview_type_mime_part(Parser *ctx, char **s)
+static enum Status preview_type_mime_part(Parser *ctx, char **s)
 {
     NOT_ACCEPT(ctx, TOK_STAR);
 
@@ -184,7 +184,7 @@ static int preview_type_mime_part(Parser *ctx, char **s)
     return STAT_OK;
 }
 
-static int preview_type_mime(Parser *ctx, char **type, char **subtype)
+static enum Status preview_type_mime(Parser *ctx, char **type, char **subtype)
 {
     CHECK_OK(preview_type_mime_part(ctx, type));
     EXPECT(ctx, TOK_SLASH);
@@ -203,9 +203,9 @@ static inline void reset_lexer_opts(Parser *ctx)
     lexer_set_opts(ctx->lexer, LEX_OPT_NONE);
 }
 
-static int preview_type(Parser *ctx, struct TypeSet *set)
+static enum Status preview_type(Parser *ctx, struct TypeSet *set)
 {
-    int ret;
+    enum Status ret;
 
     *set = TYPE_SET_EMPTY;
 
@@ -231,7 +231,7 @@ static struct Option *get_option(char *name)
     return NULL;
 }
 
-static int cmd_set(Parser *ctx)
+static enum Status cmd_set(Parser *ctx)
 {
     Token name = ctx->token;
     EXPECT(ctx, TOK_STR);
@@ -264,7 +264,7 @@ static int cmd_set(Parser *ctx)
     return STAT_OK;
 }
 
-static int cmd_preview(Parser *ctx)
+static enum Status cmd_preview(Parser *ctx)
 {
     Token name = ctx->token;
     EXPECT(ctx, TOK_STR);
@@ -291,13 +291,13 @@ static int cmd_preview(Parser *ctx)
     return STAT_OK;
 }
 
-static int cmd_priority(Parser *ctx)
+static enum Status cmd_priority(Parser *ctx)
 {
     Token name = ctx->token;
     EXPECT(ctx, TOK_STR);
 
     Token number = ctx->token;
-    int i = accept(ctx, TOK_INT) == STAT_OK ? number.val.i : 1;
+    enum Status i = accept(ctx, TOK_INT) == STAT_OK ? number.val.i : 1;
 
     if (add_priority(ctx, name.val.s, i) != OK) {
         PARSEERROR(name, "preview '%s' not found", name.val.s);
@@ -307,7 +307,7 @@ static int cmd_priority(Parser *ctx)
     return STAT_OK;
 }
 
-static int cmd_remove(Parser *ctx)
+static enum Status cmd_remove(Parser *ctx)
 {
     Token name = ctx->token;
     EXPECT(ctx, TOK_STR);
@@ -320,7 +320,7 @@ static int cmd_remove(Parser *ctx)
     return STAT_OK;
 }
 
-static int command(Parser *ctx)
+static enum Status command(Parser *ctx)
 {
     Token cmd = ctx->token;
     EXPECT(ctx, TOK_STR);
@@ -346,7 +346,7 @@ static void newlines(Parser *ctx)
     }
 }
 
-static int end(Parser *ctx)
+static enum Status end(Parser *ctx)
 {
     NOT_ACCEPT(ctx, TOK_EOF);
     EXPECT(ctx, TOK_NEW_LN);
