@@ -11,7 +11,7 @@
 
 char *program = NULL;
 
-int spawn_redirect(const void *arg)
+RESULT spawn_redirect(const void *arg)
 {
     int *fds = (int *)arg;
 
@@ -21,7 +21,7 @@ int spawn_redirect(const void *arg)
     return OK;
 }
 
-int spawn_wait(int pid, int *exitcode, int *signal)
+RESULT spawn_wait(int pid, int *exitcode, int *signal)
 {
     int stat;
     ERRCHK_RET_ERN(waitpid(pid, &stat, 0) == -1);
@@ -51,8 +51,8 @@ int spawn_wait(int pid, int *exitcode, int *signal)
  *
  * cfunc is a function to call when child process is created
  */
-int spawn(char *args[], int *cpid, int *exitcode, int *signal, SpawnProg cfunc,
-          const void *carg)
+RESULT spawn(char *args[], int *cpid, int *exitcode, int *signal,
+             SpawnProg cfunc, const void *carg)
 {
     if (exitcode)
         *exitcode = -1;
@@ -99,7 +99,7 @@ int strlennull(const char *s)
     return s ? strlen(s) : 0;
 }
 
-static int get_xdg_dir(char *buf, size_t len, char *var, char *var_sub, char *name)
+static RESULT get_xdg_dir(char *buf, size_t len, char *var, char *var_sub, char *name)
 {
     char *home, *dir, dir_buf[FILENAME_MAX];
 
@@ -115,12 +115,12 @@ static int get_xdg_dir(char *buf, size_t len, char *var, char *var_sub, char *na
     return OK;
 }
 
-int get_cache_dir(char *buf, size_t len, char *name)
+RESULT get_cache_dir(char *buf, size_t len, char *name)
 {
     return get_xdg_dir(buf, len, "XDG_CACHE_HOME", ".cache", name);
 }
 
-int get_config_dir(char *buf, size_t len, char *name)
+RESULT get_config_dir(char *buf, size_t len, char *name)
 {
     return get_xdg_dir(buf, len, "XDG_CONFIG_HOME", ".config", name);
 }
@@ -160,7 +160,7 @@ const char *get_ext(const char *path)
     return dot;
 }
 
-int register_signal(int sig, SigHandler handler)
+RESULT register_signal(int sig, SigHandler handler)
 {
     ERRCHK_RET_ERN(signal(sig, handler) == SIG_ERR);
     return OK;

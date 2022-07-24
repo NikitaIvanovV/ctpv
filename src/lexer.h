@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define PARSEERROR(c, format, ...)                 \
+#define PARSEERROR(c, format, ...)                  \
     print_errorf("config:%u:%u: " format, (c).line, \
                  (c).col __VA_OPT__(, ) __VA_ARGS__)
 

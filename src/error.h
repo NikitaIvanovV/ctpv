@@ -59,11 +59,6 @@
 #define ERRCHK_RET_OK(e)        ERRCHK_RET((e) != OK)
 #define ERRCHK_GOTO_OK(e, r, l) ERRCHK_GOTO((e) != OK, r, l)
 
-enum {
-    OK,
-    ERR,
-};
-
 void print_error(const char *error_msg);
 void print_errorf(const char *format, ...);
 void print_int_error(const char *file, unsigned long line, const char *msg);

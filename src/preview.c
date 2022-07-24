@@ -125,14 +125,14 @@ static void check_init_previews(void)
     }
 }
 
-static int run(Preview *p, int *exitcode, int *signal)
+static RESULT run(Preview *p, int *exitcode, int *signal)
 {
     int pipe_fds[2];
     ERRCHK_RET_ERN(pipe(pipe_fds) == -1);
 
     int sp_arg[] = { pipe_fds[0], pipe_fds[1], STDERR_FILENO };
 
-    int ret = run_script(p->script, p->script_len, exitcode, signal, spawn_redirect, sp_arg);
+    enum Result ret = run_script(p->script, p->script_len, exitcode, signal, spawn_redirect, sp_arg);
 
     close(pipe_fds[1]);
 
@@ -160,7 +160,7 @@ static int run(Preview *p, int *exitcode, int *signal)
             ERRCHK_RET_ERN(setenv((n), (v), 1) != 0); \
     } while (0)
 
-int preview_run(const char *ext, const char *mimetype, PreviewArgs *pa)
+RESULT preview_run(const char *ext, const char *mimetype, PreviewArgs *pa)
 {
     if (pa->id || (pa->id = getenv("id")))
         ERRCHK_RET_OK(server_set_fifo_var(pa->id));

@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <signal.h>
 #include <sys/stat.h>
+#include <sys/wait.h>
 
 #include "error.h"
 #include "utils.h"
@@ -26,7 +27,7 @@ static void kill_ueberzug(void)
             FUNCFAILED("kill", strerror(errno));
     }
 
-    spawn_wait(ueberzug_pid, NULL, NULL);
+    waitpid(ueberzug_pid, NULL, 0);
 }
 
 static void sig_handler_exit(int s)
@@ -34,16 +35,16 @@ static void sig_handler_exit(int s)
     do_exit = 1;
 }
 
-static int open_fifo(int *fd, char *f)
+static RESULT open_fifo(int *fd, char *f)
 {
     ERRCHK_RET_ERN((*fd = open(f, O_RDONLY | O_NONBLOCK)) == -1);
 
     return OK;
 }
 
-static int listen(char *fifo)
+static RESULT listen(char *fifo)
 {
-    int ret = OK;
+    enum Result ret = OK;
 
     struct pollfd pollfd = { .fd = -1, .events = POLLIN };
     ERRCHK_GOTO_OK(open_fifo(&pollfd.fd, fifo), ret, exit);
@@ -117,7 +118,7 @@ exit:
     return ret;
 }
 
-static int check_ueberzug(int *exitcode)
+static RESULT check_ueberzug(int *exitcode)
 {
     char *args[] = SHELL_ARGS("command -v ueberzug > /dev/null");
     return spawn(args, NULL, exitcode, NULL, NULL, NULL);
@@ -128,9 +129,9 @@ static void get_fifo_name(char *buf, size_t len, const char *id_s)
     snprintf(buf, len-1, "/tmp/ctpvfifo.%s", id_s);
 }
 
-int server_listen(const char *id_s)
+RESULT server_listen(const char *id_s)
 {
-    int ret = OK;
+    enum Result ret = OK;
 
     int exitcode;
     ERRCHK_GOTO_OK(check_ueberzug(&exitcode), ret, exit);
@@ -168,7 +169,7 @@ static inline int run_server_script(char *script, size_t script_len, char *arg)
     return run_script(script, script_len, NULL, NULL, NULL, NULL);
 }
 
-int server_set_fifo_var(const char *id_s)
+RESULT server_set_fifo_var(const char *id_s)
 {
     char fifo[FIFO_FILENAME_SIZE];
     get_fifo_name(fifo, LEN(fifo), id_s);
@@ -177,14 +178,14 @@ int server_set_fifo_var(const char *id_s)
     return OK;
 }
 
-int server_clear(const char *id_s)
+RESULT server_clear(const char *id_s)
 {
     ERRCHK_RET_OK(server_set_fifo_var(id_s));
 
     return run_server_script(scr_clear_sh, LEN(scr_clear_sh), (char *)id_s);
 }
 
-int server_end(const char *id_s)
+RESULT server_end(const char *id_s)
 {
     ERRCHK_RET_OK(server_set_fifo_var(id_s));
 

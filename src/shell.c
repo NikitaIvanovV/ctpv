@@ -34,8 +34,8 @@ static char *prepend_helpers(char *str, size_t len)
 #define OPT_SETENV(name) \
     ERRCHK_RET_ERN(setenv((#name), ctpv.opts.name ? "1" : "", 1) == -1)
 
-int run_script(char *script, size_t script_len, int *exitcode, int *signal,
-               SpawnProg sp, void *sp_arg)
+RESULT run_script(char *script, size_t script_len, int *exitcode, int *signal,
+                  SpawnProg sp, void *sp_arg)
 {
     OPT_SETENV(forcekitty);
     OPT_SETENV(forcekittyanim);
@@ -46,7 +46,7 @@ int run_script(char *script, size_t script_len, int *exitcode, int *signal,
 
     char *scr = prepend_helpers(script, script_len);
     char *args[] = SHELL_ARGS(scr);
-    int ret = spawn(args, NULL, exitcode, signal, sp, sp_arg);
+    enum Result ret = spawn(args, NULL, exitcode, signal, sp, sp_arg);
 
     free(scr);
 

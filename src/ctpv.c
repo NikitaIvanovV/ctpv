@@ -41,7 +41,7 @@ static void cleanup(void)
         vectorPreview_free(previews);
 }
 
-static int init_magic(void)
+static RESULT init_magic(void)
 {
     ERRCHK_RET_MSG(!(magic = magic_open(MAGIC_MIME_TYPE)), magic_error(magic));
 
@@ -50,7 +50,7 @@ static int init_magic(void)
     return OK;
 }
 
-static int create_dir(char *buf, size_t len)
+static RESULT create_dir(char *buf, size_t len)
 {
     char dir[len];
     strncpy(dir, buf, LEN(dir) - 1);
@@ -59,7 +59,7 @@ static int create_dir(char *buf, size_t len)
     return OK;
 }
 
-static int get_config_file(char *buf, size_t len)
+static RESULT get_config_file(char *buf, size_t len)
 {
     ERRCHK_RET_OK(get_config_dir(buf, len, "ctpv/"));
     ERRCHK_RET_OK(create_dir(buf, len));
@@ -72,7 +72,7 @@ static int get_config_file(char *buf, size_t len)
     return OK;
 }
 
-static int config(int prevs)
+static RESULT config(int prevs)
 {
     char config_file[FILENAME_MAX];
     ERRCHK_RET_OK(get_config_file(config_file, LEN(config_file)));
@@ -82,7 +82,7 @@ static int config(int prevs)
     return OK;
 }
 
-static int init_previews(void)
+static RESULT init_previews(void)
 {
     /* 20 is some arbitrary number, it's here in order to
      * to save one realloc() if user has less then 20 custom previews */
@@ -112,7 +112,7 @@ static inline void file_access_err(char *f, int errno_)
     print_errorf("failed to access '%s': %s", f, strerror(errno_));
 }
 
-static int get_input_file(struct InputFile *input_f, char *f)
+static RESULT get_input_file(struct InputFile *input_f, char *f)
 {
     if (!f) {
         print_error("file not given");
@@ -137,7 +137,7 @@ static int get_input_file(struct InputFile *input_f, char *f)
     return OK;
 }
 
-static int is_newer(int *resp, char *f1, char *f2)
+static RESULT is_newer(int *resp, char *f1, char *f2)
 {
     struct stat stat1, stat2;
     ERRCHK_RET_ERN(lstat(f1, &stat1) == -1);
@@ -171,8 +171,8 @@ static void md5_string(char *buf, size_t len, char *s)
     }
 }
 
-static int get_cache_file(char *dir, size_t dir_len, char *filename,
-                          size_t filename_len, char *file)
+static RESULT get_cache_file(char *dir, size_t dir_len, char *filename,
+                             size_t filename_len, char *file)
 {
     ERRCHK_RET_OK(get_cache_dir(dir, dir_len, "ctpv/"));
     ERRCHK_RET_OK(create_dir(dir, dir_len));
@@ -189,7 +189,7 @@ static int get_cache_file(char *dir, size_t dir_len, char *filename,
     return OK;
 }
 
-static int check_cache(int *resp, char *file, char *cache_file)
+static RESULT check_cache(int *resp, char *file, char *cache_file)
 {
     if (access(cache_file, F_OK) != 0) {
         *resp = 0;
@@ -201,7 +201,7 @@ static int check_cache(int *resp, char *file, char *cache_file)
 
 #define GET_PARG(a, i) (a) = (argc > (i) ? argv[i] : NULL)
 
-static int preview(int argc, char *argv[])
+static RESULT preview(int argc, char *argv[])
 {
     char *f, *w, *h, *x, *y, *id;
     char y_buf[4], h_buf[4];
@@ -261,24 +261,24 @@ static int preview(int argc, char *argv[])
     return preview_run(get_ext(input_f.path), mimetype, &args);
 }
 
-static int server(void)
+static RESULT server(void)
 {
     return server_listen(ctpv.server_id_s);
 }
 
-static int clear(void)
+static RESULT clear(void)
 {
     ERRCHK_RET_OK(config(0));
     return server_clear(ctpv.server_id_s);
 }
 
-static int end(void)
+static RESULT end(void)
 {
     ERRCHK_RET_OK(config(0));
     return server_end(ctpv.server_id_s);
 }
 
-static int list(void)
+static RESULT list(void)
 {
     ERRCHK_RET_OK(init_previews());
 
@@ -338,7 +338,7 @@ static int list(void)
     return OK;
 }
 
-static int mime(int argc, char *argv[])
+static RESULT mime(int argc, char *argv[])
 {
     const char *mimetype;
     struct InputFile input_f;
@@ -399,7 +399,7 @@ int main(int argc, char *argv[])
     argc -= optind;
     argv = &argv[optind];
 
-    int ret;
+    enum Result ret;
     switch (ctpv.mode) {
         case MODE_PREVIEW:
             ret = preview(argc, argv);

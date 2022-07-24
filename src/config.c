@@ -97,7 +97,7 @@ static void add_preview(Parser *ctx, char *name, char *script, struct TypeSet *s
     }
 }
 
-static int add_priority(Parser *ctx, char *name, int priority)
+static RESULT add_priority(Parser *ctx, char *name, int priority)
 {
     if (!ctx->previews)
         return OK;
@@ -115,7 +115,7 @@ static int add_priority(Parser *ctx, char *name, int priority)
     return found ? OK : ERR;
 }
 
-static int remove_preview(Parser *ctx, char *name)
+static RESULT remove_preview(Parser *ctx, char *name)
 {
     if (!ctx->previews)
         return OK;
@@ -367,7 +367,7 @@ static int commands(Parser *ctx)
     }
 }
 
-static int parse(Parser *ctx)
+static RESULT parse(Parser *ctx)
 {
 #ifdef DEBUG_LEXER
     while (1) {
@@ -397,9 +397,9 @@ static int parse(Parser *ctx)
     return OK;
 }
 
-int config_load(Parser **ctx, VectorPreview *prevs, char *filename)
+RESULT config_load(Parser **ctx, VectorPreview *prevs, char *filename)
 {
-    int ret = OK;
+    enum Result ret = OK;
 
     FILE *f;
     ERRCHK_GOTO_ERN(!(f = fopen(filename, "r")), ret, exit);

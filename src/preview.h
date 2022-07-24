@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "vector.h"
+#include "result.h"
 
 #define MIMETYPE_MAX 64
 
@@ -29,7 +30,7 @@ typedef struct {
 
 void previews_init(Preview *ps, size_t len);
 void previews_cleanup(void);
-int preview_run(const char *ext, const char *mimetype, PreviewArgs *pa);
+RESULT preview_run(const char *ext, const char *mimetype, PreviewArgs *pa);
 Preview **previews_get(size_t *len);
 
 #endif
