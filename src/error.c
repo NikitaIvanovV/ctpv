@@ -3,8 +3,6 @@
 #include "error.h"
 #include "utils.h"
 
-int err_internal_error = 0;
-
 void print_error(const char *error_msg)
 {
     /* We print errors to stdout because lf file manager
@@ -15,7 +13,21 @@ void print_error(const char *error_msg)
 
 void print_errorf(const char *format, ...)
 {
-    char s[1024];
+    char s[512];
     FORMATTED_STRING(s, format);
+
     print_error(s);
+}
+
+void print_int_error(const char *file, unsigned long line, const char *msg)
+{
+    print_errorf("%s:%lu: internal error: %s", file, line, msg);
+}
+
+void print_int_errorf(const char *file, unsigned long line, const char *format, ...)
+{
+    char s[512];
+    FORMATTED_STRING(s, format);
+
+    print_int_error(file, line, s);
 }
