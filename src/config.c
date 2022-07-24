@@ -356,7 +356,7 @@ static enum Status end(Parser *ctx)
     return STAT_OK;
 }
 
-static int commands(Parser *ctx)
+static enum Status commands(Parser *ctx)
 {
     newlines(ctx);
 
