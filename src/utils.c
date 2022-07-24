@@ -159,3 +159,9 @@ const char *get_ext(const char *path)
 
     return dot;
 }
+
+int register_signal(int sig, SigHandler handler)
+{
+    ERRCHK_RET_ERN(signal(sig, handler) == SIG_ERR);
+    return OK;
+}

@@ -34,12 +34,6 @@ static void sig_handler_exit(int s)
     do_exit = 1;
 }
 
-static int register_signal(int sig, __sighandler_t handler)
-{
-    ERRCHK_RET_ERN(signal(sig, handler) == SIG_ERR);
-    return OK;
-}
-
 static int open_fifo(int *fd, char *f)
 {
     ERRCHK_RET_ERN((*fd = open(f, O_RDONLY | O_NONBLOCK)) == -1);

@@ -23,6 +23,8 @@
 
 typedef int (*SpawnProg)(const void *);
 
+typedef void (*SigHandler)(int);
+
 extern char *program;
 
 int spawn_redirect(const void *arg);
@@ -38,5 +40,7 @@ int get_config_dir(char *buf, size_t len, char *name);
 
 int mkpath(char* file_path, int mode);
 const char *get_ext(const char *path);
+
+int register_signal(int sig, SigHandler handler);
 
 #endif
