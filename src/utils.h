@@ -21,6 +21,8 @@
         va_end(args);                                   \
     } while (0)
 
+#define UNUSED __attribute__((unused))
+
 typedef int (*SpawnProg)(const void *);
 
 typedef void (*SigHandler)(int);

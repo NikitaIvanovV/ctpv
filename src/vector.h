@@ -3,6 +3,8 @@
 
 #include <stdlib.h>
 
+#include "utils.h"
+
 #define VECTOR_TYPE(name, type) \
     typedef struct {            \
         size_t len, cap, size;  \
@@ -57,7 +59,7 @@
 #define VECTOR_GEN_SOURCE(name, type) VECTOR_GEN_SOURCE_(name, type, )
 #define VECTOR_GEN_SOURCE_STATIC(name, type) \
     VECTOR_TYPE(name, type);                 \
-    VECTOR_GEN_SOURCE_(name, type, static __attribute__((unused)))
+    VECTOR_GEN_SOURCE_(name, type, static UNUSED)
 
 #define VECTOR_GEN_HEADER(name, type)   \
     VECTOR_TYPE(name, type);            \
