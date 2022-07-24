@@ -75,7 +75,7 @@ static int get_config_file(char *buf, size_t len)
 static int config(int prevs)
 {
     char config_file[FILENAME_MAX];
-    get_config_file(config_file, LEN(config_file));
+    ERRCHK_RET_OK(get_config_file(config_file, LEN(config_file)));
 
     ERRCHK_RET_OK(config_load(&parser, prevs ? previews : NULL, config_file));
 
