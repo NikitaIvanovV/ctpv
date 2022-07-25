@@ -401,28 +401,28 @@ int main(int argc, char *argv[])
 
     enum Result ret;
     switch (ctpv.mode) {
-        case MODE_PREVIEW:
-            ret = preview(argc, argv);
-            break;
-        case MODE_SERVER:
-            ret = server();
-            break;
-        case MODE_CLEAR:
-            ret = clear();
-            break;
-        case MODE_END:
-            ret = end();
-            break;
-        case MODE_LIST:
-            ret = list();
-            break;
-        case MODE_MIME:
-            ret = mime(argc, argv);
-            break;
-        default:
-            PRINTINTERR("unknowm mode: %d", ctpv.mode);
-            ret = ERR;
-            break;
+    case MODE_PREVIEW:
+        ret = preview(argc, argv);
+        break;
+    case MODE_SERVER:
+        ret = server();
+        break;
+    case MODE_CLEAR:
+        ret = clear();
+        break;
+    case MODE_END:
+        ret = end();
+        break;
+    case MODE_LIST:
+        ret = list();
+        break;
+    case MODE_MIME:
+        ret = mime(argc, argv);
+        break;
+    default:
+        PRINTINTERR("unknown mode: %d", ctpv.mode);
+        ret = ERR;
+        break;
     }
 
     cleanup();

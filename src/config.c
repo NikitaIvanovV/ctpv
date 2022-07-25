@@ -257,7 +257,7 @@ static enum Status cmd_set(Parser *ctx)
         *opt->arg_val.s = value.val.s;
         break;
     default:
-        PRINTINTERR("unknowm type: %d", opt->arg_type);
+        PRINTINTERR("unknown type: %d", opt->arg_type);
         abort();
     }
 
