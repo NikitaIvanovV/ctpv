@@ -41,8 +41,8 @@ clean:
 	$(MAKE) -C embed clean
 
 docs: README.md doc/ctpv.1
-	deptable/list.awk $(PRE) | deptable/markdown.sh | deptable/insert.sh README.md
-	deptable/list.awk $(PRE) | deptable/roff.sh     | deptable/insert.sh doc/ctpv.1
+	deptable/list.awk $(PRE) | deptable/markdown.sed | deptable/insert.awk README.md
+	deptable/list.awk $(PRE) | deptable/roff.sed | deptable/insert.awk doc/ctpv.1
 
 ctpv: $(OBJ)
 	$(CC) -o $@ $+ $(LDFLAGS)

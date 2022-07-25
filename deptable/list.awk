@@ -38,5 +38,7 @@ BEGIN {
         process_file(ARGV[i])
 
     for (t in types)
-        printf "%s\t%s\n", t, join(types[t], " ")
+        s = s sprintf("%s\t%s\n", t, join(types[t], " "))
+
+    printf "%s", s | "sort"
 }
