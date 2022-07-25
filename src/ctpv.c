@@ -214,6 +214,15 @@ static RESULT preview(int argc, char *argv[])
     GET_PARG(y, 4);
     GET_PARG(id, 5);
 
+    if (!w)
+        w = "80";
+    if (!h)
+        h = "40";
+    if (!x)
+        x = "0";
+    if (!y)
+        y = "0";
+
     ERRCHK_RET_OK(init_previews());
 
     struct InputFile input_f;
