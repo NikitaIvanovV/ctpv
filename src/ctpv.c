@@ -14,6 +14,7 @@
 #include "config.h"
 #include "server.h"
 #include "preview.h"
+#include "../version.h"
 #include "../previews.h"
 
 struct InputFile {
@@ -366,12 +367,18 @@ static RESULT mime(int argc, char *argv[])
     return OK;
 }
 
+static RESULT version(void)
+{
+    printf("%s version %s\n", program, VERSION);
+    return OK;
+}
+
 int main(int argc, char *argv[])
 {
     program = argc > 0 ? argv[0] : "ctpv";
 
     int c;
-    while ((c = getopt(argc, argv, "s:c:e:lm")) != -1) {
+    while ((c = getopt(argc, argv, "s:c:e:lmv")) != -1) {
         switch (c) {
         case 's':
             ctpv.mode = MODE_SERVER;
@@ -390,6 +397,9 @@ int main(int argc, char *argv[])
             break;
         case 'm':
             ctpv.mode = MODE_MIME;
+            break;
+        case 'v':
+            ctpv.mode = MODE_VERSION;
             break;
         default:
             return EXIT_FAILURE;
@@ -418,6 +428,9 @@ int main(int argc, char *argv[])
         break;
     case MODE_MIME:
         ret = mime(argc, argv);
+        break;
+    case MODE_VERSION:
+        ret = version();
         break;
     default:
         PRINTINTERR("unknown mode: %d", ctpv.mode);

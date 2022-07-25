@@ -11,6 +11,7 @@ struct CTPV {
         MODE_END,
         MODE_LIST,
         MODE_MIME,
+        MODE_VERSION,
     } mode;
     char *server_id_s;
     struct {
