@@ -1,6 +1,6 @@
 '\" t
 .ds op \&.\|.\|.\&
-.ds ue \(:Uberzug
+.ds ub \(:Uberzug
 .
 .de Op
 .RI [ "\\$1" "]\\$2"
@@ -14,13 +14,10 @@
 \&\fB\\$1\fP \fI\\$2\fP\\$3
 ..
 .
-.
 .TH CTPV 1 "July 2022" Linux "User Manuals"
-.
 .
 .SH NAME
 ctpv \- terminal previewer
-.
 .
 .SH SYNOPSIS
 .
@@ -46,7 +43,6 @@ ctpv \- terminal previewer
 .RB { \-s | \-c | \-e }
 .I id
 .YS
-.
 .
 .SH DESCRIPTION
 .
@@ -153,7 +149,7 @@ cmd on-quit $ctpv -e $id
 .SS Image previews
 .
 Image previews are enabled by either installing
-.I \*(ue
+.I \*(ub
 or
 .I Chafa
 (as seen in
@@ -166,7 +162,7 @@ terminal.
 When possible,
 .B ctpv
 will prefer
-.I \*(ue
+.I \*(ub
 over others image preview methods. You can override this
 behavior by using
 .B forcekitty
@@ -209,7 +205,6 @@ attempts to run another appropriate preview and so on.
 If the script exists with 0 or a any other status, both standard output
 and standard error are printed.
 .
-.
 .SH OPTIONS
 .
 .TP
@@ -237,7 +232,6 @@ command to server with ID
 .Bsi \-e id
 Kill server with ID
 .IR id .
-.
 .
 .SH CONFIGURATION
 .
@@ -455,16 +449,27 @@ to use it for generating previews.
 .
 .TP
 .I $XDG_CONFIG_HOME/ctpv/config
-Configuration file. If
+Configuration file.
+If
 .I $XDG_CONFIG_HOME
 is not set, defaults to
 .IR \(ti/.config .
 .
+.TP
+.I $XDG_CACHE_HOME/ctpv
+Directory to store cached image previews.
+It takes some time to generate an image preview for some file types,
+such as videos or PDF files, this is why the generated images are
+stored in the directory to be shown if the same file is previewed
+again.
+If
+.I $XDG_CACHE_HOME
+is not set, defaults to
+.IR \(ti/.cache .
 .
 .SH SEE ALSO
 .
 .BR lf (1)
-.
 .
 .SH AUTHOR
 .
