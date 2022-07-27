@@ -44,6 +44,8 @@ Preview b_previews[] = {
     PR(NULL,      "text",           "x-diff",         colordiff,               PREV_ATTR_NONE),
     PR(NULL,      "text",           "x-patch",        colordiff,               PREV_ATTR_NONE),
 
+    PR(NULL,      "font",           NULL,             font,                    PREV_ATTR_NONE),
+
     PR("tar.gz",   NULL,            NULL,             atool,                   PREV_ATTR_NONE),
     PR("tgz",      NULL,            NULL,             atool,                   PREV_ATTR_NONE),
     PR("tgz",      NULL,            NULL,             atool,                   PREV_ATTR_NONE),
