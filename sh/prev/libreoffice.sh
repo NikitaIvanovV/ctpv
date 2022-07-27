@@ -1,6 +1,6 @@
-# odt: libreoffice
+# office: libreoffice
 
-office() {
+libreoffice() {
 	# File produced by libreoffice
 	jpg="$(printf '%s\n' "$f" | sed 's|^.*/||; s|\..*$||')"
 
@@ -12,4 +12,4 @@ office() {
 		mv -- "$cache_d/$jpg.jpg" "$cache_f"
 }
 
-convert_and_show_image office
+convert_and_show_image libreoffice

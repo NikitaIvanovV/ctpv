@@ -17,7 +17,17 @@ Preview b_previews[] = {
 
     PR("md",      NULL,             NULL,             mdcat,                   PREV_ATTR_NONE),
     PR("torrent", NULL,             NULL,             torrent,                 PREV_ATTR_NONE),
-    PR("odt",     NULL,             NULL,             odt,                     PREV_ATTR_NONE),
+
+    PR("ods",     NULL,             NULL,             libreoffice,             PREV_ATTR_NONE),
+    PR("fods",    NULL,             NULL,             libreoffice,             PREV_ATTR_NONE),
+    PR("xls",     NULL,             NULL,             libreoffice,             PREV_ATTR_NONE),
+    PR("xlsx",    NULL,             NULL,             libreoffice,             PREV_ATTR_NONE),
+    PR("csv",     NULL,             NULL,             libreoffice,             PREV_ATTR_NONE),
+
+    PR("odt",     NULL,             NULL,             libreoffice,             PREV_ATTR_NONE),
+    PR("fodt",    NULL,             NULL,             libreoffice,             PREV_ATTR_NONE),
+    PR("doc",     NULL,             NULL,             libreoffice,             PREV_ATTR_NONE),
+    PR("docx",    NULL,             NULL,             libreoffice,             PREV_ATTR_NONE),
 
     PR(NULL,      "text",           NULL,             bat,                     PREV_ATTR_NONE),
     PR(NULL,      "text",           NULL,             highlight,               PREV_ATTR_NONE),
