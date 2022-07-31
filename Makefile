@@ -43,6 +43,7 @@ clean:
 docs: README.md doc/ctpv.1
 	deptable/list.awk $(PRE) | deptable/markdown.sed | deptable/insert.awk README.md
 	deptable/list.awk $(PRE) | deptable/roff.sed | deptable/insert.awk doc/ctpv.1
+	./updatedate.awk doc/ctpv.1
 
 ctpv: $(OBJ)
 	$(CC) -o $@ $+ $(LDFLAGS)
