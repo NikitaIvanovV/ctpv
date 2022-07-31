@@ -29,6 +29,11 @@ Preview b_previews[] = {
     PR("doc",     NULL,             NULL,             libreoffice,             PREV_ATTR_NONE),
     PR("docx",    NULL,             NULL,             libreoffice,             PREV_ATTR_NONE),
 
+    PR("odp",     NULL,             NULL,             libreoffice,             PREV_ATTR_NONE),
+    PR("fodp",    NULL,             NULL,             libreoffice,             PREV_ATTR_NONE),
+    PR("ppt",     NULL,             NULL,             libreoffice,             PREV_ATTR_NONE),
+    PR("pptx",    NULL,             NULL,             libreoffice,             PREV_ATTR_NONE),
+
     PR(NULL,      "text",           NULL,             bat,                     PREV_ATTR_NONE),
     PR(NULL,      "text",           NULL,             highlight,               PREV_ATTR_NONE),
     PR(NULL,      "text",           NULL,             source_highlight,        PREV_ATTR_NONE),
