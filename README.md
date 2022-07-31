@@ -60,7 +60,7 @@ For example, you only need either `elinks`, `lynx` or
 | image | `ueberzug` `chafa` |
 | json | `jq` |
 | markdown | `mdcat` |
-| odt | `libreoffice` |
+| office | `libreoffice` |
 | pdf | `pdftoppm` |
 | text | `bat` `cat` `highlight` `source-highlight` |
 | torrent | `transmission-show` |
