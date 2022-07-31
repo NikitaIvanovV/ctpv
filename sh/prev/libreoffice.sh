@@ -1,6 +1,6 @@
 # office: libreoffice
 
-libreoffice() {
+lo() {
 	# File produced by libreoffice
 	jpg="$(printf '%s\n' "$f" | sed 's|^.*/||; s|\..*$||')"
 
@@ -12,4 +12,4 @@ libreoffice() {
 		mv -- "$cache_d/$jpg.jpg" "$cache_f"
 }
 
-convert_and_show_image libreoffice
+convert_and_show_image lo
