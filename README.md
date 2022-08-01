@@ -96,16 +96,11 @@ yay -S ctpv-git
 Add these lines to your lf config
 (usually located at `~/.config/lf/lfrc`).
 
-Note: `on-quit` command is not a part of
-[lf r27 release](https://github.com/gokcehan/lf/releases/tag/r27)
-yet, so I strongly suggest you to install the latest version [from the GitHub page][lf]
-(or [`lf-git`](https://aur.archlinux.org/packages/lf-git) AUR package if you use Arch Linux).
-
 ```
 set previewer ctpv
 set cleaner ctpvclear
 &ctpv -s $id
-cmd on-quit $ctpv -e $id
+&ctpvquit $id
 ```
 
 ## Documentation
