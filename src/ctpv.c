@@ -205,7 +205,8 @@ static RESULT check_cache(int *resp, char *file, char *cache_file)
 static RESULT preview(int argc, char *argv[])
 {
     char *f, *w, *h, *x, *y, *id;
-    char y_buf[4], h_buf[4];
+    char w_buf[24], h_buf[24], y_buf[24];
+    long w_l, h_l, y_l;
 
     GET_PARG(f, 0);
     GET_PARG(w, 1);
@@ -223,6 +224,10 @@ static RESULT preview(int argc, char *argv[])
     if (!y)
         y = "0";
 
+    ERRCHK_RET_OK(strtol_w(&w_l, w, NULL, 10));
+    ERRCHK_RET_OK(strtol_w(&h_l, h, NULL, 10));
+    ERRCHK_RET_OK(strtol_w(&y_l, y, NULL, 10));
+
     ERRCHK_RET_OK(init_previews());
 
     struct InputFile input_f;
@@ -232,17 +237,20 @@ static RESULT preview(int argc, char *argv[])
         printf("\033[1;36mSymlink points to:\033[m\n\t%s\n\n", input_f.link);
         fflush(stdout);
 
-        if (y && h) {
-            unsigned char y_i = atoi(y);
-            unsigned char h_i = atoi(h);
-            y_i += 3;
-            h_i -= 3;
-            snprintf(y_buf, LEN(y_buf), "%d", y_i);
-            snprintf(h_buf, LEN(h_buf), "%d", h_i);
-            y = y_buf;
-            h = h_buf;
-        }
+        y_l += 3;
+        h_l -= 3;
     }
+
+    /* To some reason lf chops off last 2 characters of a line */
+    w_l -= 2;
+
+    snprintf(w_buf, LEN(w_buf), "%ld", w_l);
+    snprintf(h_buf, LEN(h_buf), "%ld", h_l);
+    snprintf(y_buf, LEN(y_buf), "%ld", y_l);
+
+    w = w_buf;
+    h = h_buf;
+    y = y_buf;
 
     ERRCHK_RET_OK(init_magic());
 

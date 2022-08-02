@@ -165,3 +165,26 @@ RESULT register_signal(int sig, SigHandler handler)
     ERRCHK_RET_ERN(signal(sig, handler) == SIG_ERR);
     return OK;
 }
+
+RESULT strtol_w(long *res, char *s, char **endptr, int base)
+{
+    char *endptr_int;
+
+    errno = 0;
+    *res = strtol(s, &endptr_int, base);
+
+    if (errno != 0) {
+        FUNCFAILED("strtol", strerror(errno));
+        return ERR;
+    }
+
+    if (endptr_int[0] != '\0') {
+        PRINTINTERR("strtol: invalid number %s", s);
+        return ERR;
+    }
+
+    if (endptr)
+        *endptr = endptr_int;
+
+    return OK;
+}

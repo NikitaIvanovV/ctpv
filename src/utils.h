@@ -44,5 +44,6 @@ int mkpath(char* file_path, int mode);
 const char *get_ext(const char *path);
 
 RESULT register_signal(int sig, SigHandler handler);
+RESULT strtol_w(long *res, char *s, char **endptr, int base);
 
 #endif
