@@ -15,30 +15,30 @@
 #define FUNCFAILED(f, ...) \
     PRINTINTERR(f "() failed" __VA_OPT__(": %s", __VA_ARGS__))
 
-#define ERRCHK_PRINT_(...)                    \
-    do {                                      \
-        __VA_OPT__(PRINTINTERR(__VA_ARGS__);) \
+#define ERRCHK_PRINT_(...)        \
+    do {                          \
+        PRINTINTERR(__VA_ARGS__); \
     } while (0)
 
 /*
  * If cond is true, return ERR. Also call print_error or
  * print_errorf if error message or format string is given.
  */
-#define ERRCHK_RET(cond, ...)           \
-    do {                                \
-        if (cond) {                     \
-            ERRCHK_PRINT_(__VA_ARGS__); \
-            return ERR;                 \
-        }                               \
+#define ERRCHK_RET(cond, ...)                       \
+    do {                                            \
+        if (cond) {                                 \
+            __VA_OPT__(ERRCHK_PRINT_(__VA_ARGS__);) \
+            return ERR;                             \
+        }                                           \
     } while (0)
 
-#define ERRCHK_GOTO(cond, ret, label, ...) \
-    do {                                   \
-        if (cond) {                        \
-            ERRCHK_PRINT_(__VA_ARGS__);    \
-            ret = ERR;                     \
-            goto label;                    \
-        }                                  \
+#define ERRCHK_GOTO(cond, ret, label, ...)          \
+    do {                                            \
+        if (cond) {                                 \
+            __VA_OPT__(ERRCHK_PRINT_(__VA_ARGS__);) \
+            ret = ERR;                              \
+            goto label;                             \
+        }                                           \
     } while (0)
 
 #define ERRCHK_MSG_(x) "'" x "'"
