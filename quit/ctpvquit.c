@@ -5,16 +5,14 @@
 #include <signal.h>
 #include <unistd.h>
 
-int main (int argc, char *argv[])
+int main(int argc, char *argv[])
 {
     if (argc <= 1) {
         fprintf(stderr, "id not given\n");
         return EXIT_FAILURE;
     }
 
-    char *pid_s = argv[1];
-
-    char *endptr;
+    char *endptr, *pid_s = argv[1];
 
     errno = 0;
     long pid = strtol(pid_s, &endptr, 10);
@@ -30,7 +28,7 @@ int main (int argc, char *argv[])
     }
 
     while (1) {
-        sleep(5);
+        sleep(1);
 
         if (kill(pid, 0) == -1) {
             if (errno != ESRCH) {
