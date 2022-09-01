@@ -8,11 +8,10 @@ DEP := $(OBJ:.o=.d)
 PRE := $(wildcard sh/prev/*)
 GEN := gen/previews.h gen/server.h gen/helpers.h
 
-O    := -O2
 LIBS := magic crypto
 
-CFLAGS  += $(O) -MD -Wall -Wextra -Wno-unused-parameter
-LDFLAGS += $(addprefix -l,$(LIBS))
+ALL_CFLAGS  := -O2 -MD -Wall -Wextra -Wno-unused-parameter $(CFLAGS) $(CPPFLAGS)
+ALL_LDFLAGS := $(addprefix -l,$(LIBS)) $(CFLAGS) $(LDFLAGS)
 
 INSTALL := install
 
@@ -20,8 +19,8 @@ all: ctpv
 
 options:
 	@echo "CC      = $(CC)"
-	@echo "CFLAGS  = $(CFLAGS)"
-	@echo "LDFLAGS = $(LDFLAGS)"
+	@echo "CFLAGS  = $(ALL_CFLAGS)"
+	@echo "LDFLAGS = $(ALL_LDFLAGS)"
 
 install: install.bin install.man
 
@@ -47,7 +46,10 @@ docs: README.md doc/ctpv.1
 	deptable/list.awk $(PRE) | deptable/roff.sed | deptable/insert.awk doc/ctpv.1
 
 ctpv: $(OBJ)
-	$(CC) -o $@ $+ $(LDFLAGS)
+	$(CC) -o $@ $+ $(ALL_LDFLAGS)
+
+.c.o:
+	$(CC) -o $@ $< -c $(ALL_CFLAGS)
 
 # Exclicit rules for generated header files
 src/ctpv.o: gen/previews.h
