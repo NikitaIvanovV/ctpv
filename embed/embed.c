@@ -31,7 +31,7 @@ void getvarname(char *res, char *prefix, char *filename)
     res[i] = '\0';
 }
 
-void print_byte(char c)
+void print_char(char c)
 {
     printf("0x%x, ", c);
 }
@@ -47,7 +47,7 @@ void print_file(char *f)
     }
 
     while ((c = fgetc(file)) != EOF)
-        print_byte(c);
+        print_char(c);
 
     fclose(file);
 }
@@ -62,7 +62,7 @@ void embed_file(char *prefix, char *filename, char *helpers)
 
     if (helpers) {
         print_file(helpers);
-        print_byte('\n');
+        print_char('\n');
     }
 
     print_file(filename);
