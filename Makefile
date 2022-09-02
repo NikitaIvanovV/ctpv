@@ -13,7 +13,10 @@ LIBS := magic crypto
 ALL_CFLAGS  := -O2 -MD -Wall -Wextra -Wno-unused-parameter $(CFLAGS) $(CPPFLAGS)
 ALL_LDFLAGS := $(addprefix -l,$(LIBS)) $(CFLAGS) $(LDFLAGS)
 
-INSTALL := install
+MKDIR        := mkdir -p
+INSTALL      := install
+INSTALL_EXE  := $(INSTALL)
+INSTALL_DATA := $(INSTALL) -m 0644
 
 all: ctpv
 
@@ -25,15 +28,15 @@ options:
 install: install.bin install.man
 
 install.bin: ctpv quit/ctpvquit ctpvclear
-	$(INSTALL) -d $(BINPREFIX)
-	$(INSTALL) $^ $(BINPREFIX)
+	$(MKDIR) $(BINPREFIX)
+	$(INSTALL_EXE) $^ $(BINPREFIX)
 
 install.man: doc/ctpv.1
-	$(INSTALL) -d $(MANPREFIX)
-	$(INSTALL) -m 0644 $^ $(MANPREFIX)
+	$(MKDIR) $(MANPREFIX)
+	$(INSTALL_DATA) $^ $(MANPREFIX)
 
 uninstall:
-	$(RM) $(BINPREFIX)/ctpv $(BINPREFIX)/ctpvclear $(BINPREFIX)/ctpvquit \
+	$(RM) $(BINPREFIX)/ctpv $(BINPREFIX)/ctpvquit $(BINPREFIX)/ctpvclear \
 		$(MANPREFIX)/ctpv.1
 
 clean:
@@ -68,7 +71,7 @@ gen/helpers.h: sh/helpers.sh embed/embed
 $(GEN): | gen
 
 gen:
-	mkdir $@
+	$(MKDIR) $@
 
 embed/embed: .force
 	$(MAKE) -C embed
