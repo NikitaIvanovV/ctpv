@@ -19,7 +19,10 @@ noimages() {
 }
 
 is_kitty() {
-	[ -n "$KITTY_PID" ]
+	case "$TERM" in
+		*-kitty) return 0 ;;
+		*)       return 1 ;;
+	esac
 }
 
 kitty_clear() {
