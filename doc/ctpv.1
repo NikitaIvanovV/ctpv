@@ -1,20 +1,7 @@
 '\" t
-.ds op \&.\|.\|.\&
 .ds ub \(:Uberzug
 .
-.de Op
-.RI [ "\\$1" "]\\$2"
-..
-.
-.de Om
-.Op "\\$1" \*(op
-..
-.
-.de Bsi
-\&\fB\\$1\fP \fI\\$2\fP\\$3
-..
-.
-.TH CTPV 1 2022 Linux "User Manuals"
+.TH CTPV 1 2022 Linux "User's Reference Manuals"
 .
 .SH NAME
 ctpv \- terminal previewer
@@ -23,11 +10,11 @@ ctpv \- terminal previewer
 .
 .SY ctpv
 .I file
-.Op w
-.Op h
-.Op x
-.Op y
-.Op id
+.RI [ w ]
+.RI [ h ]
+.RI [ x ]
+.RI [ y ]
+.RI [ id ]
 .YS
 .
 .SY ctpv
@@ -36,7 +23,8 @@ ctpv \- terminal previewer
 .
 .SY ctpv
 .B \-m
-.Om files
+.RI [ file
+\&.\|.\|.]
 .YS
 .
 .SY ctpv
@@ -89,7 +77,7 @@ archive	T{
 atool
 T}
 diff	T{
-colordiff delta diff-so-fancy
+colordiff delta diff\-so\-fancy
 T}
 directory	T{
 ls
@@ -122,7 +110,7 @@ text	T{
 bat cat highlight source-highlight
 T}
 torrent	T{
-transmission-show
+transmission\-show
 T}
 video	T{
 ffmpegthumbnailer
@@ -144,7 +132,7 @@ configuration file (usually located at
 .EX
 set previewer ctpv
 set cleaner ctpvclear
-&ctpv -s $id
+&ctpv \-s $id
 &ctpvquit $id
 .EE
 .RE
@@ -215,16 +203,17 @@ and standard error are printed.
 List all previews.
 .
 .TP
-.Bsi \-m files \*(op
-Print extension and MIME type of specified files.
+\fB\-m\fP \fIfile\fP.\|.\|.\&
+Print extension and MIME type of
+.IR file .
 .
 .TP
-.Bsi \-s id
+\fB\-s\fP \fIid\fP
 Start server with ID
 .IR id .
 .
 .TP
-.Bsi \-c id
+\fB\-c\fP \fIid\fP
 Send
 .B clear
 command to server with ID
@@ -232,7 +221,7 @@ command to server with ID
 (usually, it removes image from terminal).
 .
 .TP
-.Bsi \-e id
+\fB\-e\fP \fIid\fP
 Kill server with ID
 .IR id .
 .
@@ -325,7 +314,7 @@ braces.
 .IP
 .EX
 preview manpage .1 {{
-\&    groff -man -tep -Tutf8 -rLL="${w}n" "${f}" | col -x
+\&    groff \-man \-tep \-Tutf8 \-rLL="${w}n" "${f}" | col \-x
 }}
 .EE
 .
