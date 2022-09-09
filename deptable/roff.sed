@@ -8,6 +8,11 @@ lb lb\
 l li .\
 File type\tPrograms
 
+# Substitute '-' with '\-'
+:a
+s/\(\t.*[^\\]\)-/\1\\-/
+ta
+
 # Format rows
 s/\t/&T{\n/; s/$/\nT}/
 
