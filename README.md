@@ -18,13 +18,14 @@ Image previews are powered by one of these:
 * [Chafa](https://github.com/hpjansson/chafa)
 
 ctpv is a remake of an awesome program named
-[stpv](https://github.com/Naheel-Azawy/stpv) written in C.
+[stpv](https://github.com/Naheel-Azawy/stpv)
+written in C.
 stpv worked perfectly for me, except it was kinda sluggish because
 it was written in POSIX shell.
 ctpv is an attempt to make a faster version of stpv and add some
 new features.
 
-Originally it was made for [lf][lf]
+Originally it was made for [lf][]
 file manager but I believe that it can be easily integrated into
 other programs as well
 (either via configuration file like in lf or a simple wrapper
@@ -83,7 +84,8 @@ Uninstall with `sudo make uninstall`
 ### AUR
 
 If you are an Arch Linux user, you can install
-[`ctpv-git`](https://aur.archlinux.org/packages/ctpv-git) AUR package.
+[`ctpv-git`](https://aur.archlinux.org/packages/ctpv-git)
+AUR package.
 
 ```sh
 yay -S ctpv-git
@@ -106,7 +108,7 @@ set cleaner ctpvclear
 ## Documentation
 
 Full documentation on command line options,
-configuration and how to define custom previews
-can be found here: https://nikitaivanovv.github.io/ctpv/
+configuration and how to define custom previews can be found here:
+https://nikitaivanovv.github.io/ctpv/
 
 [lf]: https://github.com/gokcehan/lf
