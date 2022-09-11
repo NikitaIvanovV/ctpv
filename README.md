@@ -25,7 +25,7 @@ it was written in POSIX shell.
 ctpv is an attempt to make a faster version of stpv and add some
 new features.
 
-Originally it was made for [lf][]
+Originally it was made for [lf]
 file manager but I believe that it can be easily integrated into
 other programs as well
 (either via configuration file like in lf or a simple wrapper
