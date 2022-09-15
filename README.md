@@ -13,7 +13,7 @@ and videos (see [Previews](#previews)).
 
 Image previews are powered by one of these:
 
-* [Überzug](https://github.com/seebye/ueberzug)
+* [Überzug](https://github.com/seebye/ueberzug) (X11 only)
 * [Kitty terminal](https://github.com/kovidgoyal/kitty)
 * [Chafa](https://github.com/hpjansson/chafa)
 
