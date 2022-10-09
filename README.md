@@ -65,7 +65,7 @@ For example, you only need either `elinks`, `lynx` or
 | pdf | `pdftoppm` |
 | text | `bat` `cat` `highlight` `source-highlight` |
 | torrent | `transmission-show` |
-| video | `ffmpegthumbnailer` |
+| video | `convert` `ffmpegthumbnailer` |
 
 <!--TABLEEND-->
 
