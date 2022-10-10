@@ -10,7 +10,7 @@ GEN := gen/previews.h gen/server.h gen/helpers.h
 
 LIBS := magic crypto
 
-ALL_CFLAGS  := -O2 -MD -Wall -Wextra -Wno-unused-parameter $(CFLAGS) $(CPPFLAGS)
+ALL_CFLAGS  := -O2 -MMD -Wall -Wextra -Wno-unused-parameter $(CFLAGS) $(CPPFLAGS)
 ALL_LDFLAGS := $(addprefix -l,$(LIBS)) $(CFLAGS) $(LDFLAGS)
 
 MKDIR        := mkdir -p
