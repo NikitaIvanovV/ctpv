@@ -63,9 +63,10 @@ For example, you only need either `elinks`, `lynx` or
 | markdown | `mdcat` |
 | office | `libreoffice` |
 | pdf | `pdftoppm` |
+| svg | `convert` |
 | text | `bat` `cat` `highlight` `source-highlight` |
 | torrent | `transmission-show` |
-| video | `convert` `ffmpegthumbnailer` |
+| video | `ffmpegthumbnailer` |
 
 <!--TABLEEND-->
 

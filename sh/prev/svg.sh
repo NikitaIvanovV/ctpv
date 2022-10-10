@@ -1,7 +1,7 @@
-# video: convert
+# svg: convert
 
-video() {
+svg() {
 	convert "$f" "jpg:$cache_f"
 }
 
-convert_and_show_image video
+convert_and_show_image svg
