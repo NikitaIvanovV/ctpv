@@ -6,8 +6,6 @@
 #include "vector.h"
 #include "result.h"
 
-#define MIMETYPE_MAX 64
-
 enum PreviewAttr {
     PREV_ATTR_NONE = 0,
     PREV_ATTR_EXT_SHORT = 1 << 0,

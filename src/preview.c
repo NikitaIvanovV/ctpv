@@ -13,6 +13,8 @@
 
 #define PREVP_SIZE sizeof(Preview *)
 
+#define MIMETYPE_MAX 64
+
 VECTOR_GEN_SOURCE(Preview, Preview)
 
 static struct {
