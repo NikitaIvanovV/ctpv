@@ -60,16 +60,8 @@ is_anim_image() {
 	esac
 }
 
-prepare_anim_img() {
-	if [ "$1" != "$cache_f" ] && is_anim_image "$1"; then
-		convert "${1}[0]" "jpg:${cache_f}" && printf '%s\n' "$cache_f"
-	else
-		printf '%s\n' "$1"
-	fi
-}
-
 chafa_run() {
-	_f="$(prepare_anim_img "$1")" && chafa -s "${w}x${h}" "$_f"
+	chafa -s "${w}x${h}" "$1"
 }
 
 setup_fifo() {
