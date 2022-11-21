@@ -61,7 +61,7 @@ is_anim_image() {
 }
 
 chafa_run() {
-	chafa -s "${w}x${h}" "$1"
+	chafa -s "${w}x${h}" -f symbols "$1"
 }
 
 setup_fifo() {
