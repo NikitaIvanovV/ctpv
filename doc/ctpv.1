@@ -312,6 +312,30 @@ Print only text and do not use any image previewing method.
 Do not print resolved path of symbolic links.
 .
 .TP
+.B autochafa
+By default,
+.I Chafa
+is always forced to use \(lqsymbols\(rq format because
+.I lf
+does not support
+\(lqsixel\(rq output in the preview window.
+However, one could install a
+.UR https://github.com/horriblename/lf
+fork of
+.I lf
+.UE
+that does.
+For such cases the
+.B autochafa
+option exists, which allows
+.I Chafa
+to decide which format to use.
+Use it if you are sure that the version of
+.I lf
+you are using will be able to handle whatever output produced by
+.IR Chafa .
+.
+.TP
 .B showgpg
 Preview
 .BR gpg (1)

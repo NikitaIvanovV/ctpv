@@ -18,6 +18,10 @@ noimages() {
 	[ -n "$noimages" ]
 }
 
+autochafa() {
+	[ -z "$autochafa" ]
+}
+
 is_kitty() {
 	case "$TERM" in
 		*-kitty) return 0 ;;
@@ -61,7 +65,8 @@ is_anim_image() {
 }
 
 chafa_run() {
-	chafa -s "${w}x${h}" -f symbols "$1"
+	autochafa && format='-f symbols' || format=
+	chafa -s "${w}x${h}" $format "$1" | sed 's/#/\n#/g'
 }
 
 setup_fifo() {
