@@ -53,6 +53,7 @@ For example, you only need either `elinks`, `lynx` or
 | ---- | ---- |
 | any | `exiftool` `cat` |
 | archive | `atool` |
+| audio | `ffmpegthumbnailer` `ffmpeg` |
 | diff | `colordiff` `delta` `diff-so-fancy` |
 | directory | `ls` |
 | font | `fontimage` |
