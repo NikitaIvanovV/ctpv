@@ -42,6 +42,7 @@ Preview b_previews[] = {
     PR(NULL,      "image",          NULL,             image,                   PREV_ATTR_NONE),
     PR(NULL,      "image",          "svg+xml",        svg,                     PREV_ATTR_NONE),
     PR(NULL,      "video",          NULL,             video,                   PREV_ATTR_NONE),
+    PR(NULL,      "audio",          NULL,             audio,                   PREV_ATTR_NONE),
 
     PR(NULL,      "application",    "pdf",            pdf,                     PREV_ATTR_NONE),
     PR(NULL,      "application",    "json",           jq,                      PREV_ATTR_NONE),
