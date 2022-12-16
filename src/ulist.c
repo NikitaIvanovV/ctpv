@@ -1,4 +1,5 @@
 #include <string.h>
+#include <sys/types.h>
 
 #include "ulist.h"
 #include "error.h"
