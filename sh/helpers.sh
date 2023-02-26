@@ -32,7 +32,7 @@ is_kitty() {
 }
 
 kitty_clear() {
-	kitty +kitten icat --clear --transfer-mode file
+	kitty +kitten icat --clear --stdin no --silent --transfer-mode file < /dev/null > /dev/tty
 }
 
 fifo_open() {
@@ -95,8 +95,8 @@ send_image() {
 			return 1
 			;;
 		"$image_method_kitty")
-			kitty +kitten icat --transfer-mode file --align left \
-				--place "${w}x${h}@${x}x${y}" "$1" &
+			kitty +kitten icat --silent --stdin no --transfer-mode file \
+				--place "${w}x${h}@${x}x${y}" "$1" < /dev/null > /dev/tty
 			printf '%d\n' "$!" > "$(kitty_icat_pid)"
 			wait
 			return 1
