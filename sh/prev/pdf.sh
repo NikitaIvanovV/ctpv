@@ -5,7 +5,7 @@ pdf() {
 		-scale-to-x 1920            \
 		-scale-to-y -1              \
 		-singlefile                 \
-		-jpeg -tiffcompression jpeg \
+		-jpeg \
 		-- "$f" "$cache_f" && mv -- "$cache_f.jpg" "$cache_f"
 }
 
