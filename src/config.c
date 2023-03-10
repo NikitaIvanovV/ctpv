@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 #include "ctpv.h"
 #include "lexer.h"
 #include "error.h"
@@ -62,6 +64,7 @@ static struct Option options[] = {
     DEF_OPTION_BOOL(nosymlinkinfo),
     DEF_OPTION_BOOL(autochafa),
     DEF_OPTION_BOOL(showgpg),
+    DEF_OPTION_STR(shell),
 };
 
 static void any_type_null(char **s)
@@ -414,6 +417,8 @@ RESULT config_load(Parser **ctx, VectorPreview *prevs, char *filename)
     (*ctx)->previews = prevs;
 
     ERRCHK_GOTO_OK(parse(*ctx), ret, file);
+
+    ERRCHK_GOTO((access(ctpv.opts.shell, F_OK) != 0), ret, file, "shell '%s' was not found", ctpv.opts.shell);
 
 file:
     fclose(f);

@@ -17,6 +17,7 @@ struct CTPV {
     struct {
         int forcekitty, forcekittyanim, forcechafa, noimages, nosymlinkinfo;
         int autochafa, showgpg;
+        char *shell;
     } opts;
 };
 

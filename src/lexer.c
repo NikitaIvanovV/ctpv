@@ -240,6 +240,11 @@ static inline int issymbol(int c)
     return isalnum(c) || c == '_' || c == '-';
 }
 
+static inline int isnotquote(int c)
+{
+    return (c != '"');
+}
+
 static inline Token read_symbol(Lexer *ctx)
 {
     char c = peek_char(ctx);
@@ -252,6 +257,25 @@ static inline Token read_symbol(Lexer *ctx)
 
     Token tok = get_tok(ctx, TOK_STR);
     tok.val.s = get_text(ctx);
+
+    return tok;
+}
+
+static inline Token read_string(Lexer *ctx)
+{
+    char c = next_char(ctx);
+
+    if (isnotquote(c))
+        return get_tok(ctx, TOK_NULL);
+
+    record_text(ctx);
+    read_while(ctx, isnotquote, 1);
+
+    Token tok = get_tok(ctx, TOK_STR);
+    tok.val.s = get_text(ctx);
+
+    // Skip ending quote
+    next_char(ctx);
 
     return tok;
 }
@@ -395,6 +419,7 @@ Token lexer_get_token(Lexer *ctx)
     ATTEMPT_READ(ctx, read_symbol);
     ATTEMPT_READ(ctx, read_int);
     ATTEMPT_READ(ctx, read_block);
+    ATTEMPT_READ(ctx, read_string);
 
     PARSEERROR((*ctx), "cannot handle character: %c", peek_char(ctx));
     return get_tok(ctx, TOK_ERR);

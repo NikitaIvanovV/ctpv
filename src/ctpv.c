@@ -394,6 +394,8 @@ int main(int argc, char *argv[])
 {
     program = argc > 0 ? argv[0] : "ctpv";
 
+    ctpv.opts.shell = "/bin/sh";
+
     int c;
     while ((c = getopt(argc, argv, "s:c:e:lmv")) != -1) {
         switch (c) {

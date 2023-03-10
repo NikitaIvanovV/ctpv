@@ -31,19 +31,23 @@ static char *prepend_helpers(char *str, size_t len)
     return buf;
 }
 
-#define OPT_SETENV(name) \
-    ERRCHK_RET_ERN(setenv((#name), ctpv.opts.name ? "1" : "", 1) == -1)
+#define OPT_SETENV_INT(name) \
+    ERRCHK_RET_ERN(setenv((#name), (ctpv.opts.name ? "1" : ""), 1) == -1)
+
+#define OPT_SETENV_STR(name) \
+    ERRCHK_RET_ERN(setenv((#name), (ctpv.opts.name ? ctpv.opts.name : ""), 1) == -1)
 
 RESULT run_script(char *script, size_t script_len, int *exitcode, int *signal,
                   SpawnProg sp, void *sp_arg)
 {
-    OPT_SETENV(forcekitty);
-    OPT_SETENV(forcekittyanim);
-    OPT_SETENV(forcechafa);
-    OPT_SETENV(noimages);
-    OPT_SETENV(nosymlinkinfo);
-    OPT_SETENV(autochafa);
-    OPT_SETENV(showgpg);
+    OPT_SETENV_INT(forcekitty);
+    OPT_SETENV_INT(forcekittyanim);
+    OPT_SETENV_INT(forcechafa);
+    OPT_SETENV_INT(noimages);
+    OPT_SETENV_INT(nosymlinkinfo);
+    OPT_SETENV_INT(autochafa);
+    OPT_SETENV_INT(showgpg);
+    OPT_SETENV_STR(shell);
 
     char *scr = prepend_helpers(script, script_len);
     char *args[] = SHELL_ARGS(scr);

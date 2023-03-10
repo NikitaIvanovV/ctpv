@@ -267,8 +267,9 @@ Example:
 .
 .IP
 .EX
-# Set an option
+# Set some options
 set forcekitty
+set shell "/usr/bin/bash"
 .sp
 # Add a new preview
 preview cow .moo {{
@@ -286,6 +287,16 @@ remove elinks
 An option can be set using
 .B set
 command.
+.
+.TP
+.BR shell \~\c
+.I path
+Use
+.I path
+as a path to a shell to run previews with.
+Use it if you have a non-POSIX compliant shell installed as a default shell.
+The setting defaults to
+.BR /bin/sh .
 .
 .TP
 .B forcekitty
