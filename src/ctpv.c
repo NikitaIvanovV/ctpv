@@ -144,10 +144,18 @@ static RESULT is_newer(int *resp, char *f1, char *f2)
     ERRCHK_RET_ERN(lstat(f1, &stat1) == -1);
     ERRCHK_RET_ERN(lstat(f2, &stat2) == -1);
 
-    int sec_d = stat1.st_ctim.tv_sec - stat2.st_ctim.tv_sec;
+#if __APPLE__
+    struct timespec *t1 = &stat1.st_ctimespec;
+    struct timespec *t2 = &stat2.st_ctimespec;
+#else
+    struct timespec *t1 = &stat1.st_ctim;
+    struct timespec *t2 = &stat2.st_ctim;
+#endif
+
+    time_t sec_d = t1->tv_sec - t2->tv_sec;
     if (sec_d < 0)
         goto older;
-    else if (sec_d == 0 && stat1.st_ctim.tv_nsec <= stat2.st_ctim.tv_nsec)
+    else if (sec_d == 0 && t1->tv_nsec <= t2->tv_nsec)
         goto older;
 
     *resp = 1;
