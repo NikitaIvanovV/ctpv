@@ -99,6 +99,16 @@ AUR package.
 yay -S ctpv-git
 ```
 
+### MacPorts
+
+With MacPorts, you can install the
+[`ctpv`](https://ports.macports.org/port/ctpv)
+package.
+
+```console
+sudo port install ctpv
+```
+
 ## Integration
 
 ### lf file manager
