@@ -1,21 +1,21 @@
 # ctpv
 
-Terminal previewer
+File previewer for a terminal
 
 ![showcase](doc/showcase.gif)
 
 ----
 
-ctpv is a previewer utility for terminals.
+ctpv is a file previewer utility for terminals.
 
 It supports previews for source code, archives, PDF files, images
 and videos (see [Previews](#previews)).
 
 Image previews are powered by one of these:
 
-* [Überzug](https://github.com/seebye/ueberzug) (X11 only)
-* [Kitty terminal](https://github.com/kovidgoyal/kitty)
-* [Chafa](https://github.com/hpjansson/chafa)
+* [Überzug][ueberzug] (X11 only)
+* [Kitty terminal][kitty]
+* [Chafa][chafa]
 
 ctpv is a remake of an awesome program named
 [stpv](https://github.com/Naheel-Azawy/stpv)
@@ -61,7 +61,7 @@ For example, you only need either `elinks`, `lynx` or
 | html | `elinks` `lynx` `w3m` |
 | image | `ueberzug` `chafa` |
 | json | `jq` |
-| markdown | `mdcat` |
+| markdown | `glow` `mdcat` |
 | office | `libreoffice` |
 | pdf | `pdftoppm` |
 | svg | `convert` |
@@ -107,10 +107,25 @@ set cleaner ctpvclear
 &ctpvquit $id
 ```
 
+#### Wayland
+
+If you use Wayland, follow these steps:
+
+* Install [this fork of lf][lf-sixel]
+* Install [Chafa][chafa]
+* Add `set autochafa` to `~/.config/ctpv/config`
+
+As of 2023-03-19, original lf does not support sixel protocol,
+which is why you need use the fork.
+
 ## Documentation
 
 Full documentation on command line options,
 configuration and how to define custom previews can be found here:
-https://nikitaivanovv.github.io/ctpv/
+https://nikitaivanovv.github.io/ctpv
 
+[ueberzug]: https://github.com/seebye/ueberzug
+[kitty]: https://github.com/kovidgoyal/kitty
+[chafa]: https://github.com/hpjansson/chafa
 [lf]: https://github.com/gokcehan/lf
+[lf-sixel]: https://github.com/horriblename/lf
