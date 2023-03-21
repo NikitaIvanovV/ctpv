@@ -63,6 +63,7 @@ static struct Option options[] = {
     DEF_OPTION_BOOL(noimages),
     DEF_OPTION_BOOL(nosymlinkinfo),
     DEF_OPTION_BOOL(autochafa),
+    DEF_OPTION_BOOL(chafasixel),
     DEF_OPTION_BOOL(showgpg),
     DEF_OPTION_STR(shell),
 };

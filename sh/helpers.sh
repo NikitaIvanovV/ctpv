@@ -19,7 +19,11 @@ noimages() {
 }
 
 autochafa() {
-	[ -z "$autochafa" ]
+	[ -n "$autochafa" ]
+}
+
+chafasixel() {
+	[ -n "$chafasixel" ]
 }
 
 is_kitty() {
@@ -67,7 +71,9 @@ is_anim_image() {
 }
 
 chafa_run() {
-	autochafa && format='-f symbols' || format=
+	format='-f symbols'
+	autochafa && format=
+	chafasixel && format='-f sixels'
 	chafa -s "${w}x${h}" $format "$1" | sed 's/#/\n#/g'
 }
 
