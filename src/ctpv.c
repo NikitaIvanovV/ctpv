@@ -250,7 +250,7 @@ static RESULT preview(int argc, char *argv[])
     }
 
     /* To some reason lf chops off last 2 characters of a line */
-    w_l = MAX(0, w_l - 2);
+    w_l = MAX(0, w_l - 10);
 
     snprintf(w_buf, LEN(w_buf), "%ld", w_l);
     snprintf(h_buf, LEN(h_buf), "%ld", h_l);
