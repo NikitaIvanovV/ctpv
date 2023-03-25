@@ -117,6 +117,7 @@ set cleaner ctpvclear
 
 If you use Wayland, follow these steps:
 
+* Make sure you use one of the [terminals that support sixel][sixel]
 * Install [this fork of lf][lf-sixel]
 * Install [Chafa][chafa]
 * Add `set chafasixel` to `~/.config/ctpv/config`
@@ -135,3 +136,4 @@ configuration and how to define custom previews can be found here:
 [chafa]: https://github.com/hpjansson/chafa
 [lf]: https://github.com/gokcehan/lf
 [lf-sixel]: https://github.com/horriblename/lf
+[sixel]: https://www.arewesixelyet.com
