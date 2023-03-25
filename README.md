@@ -6,41 +6,33 @@ File previewer for a terminal
 
 ----
 
-ctpv is a file previewer utility for terminals.
+ctpv is a file previewer utility for a terminal.
 
-It supports previews for source code, archives, PDF files, images
-and videos (see [Previews](#previews)).
+It was made with integration into [lf file manager][lf] in mind,
+but I believe that it can be easily integrated into other programs
+as well.
 
-Image previews are powered by one of these:
+It supports previews for source code, archives, PDF files, images,
+videos, etc.
+See [Previews](#previews) for more info.
+
+Image previews are powered by one of these programs:
 
 * [Überzug][ueberzug] (X11 only)
+* [Chafa][chafa] (X11 and Wayland)
 * [Kitty terminal][kitty]
-* [Chafa][chafa]
 
 ctpv is a remake of an awesome program named
-[stpv](https://github.com/Naheel-Azawy/stpv)
-written in C.
-stpv worked perfectly for me, except it was kinda sluggish because
+[stpv](https://github.com/Naheel-Azawy/stpv).
+stpv did everything I wanted, except it was a bit sluggish because
 it was written in POSIX shell.
-ctpv is an attempt to make a faster version of stpv and add some
-new features.
+ctpv is written in C and is an attempt to make a faster version of
+stpv with a few new features.
 
-Originally it was made for [lf]
-file manager but I believe that it can be easily integrated into
-other programs as well
-(either via configuration file like in lf or a simple wrapper
-script).
+## Previews
 
-## Dependencies
-
-### Libraries
-
-* `libcrypto`
-* `libmagic`
-
-### Previews
-
-Previewing each file type requires specific programs.
+Previewing each file type requires specific programs installed on
+a system.
 If a program is not found on the system, ctpv
 will try to use another one.
 Only one program is required for each file type.
@@ -75,13 +67,27 @@ For example, you only need either `elinks`, `lynx` or
 
 ### Manual
 
-```sh
+If you are building from source, make sure to install these libraries!
+Depending on your system, you probably will also need "devel" versions
+of the same libraries.
+
+* `libcrypto`
+* `libmagic`
+
+Install:
+
+```console
 git clone https://github.com/NikitaIvanovV/ctpv
 cd ctpv
 sudo make install
+sudo make install
 ```
 
-Uninstall with `sudo make uninstall`
+Uninstall:
+
+```console
+sudo make uninstall
+```
 
 ### AUR
 
@@ -89,7 +95,7 @@ If you are an Arch Linux user, you can install
 [`ctpv-git`](https://aur.archlinux.org/packages/ctpv-git)
 AUR package.
 
-```sh
+```console
 yay -S ctpv-git
 ```
 
@@ -113,7 +119,7 @@ If you use Wayland, follow these steps:
 
 * Install [this fork of lf][lf-sixel]
 * Install [Chafa][chafa]
-* Add `set autochafa` to `~/.config/ctpv/config`
+* Add `set chafasixel` to `~/.config/ctpv/config`
 
 As of 2023-03-19, original lf does not support sixel protocol,
 which is why you need use the fork.
@@ -122,7 +128,7 @@ which is why you need use the fork.
 
 Full documentation on command line options,
 configuration and how to define custom previews can be found here:
-https://nikitaivanovv.github.io/ctpv
+<https://www.nikitaivanov.com/man1/ctpv>
 
 [ueberzug]: https://github.com/seebye/ueberzug
 [kitty]: https://github.com/kovidgoyal/kitty

@@ -172,13 +172,35 @@ options (see
 .IR "Preview options" ).
 .
 .PP
-Note that
 .I \*(ub
 supports
 .I X11
-only
-.RI ( Wayland
-is not supported).
+only, so
+.I Wayland
+is not supported.
+To enable high-resolution image previews on
+.IR Wayland ,
+you need to follow these steps:
+.
+.IP \(bu 4
+Install
+.UR https://\:github\:.com/\:horriblename/\:lf
+.I lf-sixel
+.UE .
+.
+.IP \(bu
+Install
+.I Chafa
+.
+.IP \(bu
+Add
+.B chafasixel
+configuration option (see
+.IR "Preview options" )
+.
+.PP
+The fork is required because, as of 2023-03-19,
+the original lf does not support sixel protocol.
 .
 .SS How previews are selected
 .
@@ -290,7 +312,7 @@ command.
 .
 .TP
 .BR shell \~\c
-.I path
+.RI \(dq path \(dq
 Use
 .I path
 as a path to a shell to run previews with.
@@ -326,28 +348,12 @@ Print only text and do not use any image previewing method.
 Do not print resolved path of symbolic links.
 .
 .TP
-.B autochafa
-By default,
+.B chafasixel
+Set output format of
 .I Chafa
-is always forced to use \(lqsymbols\(rq format because
-.I lf
-does not support
-\(lqsixel\(rq output in the preview window.
-However, one could install a
-.UR https://github.com/horriblename/lf
-fork of
-.I lf
-.UE
-that does.
-For such cases the
-.B autochafa
-option exists, which allows
-.I Chafa
-to decide which format to use.
-Use it if you are sure that the version of
-.I lf
-you are using will be able to handle whatever output produced by
-.IR Chafa .
+to \(lqsixels\(rq instead of \(lqsymbols\(rq.
+Use it if your file manager and terminal are capable of properly displaying
+sixel data.
 .
 .TP
 .B showgpg
