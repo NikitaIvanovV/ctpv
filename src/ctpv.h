@@ -6,6 +6,7 @@
 struct CTPV {
     enum {
         MODE_PREVIEW = 0, /* default mode */
+        MODE_HELP,
         MODE_SERVER,
         MODE_CLEAR,
         MODE_END,

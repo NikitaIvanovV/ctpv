@@ -6,7 +6,7 @@ SRC := $(wildcard src/*.c)
 OBJ := $(SRC:.c=.o)
 DEP := $(OBJ:.o=.d)
 PRE := $(wildcard sh/prev/*)
-GEN := gen/previews.h gen/server.h gen/helpers.h
+GEN := gen/help.h gen/previews.h gen/server.h gen/helpers.h
 
 LIBS := magic crypto
 
@@ -47,6 +47,7 @@ clean:
 docs: README.md doc/ctpv.1
 	deptable/list.awk $(PRE) | deptable/markdown.sed | deptable/insert.awk README.md
 	deptable/list.awk $(PRE) | deptable/roff.sed | deptable/insert.awk doc/ctpv.1
+	./genhelp.sh doc/ctpv.1 > help.txt
 
 ctpv: $(OBJ)
 	$(CC) -o $@ $+ $(ALL_LDFLAGS)
@@ -55,9 +56,12 @@ ctpv: $(OBJ)
 	$(CC) -o $@ $< -c $(ALL_CFLAGS)
 
 # Exclicit rules for generated header files
-src/ctpv.o: gen/previews.h
+src/ctpv.o: gen/previews.h gen/help.h
 src/shell.o: gen/helpers.h
 src/server.o: gen/server.h
+
+gen/help.h: help.txt embed/embed
+	embed/embed help.txt > $@
 
 gen/previews.h: $(PRE) embed/embed
 	embed/embed -p prev_scr_ $(PRE) > $@

@@ -1,0 +1,14 @@
+       -h     Print help message.
+
+       -l     List all previews.
+
+       -m file ...
+              Print extension and MIME type of file.
+
+       -s id  Start server with ID id.
+
+       -c id  Send clear command to server with ID id (usually, it removes im-
+              age from terminal).
+
+       -e id  Kill server with ID id.
+

@@ -16,6 +16,7 @@
 #include "preview.h"
 #include "../version.h"
 #include "../previews.h"
+#include "../gen/help.h"
 
 struct InputFile {
     char link[PATH_MAX], path[PATH_MAX];
@@ -392,6 +393,13 @@ static RESULT mime(int argc, char *argv[])
     return OK;
 }
 
+static RESULT help(void)
+{
+    printf("Usage: %s [OPTION]... FILE\n\n", program);
+    printf("Options:\n%s", help_txt);
+    return OK;
+}
+
 static RESULT version(void)
 {
     printf("%s version %s\n", program, VERSION);
@@ -405,8 +413,11 @@ int main(int argc, char *argv[])
     ctpv.opts.shell = "/bin/sh";
 
     int c;
-    while ((c = getopt(argc, argv, "s:c:e:lmv")) != -1) {
+    while ((c = getopt(argc, argv, "hs:c:e:lmv")) != -1) {
         switch (c) {
+        case 'h':
+            ctpv.mode = MODE_HELP;
+            break;
         case 's':
             ctpv.mode = MODE_SERVER;
             ctpv.server_id_s = optarg;
@@ -440,6 +451,9 @@ int main(int argc, char *argv[])
     switch (ctpv.mode) {
     case MODE_PREVIEW:
         ret = preview(argc, argv);
+        break;
+    case MODE_HELP:
+        ret = help();
         break;
     case MODE_SERVER:
         ret = server();
