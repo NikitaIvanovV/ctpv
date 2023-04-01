@@ -58,7 +58,7 @@ set_image_method() {
 
 	is_kitty && { image_method="$image_method_kitty"; return 0; }
 
-	exists chafa && exists convert && { image_method="$image_method_chafa"; return 0; }
+	exists chafa && { image_method="$image_method_chafa"; return 0; }
 }
 
 is_anim_image() {
