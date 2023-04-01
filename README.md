@@ -79,7 +79,7 @@ Install:
 ```console
 git clone https://github.com/NikitaIvanovV/ctpv
 cd ctpv
-sudo make install
+make
 sudo make install
 ```
 
