@@ -18,7 +18,6 @@ Preview b_previews[] = {
     PR("md",      NULL,             NULL,             glow,                    PREV_ATTR_NONE),
     PR("md",      NULL,             NULL,             mdcat,                   PREV_ATTR_NONE),
 
-    PR("torrent", NULL,             NULL,             torrent,                 PREV_ATTR_NONE),
 
     PR("ods",     NULL,             NULL,             libreoffice,             PREV_ATTR_NONE),
     PR("fods",    NULL,             NULL,             libreoffice,             PREV_ATTR_NONE),
@@ -113,6 +112,7 @@ Preview b_previews[] = {
     PR("7z",       NULL,            NULL,             atool,                   PREV_ATTR_NONE),
     PR("cpio",     NULL,            NULL,             atool,                   PREV_ATTR_NONE),
 
+    PR("torrent",  NULL,            NULL,             torrent,                 PREV_ATTR_EXT_SHORT),
     PR("gpg",      NULL,            NULL,             gpg,                     PREV_ATTR_EXT_SHORT),
 };
 
