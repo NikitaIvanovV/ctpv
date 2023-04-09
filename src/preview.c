@@ -201,10 +201,15 @@ run:
         return ERR;
     }
 
+    if (ctpv.debug)
+      fprintf(stderr, "Running preview: %s\n", p->name);
+
     ERRCHK_RET_OK(run(p, &exitcode, &signal));
 
     switch (exitcode) {
     case FAILED_PREVIEW_EC:
+        if (ctpv.debug)
+          fprintf(stderr, "Preview %s failed\n", p->name);
         i++;
         goto run;
     case ENOUGH_READ_EC:

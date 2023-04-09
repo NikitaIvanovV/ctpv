@@ -411,9 +411,10 @@ int main(int argc, char *argv[])
     program = argc > 0 ? argv[0] : "ctpv";
 
     ctpv.opts.shell = "/bin/sh";
+    ctpv.debug = 0;
 
     int c;
-    while ((c = getopt(argc, argv, "hs:c:e:lmv")) != -1) {
+    while ((c = getopt(argc, argv, "hs:c:e:lmdv")) != -1) {
         switch (c) {
         case 'h':
             ctpv.mode = MODE_HELP;
@@ -435,6 +436,9 @@ int main(int argc, char *argv[])
             break;
         case 'm':
             ctpv.mode = MODE_MIME;
+            break;
+        case 'd':
+            ctpv.debug = 1;
             break;
         case 'v':
             ctpv.mode = MODE_VERSION;

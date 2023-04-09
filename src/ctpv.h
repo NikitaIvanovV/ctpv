@@ -20,6 +20,7 @@ struct CTPV {
         int autochafa, chafasixel, showgpg;
         char *shell;
     } opts;
+    int debug;
 };
 
 extern struct CTPV ctpv;
