@@ -89,6 +89,34 @@ Uninstall:
 sudo make uninstall
 ```
 
+### Nix
+
+#### Nix package
+
+```console
+nix-env -ivf cptv
+nix profile install nixpkgs#cptv # with flakes enabled
+```
+
+#### NixOS and HomeManager
+
+If you don't need to call it directly and
+just want to use it through lf:
+
+```nix
+programs.lf = {
+  previewer = {
+    keybinding = "i";
+    source = "${pkgs.ctpv}/bin/ctpv";
+  };
+  extraConfig = ''
+    &${pkgs.ctpv}/bin/ctpv -s $id
+    cmd on-quit %${pkgs.ctpv}/bin/ctpv -e $id
+    set cleaner ${pkgs.ctpv}/bin/ctpvclear
+  '';
+}
+```
+
 ### AUR
 
 If you are an Arch Linux user, you can install
