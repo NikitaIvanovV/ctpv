@@ -39,29 +39,25 @@ Only one program is required for each file type.
 For example, you only need either `elinks`, `lynx` or
 `w3m` installed on your system to view HTML files.
 
-<!-- This table is auto generated! -->
-<!--TABLESTART-->
-| File types | Programs |
-| ---- | ---- |
-| any | `exiftool` `cat` |
-| archive | `atool` |
-| audio | `ffmpegthumbnailer` `ffmpeg` |
-| diff | `colordiff` `delta` `diff-so-fancy` |
-| directory | `ls` |
-| font | `fontimage` |
-| gpg-encrypted | `gpg` |
-| html | `elinks` `lynx` `w3m` |
-| image | `ueberzug` `chafa` |
-| json | `jq` |
-| markdown | `glow` `mdcat` |
-| office | `libreoffice` |
-| pdf | `pdftoppm` |
-| svg | `convert` |
-| text | `bat` `cat` `highlight` `source-highlight` |
-| torrent | `transmission-show` |
-| video | `ffmpegthumbnailer` |
-
-<!--TABLEEND-->
+| File types | Programs                                   | Meta-Package                                 |
+|------------|--------------------------------------------|----------------------------------------------|
+| any        | `exiftool` `cat`                           |                                              |
+| archive    | `atool`                                    |                                              |
+| audio      | `ffmpegthumbnailer` `ffmpeg`               |                                              |
+| diff       | `colordiff` `delta` `diff-so-fancy`        |                                              |
+| directory  | `ls`                                       |                                              |
+| font       | `fontimage`                                | [`FontForge`](https://fontforge.org)         |
+| gpg-encrypted | `gpg`                                   |                                              |
+| html       | `elinks` `lynx` `w3m`                      |                                              |
+| image      | `ueberzug` `chafa`                         |                                              |
+| json       | `jq`                                       |                                              |
+| markdown   | `glow` `mdcat`                             |                                              |
+| office     | `libreoffice`                              |                                              |
+| pdf        | `pdftoppm`                                 |                                              |
+| svg        | `convert`                                  | [`ImageMagick`](https://imagemagick.org)     |
+| text       | `bat` `cat` `highlight` `source-highlight` |                                              |
+| torrent    | `transmission-show`                        | [`Transmission`](https://transmissionbt.com) |
+| video      | `ffmpegthumbnailer`                        |                                              |
 
 ## Installation
 
