@@ -39,7 +39,7 @@ Only one program is required for each file type.
 For example, you only need either `elinks`, `lynx` or
 `w3m` installed on your system to view HTML files.
 
-| File types | Programs                                   | Meta-Package                                 |
+| File types | Programs                                   | Meta-Packages                                |
 |------------|--------------------------------------------|----------------------------------------------|
 | any        | `exiftool` `cat`                           |                                              |
 | archive    | `atool`                                    |                                              |
