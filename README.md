@@ -105,6 +105,16 @@ package.
 sudo port install ctpv
 ```
 
+### Homebrew
+
+With Homebrew, you can install the
+[`ctpv`](https://formulae.brew.sh/formula/ctpv)
+package.
+
+```console
+brew install ctpv
+```
+
 ### Nix
 
 #### Nix package
