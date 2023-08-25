@@ -39,25 +39,52 @@ Only one program is required for each file type.
 For example, you only need either `elinks`, `lynx` or
 `w3m` installed on your system to view HTML files.
 
-| File types | Programs                                   |
-|------------|--------------------------------------------|
-| any        | `exiftool` `cat`                           |
-| archive    | `atool`                                    |
-| audio      | `ffmpegthumbnailer` `ffmpeg`               |
-| diff       | `colordiff` `delta` `diff-so-fancy`        |
-| directory  | `ls`                                       |
-| font       | `fontimage`                                |
-| gpg-encrypted | `gpg`                                   |
-| html       | `elinks` `lynx` `w3m`                      |
-| image      | `ueberzug` `chafa`                         |
-| json       | `jq`                                       |
-| markdown   | `glow` `mdcat`                             |
-| office     | `libreoffice`                              |
-| pdf        | `pdftoppm`                                 |
-| svg        | `convert`                                  |
-| text       | `bat` `cat` `highlight` `source-highlight` |
-| torrent    | `transmission-show`                        |
-| video      | `ffmpegthumbnailer`                        |
+| File types    | Programs                                                                    |
+|---------------|-----------------------------------------------------------------------------|
+| any           | [`exiftool`][exiftool] `cat`                                                |
+| archive       | [`atool`][atool]                                                            |
+| audio         | [`ffmpegthumbnailer`][ffmpegthumbnailer] [`ffmpeg`][ffmpeg]                 |
+| diff          | [`colordiff`][colordiff] [`delta`][delta] [`diff-so-fancy`][diff-so-fancy]  |
+| directory     | `ls`                                                                        |
+| font          | [`fontimage`][fontforge]                                                    |
+| gpg-encrypted | [`gpg`][gpg]                                                                |
+| html          | [`elinks`][elinks] [`lynx`][lynx] [`w3m`][w3m]                              |
+| image         | [`ueberzug`][ueberzug] [`chafa`][chafa]                                     |
+| json          | [`jq`][jq]                                                                  |
+| markdown      | [`glow`][glow] [`mdcat`][mdcat]                                             |
+| office        | [`libreoffice`][libreoffice]                                                |
+| pdf           | [`pdftoppm`][poppler]                                                       |
+| svg           | [`convert`][imagemagick]                                                    |
+| text          | `bat` `cat` [`highlight`][highlight] [`source-highlight`][source-highlight] |
+| torrent       | [`transmission-show`][transmission]                                         |
+| video         | [`ffmpegthumbnailer`][ffmpegthumbnailer]                                    |
+
+<!-- Link References -->
+[exiftool]: https://github.com/exiftool/exiftool
+[atool]: https://www.nongnu.org/atool/
+[ffmpegthumbnailer]: https://github.com/dirkvdb/ffmpegthumbnailer
+[ffmpeg]: https://ffmpeg.org/
+[colordiff]: https://www.colordiff.org/
+[delta]: https://github.com/dandavison/delta
+[diff-so-fancy]: https://github.com/so-fancy/diff-so-fancy
+[fontforge]: https://fontforge.org
+[gpg]: https://www.gnupg.org/
+[libreoffice]: https://www.libreoffice.org/
+[elinks]: http://elinks.cz/
+[lynx]: https://github.com/jpanther/lynx
+[w3m]: https://w3m.sourceforge.net/
+[ueberzug]: https://github.com/seebye/ueberzug
+[chafa]: https://github.com/hpjansson/chafa
+[jq]: https://github.com/jqlang/jq
+[glow]: https://github.com/charmbracelet/glow
+[mdcat]: https://github.com/swsnr/mdcat
+[poppler]: https://poppler.freedesktop.org/
+[imagemagick]: https://imagemagick.org/
+[highlight]: https://gitlab.com/saalen/highlight
+[source-highlight]: https://www.gnu.org/software/src-highlite/
+[transmission]: https://transmissionbt.com/
+
+
 
 ## Installation
 
