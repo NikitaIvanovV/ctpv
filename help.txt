@@ -12,3 +12,5 @@
 
        -e id  Kill server with ID id.
 
+       -d     Enable debug messages.
+
