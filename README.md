@@ -43,23 +43,47 @@ For example, you only need either `elinks`, `lynx` or
 <!--TABLESTART-->
 | File types | Programs |
 | ---- | ---- |
-| any | `exiftool` `cat` |
-| archive | `atool` |
-| audio | `ffmpegthumbnailer` `ffmpeg` |
-| diff | `colordiff` `delta` `diff-so-fancy` |
-| directory | `ls` |
-| font | `fontimage` |
-| gpg-encrypted | `gpg` |
-| html | `elinks` `lynx` `w3m` |
-| image | `ueberzug` `chafa` |
-| json | `jq` |
-| markdown | `glow` `mdcat` |
-| office | `libreoffice` |
-| pdf | `pdftoppm` |
-| svg | `convert` |
-| text | `bat` `cat` `highlight` `source-highlight` |
-| torrent | `transmission-show` |
-| video | `ffmpegthumbnailer` |
+| any | [exiftool][exiftool] cat |
+| archive | [atool][atool] |
+| audio | [ffmpegthumbnailer][ffmpegthumbnailer] [ffmpeg][ffmpeg] |
+| diff | [colordiff][colordiff] [delta][delta] [diff-so-fancy][diff-so-fancy] |
+| directory | ls |
+| font | fontimage |
+| gpg-encrypted | [gpg][gpg] |
+| html | [elinks][elinks] [lynx][lynx] [w3m][w3m] |
+| image | [ueberzug][ueberzug] [chafa][chafa] |
+| json | [jq][jq] |
+| markdown | [glow][glow] [mdcat][mdcat] |
+| office | [libreoffice][libreoffice] |
+| pdf | pdftoppm |
+| svg | convert |
+| text | bat cat [highlight][highlight] [source-highlight][source-highlight] |
+| torrent | transmission-show |
+| video | [ffmpegthumbnailer][ffmpegthumbnailer] |
+
+[ffmpegthumbnailer]: https://github.com/dirkvdb/ffmpegthumbnailer
+[w3m]: https://w3m.sourceforge.net/
+[elinks]: http://elinks.cz/
+[fontforge]: https://fontforge.org
+[exiftool]: https://github.com/exiftool/exiftool
+[highlight]: https://gitlab.com/saalen/highlight
+[chafa]: https://github.com/hpjansson/chafa
+[gpg]: https://www.gnupg.org/
+[transmission]: https://transmissionbt.com/
+[delta]: https://github.com/dandavison/delta
+[colordiff]: https://www.colordiff.org/
+[source-highlight]: https://www.gnu.org/software/src-highlite/
+[ueberzug]: https://github.com/seebye/ueberzug
+[mdcat]: https://github.com/swsnr/mdcat
+[glow]: https://github.com/charmbracelet/glow
+[atool]: https://www.nongnu.org/atool/
+[lynx]: https://github.com/jpanther/lynx
+[libreoffice]: https://www.libreoffice.org/
+[diff-so-fancy]: https://github.com/so-fancy/diff-so-fancy
+[imagemagick]: https://imagemagick.org/
+[poppler]: https://poppler.freedesktop.org/
+[jq]: https://github.com/jqlang/jq
+[ffmpeg]: https://ffmpeg.org/
 
 <!--TABLEEND-->
 

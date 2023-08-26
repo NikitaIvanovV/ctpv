@@ -5,11 +5,22 @@
 | File types | Programs |\
 | ---- | ---- |
 
+# Format links
+/^>/ {
+  s/>\t/[/
+  s/\t/]: /
+  be
+}
+
 # Format rows
-s/ /` `/g
-s/\t/ | `/
-s/^/| /
-s/$/` |/
+/^$/! {
+  s/ / /g
+  s/\t/ | /
+  s/^/| /
+  s/$/ |/
+}
+
+:e
 
 # Add a newline at the end
 $a\
