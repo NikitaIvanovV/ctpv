@@ -190,12 +190,9 @@ set cleaner ctpvclear
 If you use Wayland, follow these steps:
 
 * Make sure you use one of the [terminals that support sixel][sixel]
-* Install [this fork of lf][lf-sixel]
 * Install [Chafa][chafa]
 * Add `set chafasixel` to `~/.config/ctpv/config`
-
-As of 2023-03-19, original lf does not support sixel protocol,
-which is why you need use the fork.
+* Add `set sixel true` to `~/.config/lf/lfrc`
 
 ## Documentation
 
