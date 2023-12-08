@@ -173,6 +173,17 @@ programs.lf = {
 }
 ```
 
+### Gentoo
+Add this [ctpv-9999.ebuild](https://github.com/Sneethe/sneethe-overlay/blob/main/app-misc/ctpv/ctpv-9999.ebuild) to your own [repository](https://wiki.gentoo.org/wiki/Creating_an_ebuild_repository). 
+
+Or alternatively: 
+
+```console
+eselect repository add sneethe-overlay git https://github.com/Sneethe/sneethe-overlay.git
+emaint sync --repo sneethe-overlay
+emerge --ask --verbose app-misc/ctpv
+```
+
 ## Integration
 
 ### lf file manager
