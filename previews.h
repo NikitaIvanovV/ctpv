@@ -201,6 +201,7 @@ Preview b_previews[] = {
     PR("Z",        NULL,            NULL,             7z,                      PREV_ATTR_NONE),
     PR("zip",      NULL,            NULL,             7z,                      PREV_ATTR_NONE),
     PR("7z",       NULL,            NULL,             7z,                      PREV_ATTR_NONE),
+    PR("iso",      NULL,            NULL,             7z,                      PREV_ATTR_NONE),
 
     PR("torrent",  NULL,            NULL,             torrent,                 PREV_ATTR_EXT_SHORT),
     PR("gpg",      NULL,            NULL,             gpg,                     PREV_ATTR_EXT_SHORT),
