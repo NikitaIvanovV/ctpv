@@ -115,7 +115,15 @@ sudo make uninstall
 
 ### AUR
 
-If you are an Arch Linux user, you can install
+If you are an Arch Linux user, you can install the stable
+[`ctpv`](https://aur.archlinux.org/packages/ctpv)
+AUR package.
+
+```console
+yay -S ctpv
+```
+
+Otherwise, you can install the
 [`ctpv-git`](https://aur.archlinux.org/packages/ctpv-git)
 AUR package.
 
