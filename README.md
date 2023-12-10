@@ -44,7 +44,7 @@ For example, you only need either `elinks`, `lynx` or
 | File types | Programs |
 | ---- | ---- |
 | any | [exiftool][exiftool] cat |
-| archive | [atool][atool] |
+| archive | [atool][atool] [7z][7z] [bsdtar][bsdtar] |
 | audio | [ffmpegthumbnailer][ffmpegthumbnailer] [ffmpeg][ffmpeg] |
 | diff | [colordiff][colordiff] [delta][delta] [diff-so-fancy][diff-so-fancy] |
 | directory | ls |
@@ -84,6 +84,8 @@ For example, you only need either `elinks`, `lynx` or
 [poppler]: https://poppler.freedesktop.org/
 [jq]: https://github.com/jqlang/jq
 [ffmpeg]: https://ffmpeg.org/
+[7z]: https://www.7-zip.org/
+[bsdtar]: https://github.com/libarchive/libarchive
 
 <!--TABLEEND-->
 
@@ -201,15 +203,18 @@ set cleaner ctpvclear
 
 #### Wayland
 
-If you use Wayland, follow these steps:
+If you use Wayland and are using `lf` version r31, follow these steps:
 
+* Make sure you use one of the [terminals that support sixel][sixel]
+* Install [Chafa][chafa]
+* Add `set chafasixel` to `~/.config/ctpv/config`
+* Add `set sixel true` to `~/.config/lf/lfrc`
+
+Otherwise, if you're using `lf` version r30 and below, follow these steps:
 * Make sure you use one of the [terminals that support sixel][sixel]
 * Install [this fork of lf][lf-sixel]
 * Install [Chafa][chafa]
 * Add `set chafasixel` to `~/.config/ctpv/config`
-
-As of 2023-03-19, original lf does not support sixel protocol,
-which is why you need use the fork.
 
 ## Documentation
 
