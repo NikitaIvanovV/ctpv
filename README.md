@@ -217,7 +217,7 @@ Full documentation on command line options,
 configuration and how to define custom previews can be found here:
 <https://www.nikitaivanov.com/man1/ctpv>
 
-[ueberzug]: https://github.com/seebye/ueberzug
+[ueberzug]: https://github.com/jstkdng/ueberzugpp
 [kitty]: https://github.com/kovidgoyal/kitty
 [chafa]: https://github.com/hpjansson/chafa
 [lf]: https://github.com/gokcehan/lf
