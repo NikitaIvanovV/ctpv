@@ -73,7 +73,7 @@ is_anim_image() {
 chafa_run() {
 	format='-f symbols'
 	autochafa && format=
-	chafasixel && format='-f sixels'
+	chafasixel && format='-f sixels --polite on'
 	chafa -s "${w}x${h}" $format "$1" | sed 's/#/\n#/g'
 }
 
