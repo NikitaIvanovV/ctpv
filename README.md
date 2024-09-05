@@ -56,7 +56,7 @@ For example, you only need either `elinks`, `lynx` or
 | markdown | [glow][glow] [mdcat][mdcat] |
 | office | [libreoffice][libreoffice] |
 | pdf | pdftoppm |
-| svg | convert |
+| svg | magick |
 | text | bat cat [highlight][highlight] [source-highlight][source-highlight] |
 | torrent | transmission-show |
 | video | [ffmpegthumbnailer][ffmpegthumbnailer] |
