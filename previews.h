@@ -48,6 +48,11 @@ Preview b_previews[] = {
     PR(NULL,      "application",    "pdf",            pdf,                     PREV_ATTR_NONE),
     PR(NULL,      "application",    "json",           jq,                      PREV_ATTR_NONE),
 
+    PR(NULL,      "application",    "javascript",     bat,                     PREV_ATTR_NONE),
+    PR(NULL,      "application",    "javascript",     highlight,               PREV_ATTR_NONE),
+    PR(NULL,      "application",    "javascript",     source_highlight,        PREV_ATTR_NONE),
+    PR(NULL,      "application",    "javascript",     cat,                     PREV_ATTR_NONE),
+
     PR(NULL,      "inode",          "directory",      ls,                      PREV_ATTR_NONE),
     PR(NULL,      "inode",          "symlink",        symlink,                 PREV_ATTR_NONE),
 
